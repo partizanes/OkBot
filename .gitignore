@@ -103,3 +103,4 @@ ENV/
 *.cfg
 *.log
 /__pycache__
+.vs
