@@ -1,0 +1,57 @@
+# -*- coding: utf-8 -*-
+# by Part!zanes 2017
+
+import time
+import telepot
+from log import Log
+from config import Config
+from telepot.loop import MessageLoop
+
+Config.initializeConfig()
+AdminList = Config.getAdminList()
+GroupId = Config.getGroupId()
+PrivateId = Config.getPrivateId()
+
+class OpenBot(telepot.Bot):
+    pass
+    botLog = Log('Bot')
+
+    def sendMessageMe(self, msg):
+       self.sendMessage(PrivateId, msg)
+
+    def sendMessageGroup(self, msg):
+        self.sendMessage(GroupId, msg)
+
+    def checkAuth(self,id,username):
+        try:
+            if(AdminList[id] == username): return True
+        except Exception:
+            return False
+
+    def send(self, username, chat_id, message, answer):
+        self.botLog.info("[%s][%s]Message: %s. Answer: %s"%(username, chat_id, message, answer))
+        self.sendMessage(chat_id, answer)
+
+    def handle(self, msg):
+        self.botLog.debug(msg)
+
+        content_type, chat_type, chat_id = telepot.glance(msg)
+        id, username, message = msg['from']['id'],msg['from']['username'],msg['text']
+
+        if(self.checkAuth(id,username)): 
+            if(content_type == 'text'):
+                self.send(username, chat_id, message, 'Сообщение получено и обработано.')
+                #Обработчик сообщения
+            else:
+                self.send(username, chat_id, '', 'Данный контент не поддерживается.')
+        else:
+            self.send(username, chat_id, message,'Вы не авторизованы.')
+
+    def listening(self):
+        self.botLog.info('Bot started.Listening...\n')
+        MessageLoop(self, self.handle).run_as_thread()
+        
+        while 1:
+            time.sleep(10)
+
+
