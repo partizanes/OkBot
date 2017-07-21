@@ -40,7 +40,7 @@ class Datebase(object):
             AND hdp_ticket_replies.ticket_id IS NULL
             """
 
-        self.dbLog.warning(sql + '\n')
+        #self.dbLog.warning(sql + '\n')
 
         self.cur.execute(sql)
         return self.cur.fetchall()    
