@@ -4,14 +4,43 @@
 import re
 import sys
 import time
-from datebase import Datebase
 from log import Log
 from ticket import Ticket
+from datebase import Datebase
+from accountloader import *
+from cpanelapiclient import cpanelApiClient
+from openbot import openbot
+from config import Config
 
 
 class CheckHandler(object):
     CheckHandlerLog = Log('CheckHandler')
     
+    def parseDomainbyTask(self, ticket):
+        try:
+            domain = re.search(u'Изменение тарифного плана виртуального хостинга для домена (.+?)</td>', ticket.message).group(1)
+            #prevPackage  = re.search(u'с плана \"(.+?)" на план', ticket.message).group(1)
+            afterPackage  = re.search(u'на план \"(.+?)"\.<br', ticket.message).group(1)
+
+            hosting = cpanelUsersAccounts[domain].server
+            username = cpanelUsersAccounts[domain].username
+
+            answer = cpanelApiClient[hosting].call('changepackage',user=username,pkg=afterPackage)['result'][0]
+            status = int(answer['status'])
+            message = answer['statusmsg']
+            #self.CheckHandlerLog.info("[Package][%s] Сообщение: %s" %(domain , message))
+
+            if(status == 1):
+                self.CheckHandlerLog.info("[Package][%s][%s] смена тарифного плана. " %(ticket.ticket_id, domain))
+                self.openbot.sendMessageMe("[Package][%s][%s] смена тарифного плана. " %(ticket.ticket_id, domain))
+                Datebase().setTicketClose(ticket.ticket_id)
+            else:
+                self.CheckHandlerLog.critical("[Package][%s][%s] %s." %(ticket.ticket_id, domain, message))
+                self.openbot.sendMessageMe("[Package][%s][%s] %s. " %(ticket.ticket_id, domain, message))
+        except Exception as inst:
+            self.CheckHandlerLog.critical(inst)
+            self.CheckHandlerLog.critical(sys.exc_info()[0])
+
     def getListTickets(self):
         try:
             list = []
@@ -57,12 +86,15 @@ class CheckHandler(object):
                 self.openbot.sendMessageMe("[API unblock][%s] Закрыт" % ticket.ticket_id)
                 Datebase().setTicketClose(ticket.ticket_id)
                 continue
-            #else:
-                #self.openbot.sendMessageGroup("[%s] Новая заявка \n %s \n %s" % (ticket.ticket_id,ticket.subject,ticket.message))
+            if (ticket.client_id == 94434):
+                self.parseDomainbyTask(ticket)
+                continue
 
-    def start(self, openbot):
+    def start(self):
         self.CheckHandlerLog.info('CheckHandler started.')
         self.openbot = openbot
+
+        loadDataFromServers()
 
         while 1:
             self.checkNewMessage()

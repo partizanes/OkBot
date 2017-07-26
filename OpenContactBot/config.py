@@ -39,7 +39,14 @@ class Config(object):
     @staticmethod
     def getMysqlPass():
         return Config.getConfigValue('helpDeskMysql', 'password')
-    
+        
+    @staticmethod
+    def getCpanelPass():
+        return Config.getConfigValue('cpanel', 'password')
+
+    def getCpanelToken(value):
+        return Config.getConfigValue('cpanel', value)
+
     @staticmethod
     def getPrivateId():
         return Config.getConfigValue('security', 'privateId')

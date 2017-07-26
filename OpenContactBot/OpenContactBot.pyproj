@@ -21,13 +21,22 @@
     <EnableUnmanagedDebugging>false</EnableUnmanagedDebugging>
   </PropertyGroup>
   <ItemGroup>
+    <Compile Include="accountloader.py">
+      <SubType>Code</SubType>
+    </Compile>
     <Compile Include="checkHandler.py">
       <SubType>Code</SubType>
     </Compile>
     <Compile Include="config.py">
       <SubType>Code</SubType>
     </Compile>
+    <Compile Include="cpanelapi\client.py" />
+    <Compile Include="cpanelapi\exceptions.py" />
+    <Compile Include="cpanelapi\__init__.py" />
     <Compile Include="crypto.py">
+      <SubType>Code</SubType>
+    </Compile>
+    <Compile Include="cpanelapiclient.py">
       <SubType>Code</SubType>
     </Compile>
     <Compile Include="datebase.py">
@@ -37,6 +46,9 @@
       <SubType>Code</SubType>
     </Compile>
     <Compile Include="core.py" />
+    <Compile Include="module1.py">
+      <SubType>Code</SubType>
+    </Compile>
     <Compile Include="openbot.py">
       <SubType>Code</SubType>
     </Compile>
@@ -46,9 +58,15 @@
     <Compile Include="ticketStatus.py">
       <SubType>Code</SubType>
     </Compile>
+    <Compile Include="cpaneluser.py">
+      <SubType>Code</SubType>
+    </Compile>
   </ItemGroup>
   <ItemGroup>
     <Content Include="config.cfg" />
+  </ItemGroup>
+  <ItemGroup>
+    <Folder Include="cpanelapi\" />
   </ItemGroup>
   <Import Project="$(MSBuildExtensionsPath32)\Microsoft\VisualStudio\v$(VisualStudioVersion)\Python Tools\Microsoft.PythonTools.targets" />
   <!-- Uncomment the CoreCompile target to enable the Build command in

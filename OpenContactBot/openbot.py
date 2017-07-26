@@ -47,11 +47,19 @@ class OpenBot(telepot.Bot):
         else:
             self.send(username, chat_id, message,'Вы не авторизованы.')
 
+    def on_callback_query(self, msg):
+        query_id, from_id, query_data = telepot.glance(msg, flavor='callback_query')
+        print('Callback Query:', query_id, from_id, query_data)
+
+        self.answerCallbackQuery(query_id, text='Принято')
+
     def listening(self):
         self.botLog.info('Bot started.Listening...\n')
-        MessageLoop(self, self.handle).run_as_thread()
-        
+        MessageLoop(self, {'chat': self.handle,
+                  'callback_query': self.on_callback_query}).run_as_thread()
+
         while 1:
             time.sleep(10)
 
 
+openbot = OpenBot(Config.getToken())
