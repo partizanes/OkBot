@@ -29,7 +29,4 @@ t3.start()
 
 while 1:
     time.sleep(10)
-    coreLog.info('tick.')
-
-    #openbot.sendMessage('233355404', 'test')
-    #bot.okbot.sendMessage('-201136336', 'test')
+    #coreLog.info('tick.')

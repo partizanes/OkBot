@@ -2,7 +2,7 @@
 # by Part!zanes 2017
 
 class Ticket(object):
-    def __init__(self, ticket_id, status, client_id, subject, message, client_last_activity, dept_id, ticket_created, sent_date, timezone):
+    def __init__(self, ticket_id, status, client_id, subject, message, client_last_activity, dept_id, ticket_created, sent_date, timezone, email):
         self.ticket_id = ticket_id
         self.status = status
         self.client_id = client_id
@@ -13,6 +13,7 @@ class Ticket(object):
         self.ticket_created = ticket_created
         self.sent_date = sent_date
         self.timezone = timezone
+        self.email = email
 
         #def ticketClose():
 
@@ -25,3 +26,5 @@ class Ticket(object):
 #if('N' == TicketStatus.NEW):
 #    print('true')
 #
+
+activeTickets = {}

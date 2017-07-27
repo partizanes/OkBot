@@ -33,9 +33,10 @@ class Datebase(object):
     
     def getNewTicketsRows(self):
         sql = """
-            SELECT hdp_tickets.ticket_id,status,client_id,hdp_tickets.subject,message,
-            client_last_activity,dept_id,ticket_created,sent_date,timezone FROM hdp_tickets 
+            SELECT hdp_tickets.ticket_id,STATUS,hdp_tickets.client_id,hdp_tickets.subject,message,
+            client_last_activity,dept_id,ticket_created,sent_date,timezone,hdp_clients.email FROM hdp_tickets 
             LEFT OUTER JOIN hdp_ticket_replies ON hdp_tickets.ticket_id = hdp_ticket_replies.ticket_id
+            LEFT JOIN hdp_clients ON hdp_tickets.client_id = hdp_clients.client_id
             WHERE hdp_tickets.status = 'N' AND hdp_tickets.dept_id = 2 AND assigned_to = 0 
             AND hdp_ticket_replies.ticket_id IS NULL
             """

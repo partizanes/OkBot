@@ -11,6 +11,7 @@ from accountloader import *
 from cpanelapiclient import cpanelApiClient
 from openbot import openbot
 from config import Config
+from ticket import activeTickets
 
 
 class CheckHandler(object):
@@ -47,12 +48,22 @@ class CheckHandler(object):
             results = Datebase().getNewTicketsRows()
 
             for row in results:
-                list.append(Ticket(row[0],row[1],row[2],row[3],row[4],row[5],row[6],row[7],row[8],row[9]))
+                list.append(Ticket(row[0], row[1], row[2], row[3], row[4], row[5], row[6], row[7], row[8], row[9], row[10]))
 
             return list
         except Exception as inst:
             self.CheckHandlerLog.critical(inst)
             self.CheckHandlerLog.critical(sys.exc_info()[0])
+
+    def undefinedTicket(self, ticket):
+        if (ticket.ticket_id not in activeTickets):
+            activeTickets[ticket.ticket_id] = ticket
+            self.CheckHandlerLog.info("[Ticket][%s] Новая Заявка.\n %s \n %s \n %s" %(ticket.ticket_id, ticket.email, ticket.subject, ticket.message))
+            self.openbot.sendMessageMe("[Ticket][%s] Новая Заявка.\n %s \n %s \n %s" %(ticket.ticket_id, ticket.email, ticket.subject, ticket.message))
+            self.openbot.sendMessageGroup("[Ticket][%s] Новая Заявка.\n %s \n %s \n %s" %(ticket.ticket_id, ticket.email, ticket.subject, ticket.message))
+        else:
+            self.CheckHandlerLog.debug("[Ticket][%s] Заявка уже содержится в списке." % ticket.ticket_id)
+
 
     def checkNewMessage(self):
         for ticket in self.getListTickets():
@@ -71,6 +82,7 @@ class CheckHandler(object):
                 self.CheckHandlerLog.info("[Pазблокировка][%s] Закрыт" % ticket.ticket_id)
                 self.openbot.sendMessageMe("[Pазблокировка][%s] Закрыт" % ticket.ticket_id)
                 Datebase().setTicketClose(ticket.ticket_id)
+                continue
             if re.match("\[s.\.open.by\] Disk Usage Warning: The user", ticket.subject):
                 self.CheckHandlerLog.info("[Квота][%s] Закрыт" % ticket.ticket_id)
                 self.openbot.sendMessageMe("Квота[%s] Закрыт" % ticket.ticket_id)
@@ -89,6 +101,9 @@ class CheckHandler(object):
             if (ticket.client_id == 94434):
                 self.parseDomainbyTask(ticket)
                 continue
+            else:
+                self.undefinedTicket(ticket)
+
 
     def start(self):
         self.CheckHandlerLog.info('CheckHandler started.')

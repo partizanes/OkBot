@@ -6,6 +6,7 @@ import telepot
 from log import Log
 from config import Config
 from telepot.loop import MessageLoop
+from ticket import activeTickets
 
 Config.initializeConfig()
 AdminList = Config.getAdminList()
