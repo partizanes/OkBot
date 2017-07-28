@@ -39,6 +39,10 @@ class OpenBot(telepot.Bot):
         content_type, chat_type, chat_id = telepot.glance(msg)
         id, username, message = msg['from']['id'],msg['from']['username'],msg['text']
 
+        if (content_type, chat_type, chat_id, id, username, message) is None:
+            self.botLog.critical("Сообщение не обработано.")
+            return
+
         if(self.checkAuth(id,username)): 
             if(content_type == 'text'):
                 self.send(username, chat_id, message, 'Сообщение получено и обработано.')

@@ -59,14 +59,21 @@ class CheckHandler(object):
         if (ticket.ticket_id not in activeTickets):
             activeTickets[ticket.ticket_id] = ticket
             self.CheckHandlerLog.info("[Ticket][%s] Новая Заявка.\n %s \n %s \n %s" %(ticket.ticket_id, ticket.email, ticket.subject, ticket.message))
-            self.openbot.sendMessageMe("[Ticket][%s] Новая Заявка.\n %s \n %s \n %s" %(ticket.ticket_id, ticket.email, ticket.subject, ticket.message))
+            #self.openbot.sendMessageMe("[Ticket][%s] Новая Заявка.\n %s \n %s \n %s" %(ticket.ticket_id, ticket.email, ticket.subject, ticket.message))
             self.openbot.sendMessageGroup("[Ticket][%s] Новая Заявка.\n %s \n %s \n %s" %(ticket.ticket_id, ticket.email, ticket.subject, ticket.message))
-        else:
-            self.CheckHandlerLog.debug("[Ticket][%s] Заявка уже содержится в списке." % ticket.ticket_id)
-
+        #else:
+            #self.CheckHandlerLog.debug("[Ticket][%s] Заявка уже содержится в списке." % ticket.ticket_id)
 
     def checkNewMessage(self):
-        for ticket in self.getListTickets():
+        tickets  = self.getListTickets()
+        
+        if not tickets:
+            return
+
+        global activeTickets
+        activeTickets = {k: activeTickets[k] for k  in activeTickets.keys() & set(ticket.ticket_id for ticket in tickets)}
+
+        for ticket in tickets:
             time.sleep(0.5)
             if re.match("\[s.\.open.by\] New account: \w{1,16}", ticket.subject):
                 self.CheckHandlerLog.info("[Создание][%s] Закрыт" % ticket.ticket_id)
