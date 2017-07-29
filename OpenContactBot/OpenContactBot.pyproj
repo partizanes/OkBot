@@ -64,6 +64,7 @@
   </ItemGroup>
   <ItemGroup>
     <Content Include="config.cfg" />
+    <Content Include="requirements.txt" />
   </ItemGroup>
   <ItemGroup>
     <Folder Include="cpanelapi\" />
