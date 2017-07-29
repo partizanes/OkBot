@@ -18,29 +18,50 @@ class CheckHandler(object):
     CheckHandlerLog = Log('CheckHandler')
     
     def parseDomainbyTask(self, ticket):
-        try:
-            domain = re.search(u'Изменение тарифного плана виртуального хостинга для домена (.+?)</td>', ticket.message).group(1)
-            #prevPackage  = re.search(u'с плана \"(.+?)" на план', ticket.message).group(1)
-            afterPackage  = re.search(u'на план \"(.+?)"\.<br', ticket.message).group(1)
+        if re.match(u'Ошибки при автоматическом запуске хостинга', ticket.subject):
+            try:
+                error = re.search(u'Error: There was an error:\n(.+?)<br \/>', ticket.message).group(1)
 
-            hosting = cpanelUsersAccounts[domain].server
-            username = cpanelUsersAccounts[domain].username
+                if('Время ожидания операции истекло' in error):
+                    self.CheckHandlerLog.info("[Таймаут][%s] Закрыт" % ticket.ticket_id)
+                    self.openbot.sendMessageMe("[Таймаут][%s] Закрыт" % ticket.ticket_id)
+                    Datebase().setTicketClose(ticket.ticket_id)
+                    return
+                else:
+                    self.CheckHandlerLog.info("[Таймаут][%s] Ошибка: %s" %(ticket.ticket_id, error))
+                    self.openbot.sendMessageMe("[Таймаут][%s] Ошибка: %s" %(ticket.ticket_id, error))
 
-            answer = cpanelApiClient[hosting].call('changepackage',user=username,pkg=afterPackage)['result'][0]
-            status = int(answer['status'])
-            message = answer['statusmsg']
-            #self.CheckHandlerLog.info("[Package][%s] Сообщение: %s" %(domain , message))
+            except Exception as inst:
+                self.CheckHandlerLog.critical("[parseDomainbyTask][запуск хостинга] %s" %(inst))
+                self.CheckHandlerLog.critical(sys.exc_info()[0])
 
-            if(status == 1):
-                self.CheckHandlerLog.info("[Package][%s][%s] смена тарифного плана. " %(ticket.ticket_id, domain))
-                self.openbot.sendMessageMe("[Package][%s][%s] смена тарифного плана. " %(ticket.ticket_id, domain))
-                Datebase().setTicketClose(ticket.ticket_id)
-            else:
-                self.CheckHandlerLog.critical("[Package][%s][%s] %s." %(ticket.ticket_id, domain, message))
-                self.openbot.sendMessageMe("[Package][%s][%s] %s. " %(ticket.ticket_id, domain, message))
-        except Exception as inst:
-            self.CheckHandlerLog.critical(inst)
-            self.CheckHandlerLog.critical(sys.exc_info()[0])
+        if re.match(u'Изменение тарифного плана виртуального хостинга для домена', ticket.subject):
+            try:
+                domain = re.search(u'Изменение тарифного плана виртуального хостинга для домена (.+?)</td>', ticket.message).group(1)
+                #prevPackage  = re.search(u'с плана \"(.+?)" на план', ticket.message).group(1)
+                afterPackage  = re.search(u'на план \"(.+?)"\.<br', ticket.message).group(1)
+
+                hosting = cpanelUsersAccounts[domain].server
+                username = cpanelUsersAccounts[domain].username
+
+                answer = cpanelApiClient[hosting].call('changepackage',user=username,pkg=afterPackage)['result'][0]
+                status = int(answer['status'])
+                message = answer['statusmsg']
+                #self.CheckHandlerLog.info("[Package][%s] Сообщение: %s" %(domain , message))
+
+                if(status == 1):
+                    self.CheckHandlerLog.info("[Package][%s][%s] смена тарифного плана. " %(ticket.ticket_id, domain))
+                    self.openbot.sendMessageMe("[Package][%s][%s] смена тарифного плана. " %(ticket.ticket_id, domain))
+                    Datebase().setTicketClose(ticket.ticket_id)
+                else:
+                    self.CheckHandlerLog.critical("[Package][%s][%s] %s." %(ticket.ticket_id, domain, ticket.message))
+                    self.openbot.sendMessageMe("[Package][%s][%s] %s. " %(ticket.ticket_id, domain, ticket.message))
+            except Exception as inst:
+                self.CheckHandlerLog.critical("[Package] %s" %(inst))
+                self.CheckHandlerLog.critical(sys.exc_info()[0])
+        else:
+            self.CheckHandlerLog.critical("[parseDomainbyTask][%s] Заявка не классифицирована." %(ticket.ticket_id))
+            self.openbot.sendMessageMe("[parseDomainbyTask][%s] Заявка не классифицирована. " %(ticket.ticket_id))
 
     def getListTickets(self):
         try:
@@ -52,7 +73,7 @@ class CheckHandler(object):
 
             return list
         except Exception as inst:
-            self.CheckHandlerLog.critical(inst)
+            self.CheckHandlerLog.critical("[getListTickets] %s" %(inst))
             self.CheckHandlerLog.critical(sys.exc_info()[0])
 
     def undefinedTicket(self, ticket):
