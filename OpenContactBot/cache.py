@@ -34,5 +34,14 @@ def isOutdated(name):
         return True
 
     cacheLog.info('Cache %s active.' %(name))
-    return False 
+    return False
 
+def getTimeToStartCron(name):
+    filePath = u.patchJoin(cacheDir,name + '.pkl')
+
+    if u.fileExits(filePath):
+        fileChangeTime = u.getFileChangeTime(filePath)
+
+        return (18001 -(time.time() - fileChangeTime))
+    else:
+        return 60

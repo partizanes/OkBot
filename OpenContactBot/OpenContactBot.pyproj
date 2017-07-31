@@ -24,7 +24,13 @@
     <Compile Include="accountloader.py">
       <SubType>Code</SubType>
     </Compile>
+    <Compile Include="cache.py">
+      <SubType>Code</SubType>
+    </Compile>
     <Compile Include="checkHandler.py">
+      <SubType>Code</SubType>
+    </Compile>
+    <Compile Include="util.py">
       <SubType>Code</SubType>
     </Compile>
     <Compile Include="config.py">
