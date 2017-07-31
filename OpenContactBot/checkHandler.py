@@ -116,12 +116,12 @@ class CheckHandler(object):
                 self.openbot.sendMessageMe("Квота[%s] Закрыт" % ticket.ticket_id)
                 Datebase().setTicketClose(ticket.ticket_id)
                 continue
-            if re.match(u"\<\!\-\- head not allowed \-\->Домен\: \w{1,25}(\.\w{1,25})?\.\w{1,5}\; Сервер\: http(s)?\:\/\/s\d\.open\.by\:2087\/json\-api\/\; Действие: Успешно заблокирован", ticket.message):
+            if re.match(u"\<\!\-\- head not allowed \-\->Домен\: \w{1,25}(-)?(\.)?(\w{1,25})?(\.)?\w{1,5}\; Сервер\: http(s)?\:\/\/s\d\.open\.by\:2087\/json\-api\/\; Действие: Успешно заблокирован", ticket.message):
                 self.CheckHandlerLog.info("[API block][%s] Закрыт" % ticket.ticket_id)
                 self.openbot.sendMessageMe("[API block][%s] Закрыт" % ticket.ticket_id)
                 Datebase().setTicketClose(ticket.ticket_id)
                 continue
-            if re.match(u"\<\!\-\- head not allowed \-\->Домен\: \w{1,25}(\.\w{1,25})?\.\w{1,5}\; Сервер\: http(s)?\:\/\/s\d\.open\.by\:2087\/json\-api\/\; Действие: Успешно разблокирован", ticket.message):
+            if re.match(u"\<\!\-\- head not allowed \-\->Домен\: \w{1,25}(-)?(\.)?(\w{1,25})?(\.)?\w{1,5}\; Сервер\: http(s)?\:\/\/s\d\.open\.by\:2087\/json\-api\/\; Действие: Успешно разблокирован", ticket.message):
                 self.CheckHandlerLog.info("[API unblock][%s] Закрыт" % ticket.ticket_id)
                 self.openbot.sendMessageMe("[API unblock][%s] Закрыт" % ticket.ticket_id)
                 Datebase().setTicketClose(ticket.ticket_id)
