@@ -104,3 +104,5 @@ ENV/
 *.log
 /__pycache__
 .vs
+/cache
+*.pkl
