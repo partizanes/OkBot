@@ -7,12 +7,12 @@ import time
 from log import Log
 from ticket import Ticket
 from datebase import Datebase
-from accountloader import *
+from accountloader import loadDataFromServers
+from accountloader import getAccountsList
 from cpanelapiclient import cpanelApiClient
 from openbot import openbot
 from config import Config
 from ticket import activeTickets
-
 
 class CheckHandler(object):
     CheckHandlerLog = Log('CheckHandler')
@@ -35,12 +35,13 @@ class CheckHandler(object):
                 self.CheckHandlerLog.critical("[parseDomainbyTask][запуск хостинга] %s" %(inst))
                 self.CheckHandlerLog.critical(sys.exc_info()[0])
 
-        if re.match(u'Изменение тарифного плана виртуального хостинга для домена', ticket.subject):
+        if re.match(u'Изменение тарифного плана виртуального хостинга для домена', ticket.subject) or (re.search(u'\<td\>В ДМС изменен тарифный план виртуального хостинга для домена', ticket.message) is not None):
             try:
                 domain = re.search(u'Изменение тарифного плана виртуального хостинга для домена (.+?)</td>', ticket.message).group(1)
                 #prevPackage  = re.search(u'с плана \"(.+?)" на план', ticket.message).group(1)
                 afterPackage  = re.search(u'на план \"(.+?)"\.<br', ticket.message).group(1)
 
+                cpanelUsersAccounts = getAccountsList()
                 hosting = cpanelUsersAccounts[domain].server
                 username = cpanelUsersAccounts[domain].username
 
@@ -138,7 +139,7 @@ class CheckHandler(object):
         self.openbot = openbot
 
         loadDataFromServers()
-
+        
         while 1:
             self.checkNewMessage()
             time.sleep(30)

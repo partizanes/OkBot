@@ -15,7 +15,7 @@ def loadDataFromServers():
 
     log.info("Loading Account list...")
 
-    global CpanelAccountList
+    global cpanelUsersAccounts
 
     for hosting,client in cpanelApiClient.items():
         for accountData in (client.call('listaccts')['acct']):
@@ -27,13 +27,12 @@ def loadDataFromServers():
     log.info("...completed.Found %s accounts" %(len(cpanelUsersAccounts)))
 
 def reloadData():
-    global CpanelAccountList
+    global cpanelUsersAccounts
     
     log.info("Cleanup cpanelUsersAccounts...")
     cpanelUsersAccounts.clear()
     log.info("...cleaned")
     loadDataFromServers()
-
 
 def cronReloadListAccounts():
     while 1:
@@ -44,11 +43,14 @@ def cronReloadListAccounts():
         reloadData()
 
 def loadFromCache():
-    global CpanelAccountList
+    global cpanelUsersAccounts
+
     log.info("Loading Account list from cache...")
     cpanelUsersAccounts = load_obj('cpanelUsersAccounts')
     log.info("...completed.Found %s accounts" %(len(cpanelUsersAccounts)))
 
+def getAccountsList():
+    return cpanelUsersAccounts
 
-log = Log('CpanelAccountList')
+log = Log('cpanelUsersAccounts')
 cpanelUsersAccounts = {}
