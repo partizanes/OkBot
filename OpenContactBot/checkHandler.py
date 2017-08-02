@@ -139,10 +139,17 @@ class CheckHandler(object):
                 Datebase().setTicketClose(ticket.ticket_id)
                 continue
             if re.match("\[s.\.open.by\] Disk Usage Warning: The user", ticket.subject):
-                self.CheckHandlerLog.info("[Квота][%s] Закрыт" % ticket.ticket_id)
-                self.openbot.sendMessageMe("Квота[%s] Закрыт" % ticket.ticket_id)
-                Datebase().setTicketClose(ticket.ticket_id)
-                continue
+                if re.match("\[s.\.open.by\] Disk Usage Warning: The user", subject):
+                    try:
+                        account = re.search('Disk quota notification for \“(.+?)\”\.', message).group(1)
+                        quota = re.search('The account currently uses (.+?) of its',message).group(1)
+                        self.CheckHandlerLog.info("[Квота][%s] [%s] %s" % (ticket.ticket_id, account, quota))
+                        self.openbot.sendMessageMe("[Квота][%s] [%s] %s" % (ticket.ticket_id, account, quota))
+                        Datebase().setTicketClose(ticket.ticket_id)
+                    except Exception as inst:
+                        self.CheckHandlerLog.critical("[DiskUsageWarning] %s" % (inst))
+                        self.CheckHandlerLog.critical(sys.exc_info()[0])
+                    continue
             if re.match(u"\<\!\-\- head not allowed \-\->Домен\: \w{1,25}(-)?(\.)?(\w{1,25})?(\.)?\w{1,5}\; Сервер\: http(s)?\:\/\/s\d\.open\.by\:2087\/json\-api\/\; Действие: Успешно заблокирован", ticket.message):
                 self.CheckHandlerLog.info("[API block][%s] Закрыт" % ticket.ticket_id)
                 self.openbot.sendMessageMe("[API block][%s] Закрыт" % ticket.ticket_id)
