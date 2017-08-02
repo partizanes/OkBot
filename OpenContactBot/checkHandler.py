@@ -153,6 +153,10 @@ class CheckHandler(object):
                 self.openbot.sendMessageMe("[API unblock][%s] Закрыт" % ticket.ticket_id)
                 Datebase().setTicketClose(ticket.ticket_id)
                 continue
+            if re.match(u"\[s.\.open.by\] Account Terminated:", ticket.subject):
+                self.CheckHandlerLog.info("[Удаление][%s] Закрыт" % ticket.ticket_id)
+                self.openbot.sendMessageMe("Удаление[%s] Закрыт" % ticket.ticket_id)
+                Datebase().setTicketClose(ticket.ticket_id)
             if (ticket.client_id == 94434):
                 self.parseDomainbyTask(ticket)
                 continue
