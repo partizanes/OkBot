@@ -10,13 +10,26 @@ from datebase import Datebase
 from accountloader import loadDataFromServers
 from accountloader import getAccountsList
 from cpanelapiclient import cpanelApiClient
-from openbot import openbot
 from config import Config
+from cache import save_obj
+from cache import load_obj
+from openbot import openbot
 from ticket import activeTickets
 
 class CheckHandler(object):
     CheckHandlerLog = Log('CheckHandler')
     
+    def loadCacheActiveTasks(self):
+        global activeTickets
+
+        try:
+            temp = load_obj('activeTickets')
+
+            if (len(temp) > 0):
+                activeTickets = temp
+        except:
+            pass
+
     def parseDomainbyTask(self, ticket):
         if re.match(u'Ошибки при автоматическом запуске хостинга', ticket.subject):
             try:
@@ -88,12 +101,25 @@ class CheckHandler(object):
 
     def checkNewMessage(self):
         tickets  = self.getListTickets()
-        
-        if not tickets:
-            return
 
         global activeTickets
+
+        try:
+            closedTickets = {k: activeTickets[k] for k  in activeTickets.keys() ^ set(ticket.ticket_id for ticket in tickets)}
+
+            for cTicket in closedTickets:
+                self.CheckHandlerLog.info("[Заявка][%s] обработана вручную." % cTicket)
+                self.openbot.sendMessageMe("[Заявка][%s] обработана вручную." % cTicket)
+        except KeyError:
+            pass
+            #self.CheckHandlerLog.critical("[checkNewMessage] %s" %(inst))
+            #self.CheckHandlerLog.critical(sys.exc_info()[0]) 
+
         activeTickets = {k: activeTickets[k] for k  in activeTickets.keys() & set(ticket.ticket_id for ticket in tickets)}
+        save_obj(activeTickets,'activeTickets')
+
+        if not tickets:
+            return
 
         for ticket in tickets:
             time.sleep(0.5)
@@ -139,7 +165,8 @@ class CheckHandler(object):
         self.openbot = openbot
 
         loadDataFromServers()
-        
+        self.loadCacheActiveTasks()
+
         while 1:
             self.checkNewMessage()
             time.sleep(30)
