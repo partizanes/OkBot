@@ -19,6 +19,11 @@ from ticket import activeTickets
 class CheckHandler(object):
     CheckHandlerLog = Log('CheckHandler')
     
+    #not implement active value with add from telegram and write to configuration file
+    def getBannedEmail(self):
+        self.CheckHandlerLog.info("NOT IMPLEMENT")
+        return ['info@twitter.com', 'test@test.test']
+
     def loadCacheActiveTasks(self):
         global activeTickets
 
@@ -139,17 +144,16 @@ class CheckHandler(object):
                 Datebase().setTicketClose(ticket.ticket_id)
                 continue
             if re.match("\[s.\.open.by\] Disk Usage Warning: The user", ticket.subject):
-                if re.match("\[s.\.open.by\] Disk Usage Warning: The user", subject):
-                    try:
-                        account = re.search('Disk quota notification for \“(.+?)\”\.', message).group(1)
-                        quota = re.search('The account currently uses (.+?) of its',message).group(1)
-                        self.CheckHandlerLog.info("[Квота][%s] [%s] %s" % (ticket.ticket_id, account, quota))
-                        self.openbot.sendMessageMe("[Квота][%s] [%s] %s" % (ticket.ticket_id, account, quota))
-                        Datebase().setTicketClose(ticket.ticket_id)
-                    except Exception as inst:
-                        self.CheckHandlerLog.critical("[DiskUsageWarning] %s" % (inst))
-                        self.CheckHandlerLog.critical(sys.exc_info()[0])
-                    continue
+                try:
+                    account = re.search('Disk quota notification for \“(.+?)\”\.', ticket.message).group(1)
+                    quota = re.search('The account currently uses (.+?) of its', ticket.message).group(1)
+                    self.CheckHandlerLog.info("[Квота][%s] [%s] %s" % (ticket.ticket_id, account, quota))
+                    self.openbot.sendMessageMe("[Квота][%s] [%s] %s" % (ticket.ticket_id, account, quota))
+                    Datebase().setTicketClose(ticket.ticket_id)
+                except Exception as inst:
+                    self.CheckHandlerLog.critical("[DiskUsageWarning] %s" % (inst))
+                    self.CheckHandlerLog.critical(sys.exc_info()[0])
+                continue
             if re.match(u"\<\!\-\- head not allowed \-\->Домен\: \w{1,25}(-)?(\.)?(\w{1,25})?(\.)?\w{1,5}\; Сервер\: http(s)?\:\/\/s\d\.open\.by\:2087\/json\-api\/\; Действие: Успешно заблокирован", ticket.message):
                 self.CheckHandlerLog.info("[API block][%s] Закрыт" % ticket.ticket_id)
                 self.openbot.sendMessageMe("[API block][%s] Закрыт" % ticket.ticket_id)
@@ -167,6 +171,11 @@ class CheckHandler(object):
                 continue
             if (ticket.client_id == 94434):
                 self.parseDomainbyTask(ticket)
+                continue
+            if ticket.email in self.getBannedEmail():
+                self.CheckHandlerLog.info("[Spam][%s] Перемещен" % ticket.ticket_id)
+                self.openbot.sendMessageMe("[Spam][%s] Перемещен" % ticket.ticket_id)
+                Datebase().setTicketSpam(ticket.ticket_id)
                 continue
             else:
                 self.undefinedTicket(ticket)

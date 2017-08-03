@@ -46,7 +46,7 @@ class Datebase(object):
         self.cur.execute(sql)
         return self.cur.fetchall()    
 
-    def setTicketClose(self,ticket_id):
+    def setTicketClose(self, ticket_id):
         sql = "UPDATE hdp_tickets SET status = 'C' WHERE `ticket_id` = '%s'"  % ticket_id
         
         self.dbLog.warning(sql + '\n')
@@ -54,8 +54,17 @@ class Datebase(object):
         self.cur.fetchone()
 
         self.addPrivateReply(ticket_id,'[OpenContactBot] Заявка закрыта.')
+    
+    def setTicketSpam(self, ticket_id):
+        sql = "UPDATE hdp_tickets SET status = 'S' WHERE `ticket_id` = '%s'"  % ticket_id
 
-    def addPrivateReply(self,ticket_id,message):
+        self.dbLog.warning(sql + '\n')
+        self.cur.execute(sql)
+        self.cur.fetchone()
+
+        self.addPrivateReply(ticket_id,'[OpenContactBot] Перемещено в спам.')
+
+    def addPrivateReply(self, ticket_id, message):
         sql = """
             insert into hdp_ticket_replies (reporter_id,ticket_id,replied_on,reply,reporter,subject,
             change_status,private,readflag,draft,internal_message,reply_minutes,responded_from,resolution_item)
