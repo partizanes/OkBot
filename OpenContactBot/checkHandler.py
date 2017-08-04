@@ -107,6 +107,8 @@ class CheckHandler(object):
     def checkNewReplies(self):
         replied_tickets = Datebase().getRepliesTicketsIdList()
 
+        global activeRepTickets
+
         if(len(activeRepTickets) != 0):
             try:
                 closedTickets = set(replied_tickets) ^ set(activeRepTickets)
@@ -117,12 +119,18 @@ class CheckHandler(object):
             except KeyError:
                 pass
 
+            activeRepTickets = list(set(activeRepTickets) & set(replied_tickets))
+
         for rTicket in replied_tickets:
             if rTicket not in activeRepTickets:
                 time.sleep(0.5)
 
                 for row in Datebase().getLastRepliesByTicketId(rTicket):
                     ticket = Ticket(row[0], row[1], row[2], row[3], row[4], row[5], row[6], row[7], row[8], row[9], row[10])
+
+                    #CLEANUP THIS
+                    #Need to replace some line in replies 
+                    ticket.message  = (ticket.message).replace('\r\n\r\nС уважением,\r\n\r\nОтдел технической поддержки Domain.BY\r\n\r\n', '')
 
                     self.CheckHandlerLog.info("[Reply][%s] Новый ответ.\n %s \n %s \n %s" %(ticket.ticket_id, ticket.email, ticket.subject, ticket.message))
                     self.openbot.sendMessageGroup("[Reply][%s] Новый ответ.\n %s \n %s \n %s" %(ticket.ticket_id, ticket.email, ticket.subject, ticket.message))
