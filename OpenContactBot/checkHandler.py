@@ -15,14 +15,14 @@ from cache import save_obj
 from cache import load_obj
 from openbot import openbot
 from ticket import activeTickets
+from ticket import activeRepTickets
 
 class CheckHandler(object):
     CheckHandlerLog = Log('CheckHandler')
     
     #not implement active value with add from telegram and write to configuration file
     def getBannedEmail(self):
-        self.CheckHandlerLog.info("NOT IMPLEMENT")
-        return ['info@twitter.com', 'test@test.test']
+        return ['info@twitter.com', 'info@sitaramjindalfoundation.org']
 
     def loadCacheActiveTasks(self):
         global activeTickets
@@ -104,6 +104,30 @@ class CheckHandler(object):
         #else:
             #self.CheckHandlerLog.debug("[Ticket][%s] Заявка уже содержится в списке." % ticket.ticket_id)
 
+    def checkNewReplies(self):
+        replied_tickets = Datebase().getRepliesTicketsIdList()
+
+        if(len(activeRepTickets) != 0):
+            try:
+                closedTickets = set(replied_tickets) ^ set(activeRepTickets)
+
+                for rTicket in closedTickets:
+                    self.CheckHandlerLog.info("[Ответ][%s] обработан вручную." % rTicket)
+                    self.openbot.sendMessageMe("[Ответ][%s] обработан вручную." % rTicket)
+            except KeyError:
+                pass
+
+        for rTicket in replied_tickets:
+            if rTicket not in activeRepTickets:
+                time.sleep(0.5)
+
+                for row in Datebase().getLastRepliesByTicketId(rTicket):
+                    ticket = Ticket(row[0], row[1], row[2], row[3], row[4], row[5], row[6], row[7], row[8], row[9], row[10])
+
+                    self.CheckHandlerLog.info("[Reply][%s] Новый ответ.\n %s \n %s \n %s" %(ticket.ticket_id, ticket.email, ticket.subject, ticket.message))
+                    self.openbot.sendMessageGroup("[Reply][%s] Новый ответ.\n %s \n %s \n %s" %(ticket.ticket_id, ticket.email, ticket.subject, ticket.message))
+                    activeRepTickets.append(rTicket)
+
     def checkNewMessage(self):
         tickets  = self.getListTickets()
 
@@ -173,6 +197,7 @@ class CheckHandler(object):
                 self.parseDomainbyTask(ticket)
                 continue
             if ticket.email in self.getBannedEmail():
+                self.CheckHandlerLog.info("[Spam] NOT IMPLEMENT")
                 self.CheckHandlerLog.info("[Spam][%s] Перемещен" % ticket.ticket_id)
                 self.openbot.sendMessageMe("[Spam][%s] Перемещен" % ticket.ticket_id)
                 Datebase().setTicketSpam(ticket.ticket_id)
@@ -190,6 +215,7 @@ class CheckHandler(object):
 
         while 1:
             self.checkNewMessage()
+            self.checkNewReplies()
             time.sleep(30)
         
 

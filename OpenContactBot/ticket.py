@@ -28,3 +28,4 @@ class Ticket(object):
 #
 
 activeTickets = {}
+activeRepTickets = []

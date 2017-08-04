@@ -44,7 +44,35 @@ class Datebase(object):
         #self.dbLog.warning(sql + '\n')
 
         self.cur.execute(sql)
-        return self.cur.fetchall()    
+        return self.cur.fetchall()
+    
+    def getRepliesTicketsIdList(self):
+        sql = """
+            SELECT ticket_id FROM hdp_tickets LEFT OUTER JOIN hdp_ticket_priorities_ru ON hdp_tickets.priority_id=hdp_ticket_priorities_ru.priority_id ,
+            hdp_ticket_status_ru, hdp_departments, hdp_staff_departments, hdp_clients WHERE hdp_tickets.status=hdp_ticket_status_ru.status_key AND 
+            hdp_tickets.dept_id=hdp_departments.dept_id AND hdp_tickets.dept_id=hdp_staff_departments.dept_id AND hdp_tickets.client_id=hdp_clients.client_id
+            AND hdp_staff_departments.staff_id='103' AND  hdp_tickets.status IN ('O','H') AND hdp_tickets.updater = 'CLIENT'
+            """
+
+        self.cur.execute(sql)
+        
+        list = []
+
+        for row in self.cur.fetchall():
+            list.append(row[0])
+        
+        return list
+
+    def getLastRepliesByTicketId(self, ticket_id):
+        sql = """
+        SELECT hdp_ticket_replies.ticket_id, change_status, hdp_ticket_replies.reporter_id, hdp_ticket_replies.subject, reply, client_last_activity, dept_id, ticket_created, sent_date, timezone, hdp_clients.email FROM hdp_ticket_replies
+        LEFT JOIN `hdp_tickets` ON hdp_tickets.ticket_id = hdp_ticket_replies.ticket_id
+        LEFT JOIN `hdp_clients` ON hdp_clients.client_id = hdp_ticket_replies.reporter_id 
+        WHERE hdp_ticket_replies.ticket_id = '%s' AND hdp_ticket_replies.reporter_id <> 103  ORDER BY replied_on DESC LIMIT 1
+        """ %(ticket_id)
+
+        self.cur.execute(sql)
+        return self.cur.fetchall()
 
     def setTicketClose(self, ticket_id):
         sql = "UPDATE hdp_tickets SET status = 'C' WHERE `ticket_id` = '%s'"  % ticket_id
