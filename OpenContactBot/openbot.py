@@ -21,6 +21,9 @@ class OpenBot(telepot.Bot):
        self.sendMessage(PrivateId, msg)
 
     def sendMessageGroup(self, msg):
+        if(len(msg) > 4096):
+            msg = msg[:4096-len(msg)]
+
         self.sendMessage(GroupId, msg)
 
     def checkAuth(self,id,username):
@@ -31,6 +34,10 @@ class OpenBot(telepot.Bot):
 
     def send(self, username, chat_id, message, answer):
         self.botLog.info("[%s][%s]Message: %s. Answer: %s"%(username, chat_id, message, answer))
+
+        if(len(msg) > 4096):
+            msg = msg[:4096-len(msg)]
+
         self.sendMessage(chat_id, answer)
 
     def handle(self, msg):
