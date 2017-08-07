@@ -42,6 +42,9 @@ def getTimeToStartCron(name):
     if u.fileExits(filePath):
         fileChangeTime = u.getFileChangeTime(filePath)
 
-        return (18001 -(time.time() - fileChangeTime))
-    else:
-        return 60
+        timeToStart = (18001 -(time.time() - fileChangeTime))
+
+        if timeToStart > 0:
+            return timeToStart
+
+    return 60
