@@ -107,6 +107,15 @@ class Datebase(object):
         self.cur.fetchone()
 
         self.addPrivateReply(ticket_id,'[OpenContactBot] Перемещено в спам.')
+    
+    def setTickethold(self, ticket_id):
+         sql = "UPDATE hdp_tickets SET status = 'H', updater_id = 103, updater='STAFF' WHERE `ticket_id` = '%s'"  % ticket_id
+
+         self.dbLog.warning(sql + '\n')
+         self.cur.execute(sql)
+         self.cur.fetchone()
+
+         self.addPrivateReply(ticket_id,'[OpenContactBot] Перемещено в задержанные.')
 
     def addPrivateReply(self, ticket_id, message):
         sql = """

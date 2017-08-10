@@ -22,7 +22,7 @@ class CheckHandler(object):
     
     #not implement active value with add from telegram and write to configuration file
     def getBannedEmail(self):
-        return ['info@twitter.com', 'info@sitaramjindalfoundation.org']
+        return ['info@twitter.com', 'info@sitaramjindalfoundation.org', 'buy4@btsparts.com', 'info@busco.com.pa', 'Johan.Coenen@gmr.be']
 
     def loadCacheActiveTasks(self):
         global activeTickets
@@ -128,10 +128,6 @@ class CheckHandler(object):
                 for row in Datebase().getLastRepliesByTicketId(rTicket):
                     ticket = Ticket(row[0], row[1], row[2], row[3], row[4], row[5], row[6], row[7], row[8], row[9], row[10])
 
-                    #CLEANUP THIS
-                    #Need to replace some line in replies 
-                    ticket.message  = (ticket.message).replace('\r\n\r\nС уважением,\r\n\r\nОтдел технической поддержки Domain.BY\r\n\r\n', '')
-
                     self.CheckHandlerLog.info("[Reply][%s] Новый ответ.\n %s \n %s \n %s" %(ticket.ticket_id, ticket.email, ticket.subject, ticket.message))
                     self.openbot.sendMessageGroup("[Reply][%s] Новый ответ.\n %s \n %s \n %s" %(ticket.ticket_id, ticket.email, ticket.subject, ticket.message))
                     activeRepTickets.append(rTicket)
@@ -200,6 +196,11 @@ class CheckHandler(object):
                 self.CheckHandlerLog.info("[Удаление][%s] Закрыт" % ticket.ticket_id)
                 self.openbot.sendMessageMe("[Удаление][%s] Закрыт" % ticket.ticket_id)
                 Datebase().setTicketClose(ticket.ticket_id)
+                continue
+            if re.match(u"Сведения ИРЦ РУП Белтелеком за", ticket.subject):
+                self.CheckHandlerLog.info("[Белтелеком][%s] Задержан" % ticket.ticket_id)
+                self.openbot.sendMessageMe("[Белтелеком][%s] Задержан" % ticket.ticket_id)
+                Datebase().setTickethold(ticket.ticket_id)
                 continue
             if (ticket.client_id == 94434):
                 self.parseDomainbyTask(ticket)
