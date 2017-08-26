@@ -22,7 +22,7 @@ class CheckHandler(object):
     
     #not implement active value with add from telegram and write to configuration file
     def getBannedEmail(self):
-        return ['info@twitter.com', 'info@sitaramjindalfoundation.org', 'buy4@btsparts.com', 'info@busco.com.pa', 'Johan.Coenen@gmr.be']
+        return ['info@twitter.com', 'info@sitaramjindalfoundation.org', 'buy4@btsparts.com', 'info@busco.com.pa', 'Johan.Coenen@gmr.be', '2853372769@zhongyoutx.com', 'Sales59@cnautoparts.net']
 
     def loadCacheActiveTasks(self):
         global activeTickets
@@ -103,6 +103,39 @@ class CheckHandler(object):
             self.openbot.sendMessageGroup("[Ticket][%s] Новая Заявка.\n %s \n %s \n %s" %(ticket.ticket_id, ticket.email, ticket.subject, ticket.message))
         #else:
             #self.CheckHandlerLog.debug("[Ticket][%s] Заявка уже содержится в списке." % ticket.ticket_id)
+    def cleanUpMessage(self,message):
+
+        temp = ""
+
+        for line in message.splitlines():
+                        if line == message:
+                            return message
+                        if '-----Original Message-----' in line:
+                            return temp
+                        if 'From: Отдел технической поддержки' in line:
+                            continue
+                        if 'Sent: ' in line:
+                            continue
+                        if 'To: ' in line:
+                            continue
+                        if 'Subject: Re:' in line:
+                            continue
+                        if '## Пожалуйста, не удаляйте номер запроса' in line:
+                            continue
+                        if '## Пожалуйста, не удаляйте номер запроса' in line:
+                            continue
+                        if '## Don\'t remove the ticket number' in line:
+                            continue
+                        if 'С уважением,' in line:
+                            continue
+                        if 'Отдел технической поддержки Domain.BY' in line:
+                            continue
+                        if line == '':
+                            continue
+                        else:
+                            temp += line + '\n'
+
+        return temp
 
     def checkNewReplies(self):
         replied_tickets = Datebase().getRepliesTicketsIdList()
@@ -128,6 +161,8 @@ class CheckHandler(object):
                 for row in Datebase().getLastRepliesByTicketId(rTicket):
                     ticket = Ticket(row[0], row[1], row[2], row[3], row[4], row[5], row[6], row[7], row[8], row[9], row[10])
 
+                    ticket.message = self.cleanUpMessage(ticket.message)
+
                     self.CheckHandlerLog.info("[Reply][%s] Новый ответ.\n %s \n %s \n %s" %(ticket.ticket_id, ticket.email, ticket.subject, ticket.message))
                     self.openbot.sendMessageGroup("[Reply][%s] Новый ответ.\n %s \n %s \n %s" %(ticket.ticket_id, ticket.email, ticket.subject, ticket.message))
                     activeRepTickets.append(rTicket)
@@ -142,7 +177,7 @@ class CheckHandler(object):
 
             for cTicket in closedTickets:
                 self.CheckHandlerLog.info("[Заявка][%s] обработана вручную." % cTicket)
-                self.openbot.sendMessageMe("[Заявка][%s] обработана вручную." % cTicket)
+                self.openbot.sendMessageGroup("[Заявка][%s] обработана вручную." % cTicket)
         except KeyError:
             pass
             #self.CheckHandlerLog.critical("[checkNewMessage] %s" %(inst))
