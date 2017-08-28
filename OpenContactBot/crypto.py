@@ -27,6 +27,14 @@ class Crypto(object):
     def getCpanelToken(value):
         return rsa.decrypt(base64.b64decode(cfg.getCpanelToken(value)), Crypto.getKey()).decode('UTF-8')
 
+    @staticmethod
+    def getDomainUsername():
+        return rsa.decrypt(base64.b64decode(cfg.getDomainUsername()), Crypto.getKey()).decode('UTF-8')
+
+    @staticmethod
+    def getDomainPassword():
+        return rsa.decrypt(base64.b64decode(cfg.getDomainPassword()), Crypto.getKey()).decode('UTF-8')
+
     def getConfigCriptedValue(value):
         n,e,d,p,q =  map(int, cfg.getPrivatekey().split(","))
         key = rsa.PrivateKey(n,e,d,p,q)

@@ -44,6 +44,7 @@ class Config(object):
     def getCpanelPass():
         return Config.getConfigValue('cpanel', 'password')
 
+    @staticmethod
     def getCpanelToken(value):
         return Config.getConfigValue('cpanel', value)
 
@@ -68,3 +69,11 @@ class Config(object):
     @staticmethod
     def getPrivatekey():
         return Config.getConfigValue('security', 'privateKey')
+
+    @staticmethod
+    def getDomainUsername():
+        return Config.getConfigValue('domain', 'username')
+
+    @staticmethod
+    def getDomainPassword():
+        return Config.getConfigValue('domain', 'password')
