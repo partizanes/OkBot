@@ -46,18 +46,18 @@ class CheckHandler(object):
                     Datebase().setTicketClose(ticket.ticket_id)
                     return
                 else:
-                    self.CheckHandlerLog.info("[Таймаут][%s] Ошибка: %s" %(ticket.ticket_id, error))
-                    self.openbot.sendMessageMe("[Таймаут][%s] Ошибка: %s" %(ticket.ticket_id, error))
+                    self.CheckHandlerLog.info("[Таймаут][%s] Ошибка: %s" % (ticket.ticket_id, error))
+                    self.openbot.sendMessageMe("[Таймаут][%s] Ошибка: %s" % (ticket.ticket_id, error))
 
             except Exception as inst:
-                self.CheckHandlerLog.critical("[parseDomainbyTask][запуск хостинга] %s" %(inst))
+                self.CheckHandlerLog.critical("[parseDomainbyTask][запуск хостинга] %s" % (inst))
                 self.CheckHandlerLog.critical(sys.exc_info()[0])
 
         if re.match(u'Изменение тарифного плана виртуального хостинга для домена', ticket.subject) or (re.search(u'\<td\>В ДМС изменен тарифный план виртуального хостинга для домена', ticket.message) is not None):
             try:
                 domain = re.search(u'Изменение тарифного плана виртуального хостинга для домена (.+?)</td>', ticket.message).group(1)
-                #prevPackage  = re.search(u'с плана \"(.+?)" на план', ticket.message).group(1)
-                afterPackage  = re.search(u'на план \"(.+?)"\.<br', ticket.message).group(1)
+                #prevPackage = re.search(u'с плана \"(.+?)" на план',ticket.message).group(1)
+                afterPackage = re.search(u'на план \"(.+?)"\.<br', ticket.message).group(1)
 
                 cpanelUsersAccounts = getAccountsList()
                 hosting = cpanelUsersAccounts[domain].server
@@ -69,18 +69,18 @@ class CheckHandler(object):
                 #self.CheckHandlerLog.info("[Package][%s] Сообщение: %s" %(domain , message))
 
                 if(status == 1):
-                    self.CheckHandlerLog.info("[Package][%s][%s] смена тарифного плана. " %(ticket.ticket_id, domain))
-                    self.openbot.sendMessageMe("[Package][%s][%s] смена тарифного плана. " %(ticket.ticket_id, domain))
+                    self.CheckHandlerLog.info("[Package][%s][%s] смена тарифного плана. " % (ticket.ticket_id, domain))
+                    self.openbot.sendMessageMe("[Package][%s][%s] смена тарифного плана. " % (ticket.ticket_id, domain))
                     Datebase().setTicketClose(ticket.ticket_id)
                 else:
-                    self.CheckHandlerLog.critical("[Package][%s][%s] %s." %(ticket.ticket_id, domain, ticket.message))
-                    self.openbot.sendMessageMe("[Package][%s][%s] %s. " %(ticket.ticket_id, domain, ticket.message))
+                    self.CheckHandlerLog.critical("[Package][%s][%s] %s." % (ticket.ticket_id, domain, ticket.message))
+                    self.openbot.sendMessageMe("[Package][%s][%s] %s. " % (ticket.ticket_id, domain, ticket.message))
             except Exception as inst:
-                self.CheckHandlerLog.critical("[Package] %s" %(inst))
+                self.CheckHandlerLog.critical("[Package] %s" % (inst))
                 self.CheckHandlerLog.critical(sys.exc_info()[0])
         else:
-            self.CheckHandlerLog.critical("[parseDomainbyTask][%s] Заявка не классифицирована." %(ticket.ticket_id))
-            self.openbot.sendMessageMe("[parseDomainbyTask][%s] Заявка не классифицирована. " %(ticket.ticket_id))
+            self.CheckHandlerLog.critical("[parseDomainbyTask][%s] Заявка не классифицирована." % (ticket.ticket_id))
+            self.openbot.sendMessageMe("[parseDomainbyTask][%s] Заявка не классифицирована. " % (ticket.ticket_id))
 
     def getListTickets(self):
         try:
@@ -92,19 +92,17 @@ class CheckHandler(object):
 
             return list
         except Exception as inst:
-            self.CheckHandlerLog.critical("[getListTickets] %s" %(inst))
+            self.CheckHandlerLog.critical("[getListTickets] %s" % (inst))
             self.CheckHandlerLog.critical(sys.exc_info()[0])
 
     def undefinedTicket(self, ticket):
         if (ticket.ticket_id not in activeTickets):
             activeTickets[ticket.ticket_id] = ticket
-            self.CheckHandlerLog.info("[Ticket][%s] Новая Заявка.\n %s \n %s \n %s" %(ticket.ticket_id, ticket.email, ticket.subject, ticket.message))
+            self.CheckHandlerLog.info("[Ticket][%s] Новая Заявка.\n %s \n %s \n %s" % (ticket.ticket_id, ticket.email, ticket.subject, ticket.message))
             #self.openbot.sendMessageMe("[Ticket][%s] Новая Заявка.\n %s \n %s \n %s" %(ticket.ticket_id, ticket.email, ticket.subject, ticket.message))
-            self.openbot.sendMessageGroup("[Ticket][%s] Новая Заявка.\n %s \n %s \n %s" %(ticket.ticket_id, ticket.email, ticket.subject, ticket.message))
-        #else:
-            #self.CheckHandlerLog.debug("[Ticket][%s] Заявка уже содержится в списке." % ticket.ticket_id)
-    def cleanUpMessage(self,message):
+            self.openbot.sendMessageGroup("[Ticket][%s] Новая Заявка.\n %s \n %s \n %s" % (ticket.ticket_id, ticket.email, ticket.subject, ticket.message))
 
+    def cleanUpMessage(self,message):
         temp = ""
 
         for line in message.splitlines():
@@ -163,12 +161,12 @@ class CheckHandler(object):
 
                     ticket.message = self.cleanUpMessage(ticket.message)
 
-                    self.CheckHandlerLog.info("[Reply][%s] Новый ответ.\n %s \n %s \n %s" %(ticket.ticket_id, ticket.email, ticket.subject, ticket.message))
-                    self.openbot.sendMessageGroup("[Reply][%s] Новый ответ.\n %s \n %s \n %s" %(ticket.ticket_id, ticket.email, ticket.subject, ticket.message))
+                    self.CheckHandlerLog.info("[Reply][%s] Новый ответ.\n %s \n %s \n %s" % (ticket.ticket_id, ticket.email, ticket.subject, ticket.message))
+                    self.openbot.sendMessageGroup("[Reply][%s] Новый ответ.\n %s \n %s \n %s" % (ticket.ticket_id, ticket.email, ticket.subject, ticket.message))
                     activeRepTickets.append(rTicket)
 
     def checkNewMessage(self):
-        tickets  = self.getListTickets()
+        tickets = self.getListTickets()
 
         global activeTickets
 
@@ -181,7 +179,7 @@ class CheckHandler(object):
         except KeyError:
             pass
             #self.CheckHandlerLog.critical("[checkNewMessage] %s" %(inst))
-            #self.CheckHandlerLog.critical(sys.exc_info()[0]) 
+            #self.CheckHandlerLog.critical(sys.exc_info()[0])
 
         activeTickets = {k: activeTickets[k] for k  in activeTickets.keys() & set(ticket.ticket_id for ticket in tickets)}
         save_obj(activeTickets,'activeTickets')
