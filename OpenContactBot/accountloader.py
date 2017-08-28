@@ -50,6 +50,8 @@ def loadFromCache():
     log.info("...completed.Found %s accounts" %(len(cpanelUsersAccounts)))
 
 def getAccountsList():
+    global cpanelUsersAccounts
+
     return cpanelUsersAccounts
 
 log = Log('cpanelUsersAccounts')
