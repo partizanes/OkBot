@@ -10,5 +10,15 @@ class TicketStatus(Enum):
     ON_HOLD = 4
     SPAM    = 5
 
-    #def __str__(self):
-    #    return '%s' % self._value_
+    def __str__(self):
+        return '%s' % self._value_
+
+class HdTicketStatus(Enum):
+    NEW     = 'N'
+    OPEN    = 'O'
+    CLOSED  = 'C'
+    ON_HOLD = 'H'
+    SPAM    = 'S'
+
+    def __str__(self):
+        return '%s' % self._value_

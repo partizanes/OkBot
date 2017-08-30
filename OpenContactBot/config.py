@@ -77,3 +77,23 @@ class Config(object):
     @staticmethod
     def getDomainPassword():
         return Config.getConfigValue('domain', 'password')
+
+    @staticmethod
+    def getHdBotToken():
+        return Config.getConfigValue('hd', 'token')
+
+    @staticmethod
+    def getHdBotUsername():
+        return Config.getConfigValue('hd', 'username')
+
+    @staticmethod
+    def getHdBotPassword():
+        return Config.getConfigValue('hd', 'password')
+
+    @staticmethod
+    def getHdUrl():
+        return Config.getConfigValue('hd', 'url')
+        
+    @staticmethod
+    def getHdSession():
+        return Config.getConfigValue('hd', 'session')
