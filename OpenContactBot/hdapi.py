@@ -46,7 +46,7 @@ class hdapi(object):
 
         if(r.status_code == 200):
             hdapi.hdLog.info("[postQuickReply][%s] Ответ отправлен." % (ticket_id))
-            openbot.sendMessageGroup("[postQuickReply][%s] Ответ отправлен." % (ticket_id))
+            openbot.sendMessageGroup("[%s] Ответ отправлен." % (ticket_id))
             return True
         else:
             hdapi.hdLog.critical("[postQuickReply][%s] Попытка ответа неудачна.Код ответа: %s" % (ticket_id, r.status_code))

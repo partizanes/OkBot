@@ -13,8 +13,18 @@ class Config(object):
         cls.configParser.read(cls.configFilePath)
 
     @classmethod
+    def saveConfig(cls):
+        with open(cls.configFilePath, 'w') as configfile:
+            cls.configParser.write(configfile)
+        
+
+    @classmethod
     def getConfigValue(cls, group, key):
         return cls.configParser.get(group, key)
+    
+    @classmethod
+    def setConfigValue(cls, group, key, value):
+         cls.configParser.set(group, key, value)
 
     @staticmethod
     def getToken():
@@ -97,3 +107,4 @@ class Config(object):
     @staticmethod
     def getHdSession():
         return Config.getConfigValue('hd', 'session')
+        

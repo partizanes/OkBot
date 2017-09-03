@@ -128,4 +128,17 @@ class Datebase(object):
         self.cur.execute(sql)
         self.cur.fetchone()
 
-        
+    def getSpamEmail(self):
+        sql = "SELECT sp_addresses FROM hdp_spam_message"
+        self.cur.execute(sql)
+        return self.cur.fetchall()[0][0]
+
+    def setSpamEmail(self, email):
+        current = self.getSpamEmail()
+        current += '\r\n%s' %(email)
+
+        sql = "UPDATE hdp_spam_message SET sp_addresses = '%s' WHERE spm_id = 5" %(current)
+
+        self.dbLog.warning(sql + '\n')
+        self.cur.execute(sql)
+        self.cur.fetchone()
