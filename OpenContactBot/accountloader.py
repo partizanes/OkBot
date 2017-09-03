@@ -19,7 +19,7 @@ def loadDataFromServers():
 
     for hosting,client in cpanelApiClient.items():
         for accountData in (client.call('listaccts')['acct']):
-            cpanelUsersAccounts[accountData['domain']] =  cpanelUser(accountData['user'], accountData['domain'], hosting)
+            cpanelUsersAccounts[accountData['domain']] =  cpanelUser(accountData['user'], accountData['domain'], hosting, accountData['email'])
 
     if(len(cpanelUsersAccounts) > 0):
         save_obj(cpanelUsersAccounts,'cpanelUsersAccounts')
