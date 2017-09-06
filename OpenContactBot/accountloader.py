@@ -18,7 +18,12 @@ def loadDataFromServers():
     global cpanelUsersAccounts
 
     for hosting,client in cpanelApiClient.items():
-        for accountData in (client.call('listaccts')['acct']):
+        try:
+            answeData = client.call_v1('listaccts')
+        except Exception as exc:
+            log.critical(exc)
+
+        for accountData in (answeData['data']['acct']):
             cpanelUsersAccounts[accountData['domain']] =  cpanelUser(accountData['user'], accountData['domain'], hosting, accountData['email'])
 
     if(len(cpanelUsersAccounts) > 0):
@@ -50,8 +55,6 @@ def loadFromCache():
     log.info("...completed.Found %s accounts" %(len(cpanelUsersAccounts)))
 
 def getAccountsList():
-    global cpanelUsersAccounts
-
     return cpanelUsersAccounts
 
 log = Log('cpanelUsersAccounts')
