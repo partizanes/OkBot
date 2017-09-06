@@ -62,9 +62,6 @@
       <SubType>Code</SubType>
     </Compile>
     <Compile Include="core.py" />
-    <Compile Include="module1.py">
-      <SubType>Code</SubType>
-    </Compile>
     <Compile Include="openbot.py">
       <SubType>Code</SubType>
     </Compile>
