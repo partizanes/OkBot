@@ -117,6 +117,13 @@ class Datebase(object):
 
          self.addPrivateReply(ticket_id,'[OpenContactBot] Перемещено в задержанные.')
 
+    def moveTicketTo(self, dept_id, ticket_id):
+        sql = "UPDATE hdp_tickets SET dept_id = %i , server_id = %i WHERE ticket_id = '%s'" %(dept_id, dept_id, ticket_id)
+
+        self.dbLog.warning(sql + '\n')
+        self.cur.execute(sql)
+        self.cur.fetchone()
+
     def addPrivateReply(self, ticket_id, message):
         sql = """
             insert into hdp_ticket_replies (reporter_id,ticket_id,replied_on,reply,reporter,subject,
