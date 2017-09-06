@@ -27,5 +27,12 @@ class Ticket(object):
 #    print('true')
 #
 
+
+def getActiveTicketsList():
+    return activeTickets
+
+def getActiveRepTicketsList():
+    return activeRepTickets
+
 activeTickets = {}
-activeRepTickets = []
+activeRepTickets = {}

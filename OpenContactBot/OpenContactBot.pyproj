@@ -30,6 +30,16 @@
     <Compile Include="checkHandler.py">
       <SubType>Code</SubType>
     </Compile>
+    <Compile Include="cpanelServerHandler.py" />
+    <Compile Include="hdDepartaments.py">
+      <SubType>Code</SubType>
+    </Compile>
+    <Compile Include="domainapi.py">
+      <SubType>Code</SubType>
+    </Compile>
+    <Compile Include="hdapi.py">
+      <SubType>Code</SubType>
+    </Compile>
     <Compile Include="util.py">
       <SubType>Code</SubType>
     </Compile>
