@@ -11,28 +11,32 @@ from accountloader import loadDataFromServers
 from accountloader import getAccountsList
 from cpanelapiclient import cpanelApiClient
 from config import Config
-from cache import save_obj
-from cache import load_obj
-from openbot import openbot
-from ticket import activeTickets
-from ticket import activeRepTickets
+from cache import save_obj, load_obj
+from ticket import activeTickets,activeRepTickets
 
 class CheckHandler(object):
     CheckHandlerLog = Log('CheckHandler')
-    
-    #not implement active value with add from telegram and write to configuration file
-    def getBannedEmail(self):
-        return ['info@twitter.com', 'info@sitaramjindalfoundation.org', 'buy4@btsparts.com', 'info@busco.com.pa', 'Johan.Coenen@gmr.be', '2853372769@zhongyoutx.com', 'Sales59@cnautoparts.net']
 
     def loadCacheActiveTasks(self):
-        global activeTickets
-
         try:
-            temp = load_obj('activeTickets')
+            cache = load_obj('activeTickets')
 
-            if (len(temp) > 0):
-                activeTickets = temp
-        except:
+            for i in cache:
+                activeTickets[i] = cache[i]
+
+            self.CheckHandlerLog.info("[Cache] activeTickets загружен.")
+        except Exception as exc:
+            pass
+
+    def loadCacheActiveReply(self):
+        try:
+            cache = load_obj('activeRepTickets')
+
+            for i in cache:
+                activeRepTickets[i] = cache[i]
+
+            self.CheckHandlerLog.info("[Cache] activeRepTickets загружен.")
+        except Exception as exc:
             pass
 
     def parseDomainbyTask(self, ticket):
@@ -99,8 +103,8 @@ class CheckHandler(object):
         if (ticket.ticket_id not in activeTickets):
             activeTickets[ticket.ticket_id] = ticket
             self.CheckHandlerLog.info("[Ticket][%s] Новая Заявка.\n %s \n %s \n %s" % (ticket.ticket_id, ticket.email, ticket.subject, ticket.message))
-            #self.openbot.sendMessageMe("[Ticket][%s] Новая Заявка.\n %s \n %s \n %s" %(ticket.ticket_id, ticket.email, ticket.subject, ticket.message))
-            self.openbot.sendMessageGroup("[Ticket][%s] Новая Заявка.\n %s \n %s \n %s" % (ticket.ticket_id, ticket.email, ticket.subject, ticket.message))
+            self.openbot.sendMessageGroupInline("[Reply][%s] Новый ответ.\n %s \n %s \n %s" % (ticket.ticket_id, ticket.email, ticket.subject, ticket.message))
+            save_obj(activeTickets,'activeTickets')
 
     def cleanUpMessage(self,message):
         temp = ""
@@ -132,17 +136,14 @@ class CheckHandler(object):
                             continue
                         else:
                             temp += line + '\n'
-
         return temp
 
     def checkNewReplies(self):
         replied_tickets = Datebase().getRepliesTicketsIdList()
 
-        global activeRepTickets
-
         if(len(activeRepTickets) != 0):
             try:
-                closedTickets = set(replied_tickets) ^ set(activeRepTickets)
+                closedTickets = {k: activeRepTickets[k] for k  in activeRepTickets.keys() ^ set(replied_tickets)}
 
                 for rTicket in closedTickets:
                     self.CheckHandlerLog.info("[Ответ][%s] обработан вручную." % rTicket)
@@ -150,7 +151,14 @@ class CheckHandler(object):
             except KeyError:
                 pass
 
-            activeRepTickets = list(set(activeRepTickets) & set(replied_tickets))
+            diff_ticket = {k: activeRepTickets[k] for k  in activeRepTickets.keys() & set(replied_tickets)}
+            
+            activeRepTickets.clear()
+
+            for i in diff_ticket:
+                activeRepTickets[i] = diff_ticket[i]
+
+            save_obj(activeRepTickets,'activeRepTickets')
 
         for rTicket in replied_tickets:
             if rTicket not in activeRepTickets:
@@ -161,27 +169,32 @@ class CheckHandler(object):
 
                     ticket.message = self.cleanUpMessage(ticket.message)
 
+                    activeRepTickets[ticket.ticket_id] = ticket
+                    save_obj(activeRepTickets,'activeRepTickets')
+
                     self.CheckHandlerLog.info("[Reply][%s] Новый ответ.\n %s \n %s \n %s" % (ticket.ticket_id, ticket.email, ticket.subject, ticket.message))
-                    self.openbot.sendMessageGroup("[Reply][%s] Новый ответ.\n %s \n %s \n %s" % (ticket.ticket_id, ticket.email, ticket.subject, ticket.message))
-                    activeRepTickets.append(rTicket)
+                    self.openbot.sendMessageGroupInline("[Reply][%s] Новый ответ.\n %s \n %s \n %s" % (ticket.ticket_id, ticket.email, ticket.subject, ticket.message))
 
     def checkNewMessage(self):
         tickets = self.getListTickets()
-
-        global activeTickets
+        emailSpamList = Datebase().getSpamEmail().split('\r\n')
 
         try:
             closedTickets = {k: activeTickets[k] for k  in activeTickets.keys() ^ set(ticket.ticket_id for ticket in tickets)}
 
             for cTicket in closedTickets:
-                self.CheckHandlerLog.info("[Заявка][%s] обработана вручную." % cTicket)
-                self.openbot.sendMessageGroup("[Заявка][%s] обработана вручную." % cTicket)
+                self.CheckHandlerLog.info("[%s] закрыт." % cTicket)
+                self.openbot.sendMessageGroup("[%s] закрыт." % cTicket)
         except KeyError:
             pass
-            #self.CheckHandlerLog.critical("[checkNewMessage] %s" %(inst))
-            #self.CheckHandlerLog.critical(sys.exc_info()[0])
 
-        activeTickets = {k: activeTickets[k] for k  in activeTickets.keys() & set(ticket.ticket_id for ticket in tickets)}
+        tempactiveTickets = {k: activeTickets[k] for k  in activeTickets.keys() & set(ticket.ticket_id for ticket in tickets)}
+
+        activeTickets.clear()
+
+        for i in tempactiveTickets:
+            activeTickets[i] = tempactiveTickets[i]
+
         save_obj(activeTickets,'activeTickets')
 
         if not tickets:
@@ -238,8 +251,7 @@ class CheckHandler(object):
             if (ticket.client_id == 94434):
                 self.parseDomainbyTask(ticket)
                 continue
-            if ticket.email in self.getBannedEmail():
-                self.CheckHandlerLog.info("[Spam] NOT IMPLEMENT")
+            if ticket.email in emailSpamList:
                 self.CheckHandlerLog.info("[Spam][%s] Перемещен" % ticket.ticket_id)
                 self.openbot.sendMessageMe("[Spam][%s] Перемещен" % ticket.ticket_id)
                 Datebase().setTicketSpam(ticket.ticket_id)
@@ -248,17 +260,22 @@ class CheckHandler(object):
                 self.undefinedTicket(ticket)
 
 
-    def start(self):
+    def start(self, openbot):
+        time.sleep(1)
+
+
         self.CheckHandlerLog.info('CheckHandler started.')
         self.openbot = openbot
 
         loadDataFromServers()
         self.loadCacheActiveTasks()
+        self.loadCacheActiveReply()
 
         while 1:
-            self.checkNewMessage()
-            self.checkNewReplies()
-            time.sleep(30)
-        
-
-   
+            try:
+                self.checkNewMessage()
+                self.checkNewReplies()
+                time.sleep(30)
+            except Exception as exc:
+                self.CheckHandlerLog.critical("[CheckHandler] %s" % exc)
+                self.openbot.sendMessageMe("[CheckHandler] %s" % exc)
