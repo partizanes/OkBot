@@ -107,4 +107,13 @@ class Config(object):
     @staticmethod
     def getHdSession():
         return Config.getConfigValue('hd', 'session')
+
+    @staticmethod
+    def getExcludeEmailList():
+        exclude_list = []
+
+        for item in Config.getConfigValue('exclude', 'create').replace(' ', '').split(','):
+            exclude_list.append(item)
+
+        return exclude_list
         

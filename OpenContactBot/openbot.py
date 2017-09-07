@@ -14,10 +14,6 @@ from hdDepartaments import hdDepartaments as dept
 from ticket import activeTickets,activeRepTickets
 from telepot.namedtuple import InlineKeyboardMarkup, InlineKeyboardButton
 
-
-
-
-
 Config.initializeConfig()
 AdminList = Config.getAdminList()
 GroupId = Config.getGroupId()
@@ -112,7 +108,7 @@ https://%s:2083/resetpass?start=1
 Не закрывая данную вкладку , зайдите на почту и скопируйте код безопасности ,после чего вам будет доступно меню ввода нового пароля.
                            
 Для входа в панель управления хостингом используйте ссылку:
-https://%s.open.by:2083/""" %(domain.encode("utf-8").decode("idna"), server, username, email, server))
+https://%s:2083/""" %(domain.encode("utf-8").decode("idna"), server, username, email, server))
     
     def restoreCpanelPassword(self, msg, ticket_id, emailFrom):
         answer = ""
@@ -207,6 +203,8 @@ https://%s.open.by:2083/""" %(domain.encode("utf-8").decode("idna"), server, use
 .spam    - Перемещает заявку в спам с блокировкой отправителя в hd.
 
 .close   - Перемещает заявку в закрытые.
+
+.exclude  - Добавляет или удаляет доменное имя в список исключений. Пример: .exclude domain.by
 """)
                     return
 
@@ -237,6 +235,7 @@ https://%s.open.by:2083/""" %(domain.encode("utf-8").decode("idna"), server, use
                                     self.botLog.critical("[.restore] Stacktrace %s" %(sys.exc_info()[0]))
                                     self.sendMessageGroup("[.restore] Во время выполнения возникло исключение: %s" %exc)
                                 return
+
                             if(command == '.move'):
                                 try:
                                     dept_id = dept.DOMAIN
@@ -246,23 +245,51 @@ https://%s.open.by:2083/""" %(domain.encode("utf-8").decode("idna"), server, use
                                 except Exception as exc:
                                     self.botLog.critical("[.move] Во время выполнения возникло исключение: %s" %exc)
                                 return
+
                             if(command == '.spam'):
                                 inline_message_id = (GroupId, msg['message_id'])
                                 spam_email = combine[ticket_id].email  
             
                                 Datebase().setSpamEmail(spam_email)
                                 Datebase().setTicketSpam(ticket_id)
-                                self.deleteMessage(inline_message_id)
+                                print(self.deleteMessage(inline_message_id))
                                 return
+
                             if(command == '.close'):
                                 inline_message_id = (GroupId, msg['message_id'])
                                 Datebase().setTicketClose(ticket_id)
-                                self.deleteMessage(inline_message_id)
+                                self.botLog.debug(self.deleteMessage(inline_message_id))
+                                return
+
+                            if(command == '.exclude'):
+                                inline_message_id = (GroupId, msg['message_id'])
+                                subcommand = message.split(' ')[1]
+
+                                if(subcommand is None or subcommand == ""):
+                                    self.botLog.critical("[.exclude] Имя домена не указано.")
+                                    return
+
+                                tempExcludeList = Config.getExcludeEmailList()
+
+                                if(subcommand in tempExcludeList):
+                                    self.botLog.debug(self.deleteMessage(inline_message_id))
+                                    tempExcludeList.remove(subcommand)
+                                else:
+                                    tempExcludeList.append(subcommand)
+
+                                Config.setConfigValue('exclude', 'create', ",".join(tempExcludeList))
+                                Config.saveConfig()
+                                
+                                Datebase().setTicketClose(ticket_id)
+
+                                self.sendMessageGroup("[.exclude] Сохранен список исключений: %s" %(",".join(tempExcludeList)))
                                 return
  
                         hdapi.postQuickReply(ticket_id, msg['text'] , HdTicketStatus.OPEN, self)
 
-                except Exception as inst:
+                except Exception as exc:
+                    self.botLog.debug("[Exception][handle] %s" %exc)
+                    self.sendMessageMe("[Exception][handle] %s" %exc)
                     pass
         else:
             self.send(username, chat_id, message,'Вы не авторизованы ¯\_(ツ)_/¯')  

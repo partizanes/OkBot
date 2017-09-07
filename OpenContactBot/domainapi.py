@@ -27,7 +27,6 @@ class DomainApi(object):
 
     url_search = 'https://domain.by/BackEnd/Support/Search.aspx'
     url = 'https://domain.by'
-    exclude_list = []
 
 
     def getAuth(self):
@@ -248,6 +247,7 @@ class DomainApi(object):
     def checkDeleteHosting(self, value, browser):
         global listDeleteHosting
         tempListDeleteHosting = []
+        exclude_list = cfg.getExcludeEmailList()
 
         soup=BeautifulSoup(value, "html.parser")
 
@@ -263,7 +263,7 @@ class DomainApi(object):
                     self.openbot.sendMessageGroup("[Domain.by] хостинг на удаление: %s"%domain)
                     listDeleteHosting.append(domain)
 
-                    if(domain in self.exclude_list):
+                    if(domain in exclude_list):
                         self.dLog.info("[Domain.by] %s в списке исключений."%domain)
                         self.openbot.sendMessageGroup("[Domain.by] %s в списке исключений."%domain)
                         i += 1
@@ -312,6 +312,7 @@ class DomainApi(object):
     def checkCreateHosting(self, browser):
         soup=BeautifulSoup(browser.response.text, "html.parser")
         recoveryHostingDns = ['s1.open.by', 's2.open.by', 's3.open.by', 's4.open.by', 's5.open.by', 's6.open.by', 'ns2.open.by']
+        exclude_list = cfg.getExcludeEmailList()
 
         haveValue = True
         i = 1
@@ -334,7 +335,7 @@ class DomainApi(object):
                     if(len(listCreateHosting) > 0):
                         save_obj(listCreateHosting,'listCreateHosting')
 
-                    if(domain in self.exclude_list):
+                    if(domain in exclude_list):
                         self.dLog.info("[Domain.by] %s в списке исключений."%domain)
                         self.openbot.sendMessageGroup("[Domain.by] %s в списке исключений."%domain)
                         i += 1
