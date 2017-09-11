@@ -109,8 +109,35 @@ https://%s:2083/resetpass?start=1
                            
 Для входа в панель управления хостингом используйте ссылку:
 https://%s:2083/""" %(domain.encode("utf-8").decode("idna"), server, username, email, server))
+
+    def accessToSsh(self, domain, server, username):
+        return ("""
+Для доступа к %s используйте имя пользователя и пароль, как в панели управления хостингом.
+
+Хост:      %s или %s
+Порт:      20022
+Логин:     %s
+        """ %(domain, domain, server, username))
     
-    def restoreCpanelPassword(self, msg, ticket_id, emailFrom):
+    def changeContactEmailInCpanel(self, emailFrom, hostingService, cpanelUsersAccounts):
+        self.botLog.warning('Адрес контактной почты в панели хостинга отличается от панели доменов или от адреса отправителя.')
+
+        hosting = cpanelUsersAccounts[hostingService.domain].server
+        username = cpanelUsersAccounts[hostingService.domain].username
+
+        _answer = cpanelApiClient[hosting].call('modifyacct',user=username,contactemail=emailFrom)['result'][0]
+            
+        status = int(_answer['status'])
+        message = _answer['statusmsg']
+
+        self.botLog.debug("[restoreCpanelPassword][modifyacct] %s" %(message))
+
+        if(status == 1):
+            cpanelUsersAccounts[hostingService.domain].email = emailFrom
+            self.botLog.warning('Контактная почта %s для аккаунта %s синхронизирована с панелью хостинга.' %(emailFrom, hostingService.domain))
+            self.sendMessageGroup('Контактная почта %s для аккаунта %s синхронизирована с панелью хостинга.' %(emailFrom, hostingService.domain))
+
+    def restoreCpanelPassword(self, emailFrom):
         answer = ""
         cpanelUsersAccounts = getAccountsList()
 
@@ -120,31 +147,41 @@ https://%s:2083/""" %(domain.encode("utf-8").decode("idna"), server, username, e
         if(len(ListOfHostingServices) == 0):
             return "На данный контактный адрес почты не найдено зарегистрированых услуг."
 
-        if(len(ListOfHostingServices) > 0):
-            for hostingService in ListOfHostingServices:
-                if(cpanelUsersAccounts[hostingService.domain].email not in hostingService.controlemail or cpanelUsersAccounts[hostingService.domain].email != emailFrom):
-                    self.botLog.warning('Адрес контактной почты в панели хостинга отличается от панели доменов или от адреса отправителя.')
+        for hostingService in ListOfHostingServices:
+            if(cpanelUsersAccounts[hostingService.domain].email not in hostingService.controlemail or cpanelUsersAccounts[hostingService.domain].email != emailFrom):
+                self.changeContactEmailInCpanel(emailFrom, hostingService, cpanelUsersAccounts)
+            else:
+                self.botLog.debug('Контактная почта в панели хостинга совпадает с панелью доменов.')
 
-                    hosting = cpanelUsersAccounts[hostingService.domain].server
-                    username = cpanelUsersAccounts[hostingService.domain].username
+            answer += self.resetCpanelPasswordText(hostingService.domain, cpanelUsersAccounts[hostingService.domain].server, cpanelUsersAccounts[hostingService.domain].username, cpanelUsersAccounts[hostingService.domain].email)
 
-                    _answer = cpanelApiClient[hosting].call('modifyacct',user=username,contactemail=emailFrom)['result'][0]
+        return answer
+
+    def grantAccessToSsh(self, emailFrom):
+        answer = "Произведена активация ssh доступа."
+        cpanelUsersAccounts = getAccountsList()
+
+        #Получаем список всех хостинг услуг по адресу контактной почты
+        ListOfHostingServices = self.dApi.getListofHostingServices(emailFrom)
+
+        if(len(ListOfHostingServices) == 0):
+            return "На данный контактный адрес почты не найдено зарегистрированых услуг."
+
+        for hostingService in ListOfHostingServices:
+            hosting = cpanelUsersAccounts[hostingService.domain].server
+            username = cpanelUsersAccounts[hostingService.domain].username
+
+            if(cpanelUsersAccounts[hostingService.domain].email not in hostingService.controlemail or cpanelUsersAccounts[hostingService.domain].email != emailFrom):
+                self.changeContactEmailInCpanel(emailFrom, hostingService, cpanelUsersAccounts)
+            else:
+                self.botLog.debug('Контактная почта в панели хостинга совпадает с панелью доменов.')
             
-                    status = int(_answer['status'])
-                    message = _answer['statusmsg']
+            output = cpanelApiClient[hosting].call_v1('modifyacct',user=username,shell='jailshell')
+            self.botLog.debug(output)
 
-                    self.botLog.debug("[restoreCpanelPassword][modifyacct] %s" %(message))
-
-                    if(status == 1):
-                        cpanelUsersAccounts[hostingService.domain].email = emailFrom
-                        self.botLog.warning('Контактная почта %s для аккаунта %s синхронизирована с панелью хостинга.' %(emailFrom, hostingService.domain))
-                        self.sendMessageGroup('Контактная почта %s для аккаунта %s синхронизирована с панелью хостинга.' %(emailFrom, hostingService.domain))
-                    else:
-                        self.botLog.debug('Контактная почта в панели хостинга совпадает с панелью доменов.')
-
-                answer += self.resetCpanelPasswordText(hostingService.domain, cpanelUsersAccounts[hostingService.domain].server, cpanelUsersAccounts[hostingService.domain].username, cpanelUsersAccounts[hostingService.domain].email)
-
-            return answer
+            answer += self.accessToSsh(hostingService.domain, hosting, username)
+    
+        return answer
 
     def handle(self, msg):
         self.botLog.debug(msg)
@@ -205,6 +242,8 @@ https://%s:2083/""" %(domain.encode("utf-8").decode("idna"), server, username, e
 .close   - Перемещает заявку в закрытые.
 
 .exclude  - Добавляет или удаляет доменное имя в список исключений. Пример: .exclude domain.by
+
+.ssh      - Добавляет пользователю возможность подключения по ssh.
 """)
                     return
 
@@ -225,15 +264,14 @@ https://%s:2083/""" %(domain.encode("utf-8").decode("idna"), server, username, e
 
                             if(command == '.restore'):
                                 try:
-                                    temp = self.restoreCpanelPassword(msg, ticket_id, combine[ticket_id].email)
+                                    temp = self.restoreCpanelPassword(combine[ticket_id].email)
                                     self.botLog.warning(temp)
                                     self.sendMessageGroup(temp)
 
                                     #hdapi.postQuickReply(ticket_id, temp , HdTicketStatus.Close, self)
                                 except Exception as exc:
-                                    self.botLog.critical("[.restore] Во время выполнения возникло исключение: %s" %exc)
-                                    self.botLog.critical("[.restore] Stacktrace %s" %(sys.exc_info()[0]))
-                                    self.sendMessageGroup("[.restore] Во время выполнения возникло исключение: %s" %exc)
+                                    self.botLog.critical("[.restore] Во время выполнения возникло исключение: %s" %repr(exc))
+                                    self.sendMessageGroup("[.restore] Во время выполнения возникло исключение: %s" %repr(exc))
                                 return
 
                             if(command == '.move'):
@@ -243,7 +281,7 @@ https://%s:2083/""" %(domain.encode("utf-8").decode("idna"), server, username, e
                                     self.botLog.critical("[.move] Заявка %s перемещена в отдел: %s" %(ticket_id, dept_id.name))
                                     self.sendMessageGroup("[.move] Заявка %s перемещена в отдел: %s" %(ticket_id, dept_id.name))
                                 except Exception as exc:
-                                    self.botLog.critical("[.move] Во время выполнения возникло исключение: %s" %exc)
+                                    self.botLog.critical("[.move] Во время выполнения возникло исключение: %s" %repr(exc))
                                 return
 
                             if(command == '.spam'):
@@ -252,7 +290,20 @@ https://%s:2083/""" %(domain.encode("utf-8").decode("idna"), server, username, e
             
                                 Datebase().setSpamEmail(spam_email)
                                 Datebase().setTicketSpam(ticket_id)
-                                print(self.deleteMessage(inline_message_id))
+                                self.deleteMessage(inline_message_id)
+                                return
+
+                            if(command == '.ssh'):
+                                try:
+                                    inline_message_id = (GroupId, msg['message_id'])
+                                    temp = self.grantAccessToSsh(combine[ticket_id].email)
+                                    self.botLog.warning(temp)
+                                    self.sendMessageGroup(temp)
+
+                                    #hdapi.postQuickReply(ticket_id, temp , HdTicketStatus.Close, self)
+                                except Exception as exc:
+                                    self.botLog.critical("[.ssh] Во время выполнения возникло исключение: %s" %repr(exc))
+                                    self.sendMessageGroup("[.ssh] Во время выполнения возникло исключение: %s" %repr(exc))
                                 return
 
                             if(command == '.close'):
@@ -288,8 +339,8 @@ https://%s:2083/""" %(domain.encode("utf-8").decode("idna"), server, username, e
                         hdapi.postQuickReply(ticket_id, msg['text'] , HdTicketStatus.OPEN, self)
 
                 except Exception as exc:
-                    self.botLog.debug("[Exception][handle] %s" %exc)
-                    self.sendMessageMe("[Exception][handle] %s" %exc)
+                    self.botLog.debug("[Exception][handle] %s" %repr(exc))
+                    self.sendMessageMe("[Exception][handle] %s" %repr(exc))
                     pass
         else:
             self.send(username, chat_id, message,'Вы не авторизованы ¯\_(ツ)_/¯')  
