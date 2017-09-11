@@ -257,20 +257,23 @@ class DomainApi(object):
         while(haveValue):
             try:
                 domain = soup.find(id="ctl00_contentHolder_TaskList_ucDelete_rptServiceList_ctl0%s_lblDomain"%i).text
+
+                if(re.search('[а-яА-Я]', domain)):
+                    domain = domain.encode("idna").decode("utf-8")
                 
                 if(domain not in listDeleteHosting):
-                    self.dLog.info("[Domain.by] хостинг на удаление: %s"%domain)
-                    self.openbot.sendMessageGroup("[Domain.by] хостинг на удаление: %s"%domain)
+                    self.dLog.info("[Domain.by] хостинг на удаление: %s"%domain.encode("utf-8").decode("idna"))
+                    self.openbot.sendMessageGroup("[Domain.by] хостинг на удаление: %s"%domain.encode("utf-8").decode("idna"))
                     listDeleteHosting.append(domain)
 
                     if(domain in exclude_list):
-                        self.dLog.info("[Domain.by] %s в списке исключений."%domain)
-                        self.openbot.sendMessageGroup("[Domain.by] %s в списке исключений."%domain)
+                        self.dLog.info("[Domain.by] %s в списке исключений."%domain.encode("utf-8").decode("idna"))
+                        self.openbot.sendMessageGroup("[Domain.by] %s в списке исключений."%domain.encode("utf-8").decode("idna"))
                         i += 1
                         continue
 
                     cpanelUsersAccounts = getAccountsList()
-                    
+
                     hosting = cpanelUsersAccounts[domain].server
                     username = cpanelUsersAccounts[domain].username
                     self.dLog.info("[Domain.by] Расположен на сервере: %s"%hosting)
