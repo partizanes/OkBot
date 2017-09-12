@@ -294,11 +294,6 @@ https://%s:2083/""" %(domain.encode("utf-8").decode("idna"), server, username, e
                                 self.deleteMessage(original_message_id)
                                 return
 
-                            if(command == '.del'):
-                                inline_message_id = (GroupId, msg['reply_to_message']['message_id']) 
-                                self.deleteMessage(inline_message_id)
-                                return
-
                             if(command == '.ssh'):
                                 try:
                                     answer = self.grantAccessToSsh(combine[ticket_id].email)
