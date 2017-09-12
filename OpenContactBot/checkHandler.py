@@ -103,7 +103,8 @@ class CheckHandler(object):
         if (ticket.ticket_id not in activeTickets):
             activeTickets[ticket.ticket_id] = ticket
             self.CheckHandlerLog.info("[Ticket][%s] Новая Заявка.\n %s \n %s \n %s" % (ticket.ticket_id, ticket.email, ticket.subject, ticket.message))
-            self.openbot.sendMessageGroupInline("[Ticket][%s] Новая Заявка.\n %s \n %s \n %s" % (ticket.ticket_id, ticket.email, ticket.subject, ticket.message))
+            #self.openbot.sendMessageGroupInline("[Ticket][%s] Новая Заявка.\n %s \n %s \n %s" % (ticket.ticket_id, ticket.email, ticket.subject, ticket.message))
+            self.openbot.sendMessageGroup("[Ticket][%s] Новая Заявка.\n %s \n %s \n %s" % (ticket.ticket_id, ticket.email, ticket.subject, ticket.message))
             save_obj(activeTickets,'activeTickets')
 
     def cleanUpMessage(self,message):
@@ -173,7 +174,8 @@ class CheckHandler(object):
                     save_obj(activeRepTickets,'activeRepTickets')
 
                     self.CheckHandlerLog.info("[Reply][%s] Новый ответ.\n %s \n %s \n %s" % (ticket.ticket_id, ticket.email, ticket.subject, ticket.message))
-                    self.openbot.sendMessageGroupInline("[Reply][%s] Новый ответ.\n %s \n %s \n %s" % (ticket.ticket_id, ticket.email, ticket.subject, ticket.message))
+                    #self.openbot.sendMessageGroupInline("[Reply][%s] Новый ответ.\n %s \n %s \n %s" % (ticket.ticket_id, ticket.email, ticket.subject, ticket.message))
+                    self.openbot.sendMessageGroup("[Reply][%s] Новый ответ.\n %s \n %s \n %s" % (ticket.ticket_id, ticket.email, ticket.subject, ticket.message))
 
     def checkNewMessage(self):
         tickets = self.getListTickets()

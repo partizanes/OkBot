@@ -251,6 +251,7 @@ https://%s:2083/""" %(domain.encode("utf-8").decode("idna"), server, username, e
                     #Implement accept reply to ticket message 
                     if msg['reply_to_message'] is not None:
                         ticket_id = re.search('\[(Ticket|Reply)]\[(.+?)]', msg['reply_to_message']['text']).group(2)
+                        original_message_id = (GroupId, msg['reply_to_message']['message_id'])
 
                         if(ticket_id is None):
                             self.botLog.critical("[handle][group] Не удалось извлечь идентификатор заявки.\n Отладочная информация: \n %s" %(msg))
@@ -278,6 +279,7 @@ https://%s:2083/""" %(domain.encode("utf-8").decode("idna"), server, username, e
                                 try:
                                     dept_id = dept.DOMAIN
                                     Datebase().moveTicketTo(dept_id.value, ticket_id)
+                                    self.deleteMessage(original_message_id)
                                     self.botLog.critical("[.move] Заявка %s перемещена в отдел: %s" %(ticket_id, dept_id.name))
                                     self.sendMessageGroup("[.move] Заявка %s перемещена в отдел: %s" %(ticket_id, dept_id.name))
                                 except Exception as exc:
@@ -285,21 +287,23 @@ https://%s:2083/""" %(domain.encode("utf-8").decode("idna"), server, username, e
                                 return
 
                             if(command == '.spam'):
-                                inline_message_id = (GroupId, msg['message_id'])
                                 spam_email = combine[ticket_id].email  
             
                                 Datebase().setSpamEmail(spam_email)
                                 Datebase().setTicketSpam(ticket_id)
+                                self.deleteMessage(original_message_id)
+                                return
+
+                            if(command == '.del'):
+                                inline_message_id = (GroupId, msg['reply_to_message']['message_id']) 
                                 self.deleteMessage(inline_message_id)
                                 return
 
                             if(command == '.ssh'):
                                 try:
-                                    inline_message_id = (GroupId, msg['message_id'])
-                                    temp = self.grantAccessToSsh(combine[ticket_id].email)
-                                    self.botLog.warning(temp)
-                                    self.sendMessageGroup(temp)
-
+                                    answer = self.grantAccessToSsh(combine[ticket_id].email)
+                                    self.botLog.warning(answer)
+                                    self.sendMessageGroup(answer)
                                     #hdapi.postQuickReply(ticket_id, temp , HdTicketStatus.Close, self)
                                 except Exception as exc:
                                     self.botLog.critical("[.ssh] Во время выполнения возникло исключение: %s" %repr(exc))
@@ -307,13 +311,11 @@ https://%s:2083/""" %(domain.encode("utf-8").decode("idna"), server, username, e
                                 return
 
                             if(command == '.close'):
-                                inline_message_id = (GroupId, msg['message_id'])
                                 Datebase().setTicketClose(ticket_id)
-                                self.botLog.debug(self.deleteMessage(inline_message_id))
+                                self.deleteMessage(original_message_id)
                                 return
 
                             if(command == '.exclude'):
-                                inline_message_id = (GroupId, msg['message_id'])
                                 subcommand = message.split(' ')[1]
 
                                 if(subcommand is None or subcommand == ""):
@@ -332,6 +334,7 @@ https://%s:2083/""" %(domain.encode("utf-8").decode("idna"), server, username, e
                                 Config.saveConfig()
                                 
                                 Datebase().setTicketClose(ticket_id)
+                                self.deleteMessage(original_message_id)
 
                                 self.sendMessageGroup("[.exclude] Сохранен список исключений: %s" %(",".join(tempExcludeList)))
                                 return
