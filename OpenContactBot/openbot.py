@@ -117,7 +117,7 @@ https://%s:2083/""" %(domain.encode("utf-8").decode("idna"), server, username, e
 Хост:      %s или %s
 Порт:      20022
 Логин:     %s
-        """ %(domain, domain, server, username))
+        """ %(domain.encode("utf-8").decode("idna"), domain.encode("utf-8").decode("idna"), server, username))
     
     def changeContactEmailInCpanel(self, emailFrom, hostingService, cpanelUsersAccounts):
         self.botLog.warning('Адрес контактной почты в панели хостинга отличается от панели доменов или от адреса отправителя.')
@@ -165,7 +165,7 @@ https://%s:2083/""" %(domain.encode("utf-8").decode("idna"), server, username, e
         ListOfHostingServices = self.dApi.getListofHostingServices(emailFrom)
 
         if(len(ListOfHostingServices) == 0):
-            return "На данный контактный адрес почты не найдено зарегистрированых услуг."
+            return "На данный контактный адрес почты не найдено зарегистрированных услуг.\n Заявка должна быть оформлена с контактного адреса почты хостинга."
 
         for hostingService in ListOfHostingServices:
             hosting = cpanelUsersAccounts[hostingService.domain].server

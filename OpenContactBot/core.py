@@ -6,9 +6,9 @@ import threading
 from log import Log
 from config import Config
 from openbot import OpenBot
+from domainapi import DomainApi
 from checkHandler import CheckHandler
 from accountloader import cronReloadListAccounts
-from domainapi import DomainApi
 from cpanelServerHandler import cpanelServerHandler
 
 coreLog = Log('Core')
@@ -18,7 +18,6 @@ dApi = DomainApi()
 checkhandler = CheckHandler()
 openbot = OpenBot(Config.getToken())
 cServHandler = cpanelServerHandler()
-
 
 t = threading.Thread(target=openbot.listening, args=(dApi,))
 t.daemon = True
