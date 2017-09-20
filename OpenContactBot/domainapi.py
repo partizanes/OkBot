@@ -377,6 +377,9 @@ class DomainApi(object):
                         
                         listCreateHosting.remove(domain)  
                         save_obj(listCreateHosting,'listCreateHosting')
+                    else:
+                        self.dLog.info("[Domain.by] Аккаунт хостинга не создан: %s"%domain)
+                        self.openbot.sendMessageGroup("[Domain.by] хостинг не создан: %s"%domain)
 
                 i += 1
             except Exception as inst:
