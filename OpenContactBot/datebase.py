@@ -149,3 +149,12 @@ class Datebase(object):
         self.dbLog.warning(sql + '\n')
         self.cur.execute(sql)
         self.cur.fetchone()
+
+    def getEmailByTicketId(self, ticket_id):
+         sql = """SELECT email FROM `hdp_tickets` 
+         LEFT JOIN hdp_clients ON hdp_tickets.client_id = hdp_clients.client_id 
+         WHERE `ticket_id` = '%s'
+         """ %(ticket_id)
+         
+         self.cur.execute(sql)
+         return self.cur.fetchall()[0][0]

@@ -145,7 +145,7 @@ https://%s:2083/""" %(domain.encode("utf-8").decode("idna"), server, username, e
         ListOfHostingServices = self.dApi.getListofHostingServices(emailFrom)
         
         if(len(ListOfHostingServices) == 0):
-            return "На данный контактный адрес почты не найдено зарегистрированых услуг."
+            return "На данный контактный адрес почты не найдено зарегистрированых услуг.Заявка на восстановление доступа должна быть отправлена с контакного адреса хостинга."
 
         for hostingService in ListOfHostingServices:
             if(cpanelUsersAccounts[hostingService.domain].email not in hostingService.controlemail or cpanelUsersAccounts[hostingService.domain].email != emailFrom):
@@ -188,7 +188,7 @@ https://%s:2083/""" %(domain.encode("utf-8").decode("idna"), server, username, e
         
         content_type, chat_type, chat_id = telepot.glance(msg)
         id, username = msg['from']['id'],msg['from']['username']
-        combine = dict(list(activeTickets.items()) + list(activeRepTickets.items()))
+        #combine = dict(list(activeTickets.items()) + list(activeRepTickets.items()))
 
         if (content_type, chat_type, chat_id, id, username) is None:
             self.botLog.critical("Сообщение не обработано.")
@@ -252,6 +252,7 @@ https://%s:2083/""" %(domain.encode("utf-8").decode("idna"), server, username, e
                     if msg['reply_to_message'] is not None:
                         ticket_id = re.search('\[(Ticket|Reply)]\[(.+?)]', msg['reply_to_message']['text']).group(2)
                         original_message_id = (GroupId, msg['reply_to_message']['message_id'])
+                        ticket_email = Datebase().getEmailByTicketId(ticket_id)
 
                         if(ticket_id is None):
                             self.botLog.critical("[handle][group] Не удалось извлечь идентификатор заявки.\n Отладочная информация: \n %s" %(msg))
@@ -265,7 +266,7 @@ https://%s:2083/""" %(domain.encode("utf-8").decode("idna"), server, username, e
 
                             if(command == '.restore'):
                                 try:
-                                    temp = self.restoreCpanelPassword(combine[ticket_id].email)
+                                    temp = self.restoreCpanelPassword(ticket_email)
                                     self.botLog.warning(temp)
                                     self.sendMessageGroup(temp)
 
@@ -287,7 +288,7 @@ https://%s:2083/""" %(domain.encode("utf-8").decode("idna"), server, username, e
                                 return
 
                             if(command == '.spam'):
-                                spam_email = combine[ticket_id].email  
+                                spam_email = ticket_email
             
                                 Datebase().setSpamEmail(spam_email)
                                 Datebase().setTicketSpam(ticket_id)
@@ -296,7 +297,7 @@ https://%s:2083/""" %(domain.encode("utf-8").decode("idna"), server, username, e
 
                             if(command == '.ssh'):
                                 try:
-                                    answer = self.grantAccessToSsh(combine[ticket_id].email)
+                                    answer = self.grantAccessToSsh(ticket_email)
                                     self.botLog.warning(answer)
                                     self.sendMessageGroup(answer)
                                     #hdapi.postQuickReply(ticket_id, temp , HdTicketStatus.Close, self)
