@@ -13,6 +13,7 @@ from cpanelapiclient import cpanelApiClient
 from hdDepartaments import hdDepartaments as dept
 from ticket import activeTickets,activeRepTickets
 from telepot.namedtuple import InlineKeyboardMarkup, InlineKeyboardButton
+from util import Util
 
 Config.initializeConfig()
 AdminList = Config.getAdminList()
@@ -227,9 +228,12 @@ https://%s:2083/""" %(domain.encode("utf-8").decode("idna"), server, username, e
             elif(chat_type == 'group'):
 
                 if(message[0] == '/'):
-                    if(message.split(' ')[0] == '/help'):
+                    checkCmd = message.split(' ')[0]
+
+                    if(checkCmd == '/help'):
                         self.sendMessageGroup("""
 /help    - Данное меню.
+/update  - Проверка наличия обновлений.
 
 Следующие команды используються , как ответ(reply) на сообщение:
 
@@ -245,8 +249,12 @@ https://%s:2083/""" %(domain.encode("utf-8").decode("idna"), server, username, e
 
 .ssh      - Добавляет пользователю возможность подключения по ssh.
 """)
-                    return
 
+                    if (checkCmd == '/update'):
+                        self.sendMessageGroup("Проводим проверку наличия обновлений...")
+                        self.botLog.warning("Получена комманда: %s"%checkCmd)
+                        Util.checkUpdate(botLog, self)
+                    return
                 try:
                     #Implement accept reply to ticket message 
                     if msg['reply_to_message'] is not None:
