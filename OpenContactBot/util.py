@@ -63,8 +63,8 @@ class Util(object):
         try:
             print('[%s][Updater] Проверка наличия обновлений...'%time.strftime('%Y-%m-%d %H:%M:%S'))
 
-            currentVersion = getCurrentVersion()
-            versionAtServer = getVersionAtServer()
+            currentVersion = Util.getCurrentVersion()
+            versionAtServer = Util.getVersionAtServer()
 
             print('[%s][Updater] Текущая версия: %s \n[%s][Updater] Версия на сервере: %s'%(time.strftime('%Y-%m-%d %H:%M:%S'), currentVersion, time.strftime('%Y-%m-%d %H:%M:%S'), versionAtServer))
             
@@ -73,6 +73,7 @@ class Util(object):
 
             return False
         except Exception as inst:
+            print('[%s][Updater][Exception] %s'%(time.strftime('%Y-%m-%d %H:%M:%S', inst)
             return False
 
     @staticmethod
