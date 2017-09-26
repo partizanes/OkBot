@@ -1,6 +1,7 @@
 # -*- coding: utf-8 -*-
 # by Part!zanes 2017
-import os, sys, time, git
+
+import os, sys, time, git, subprocess
 import urllib.request
 
 class Util(object):
@@ -30,15 +31,24 @@ class Util(object):
     def checkUpdate(coreLog, openbot):
         if(Util.needUpdate()):
             openbot.sendMessageGroup('Обнаружено обновление...')
+           
+            curPath = os.getcwd()
 
-            os.chdir('..')
-            g = git.cmd.Git(os.getcwd())
-            updateLog = g.pull()
+            if (os.name == 'nt'):
+                splitedPath = curPath.split("\\")[0:-1]
+            else:
+                splitedPath = curPath.split('/')[0:-1]
+
+            if (os.name == 'nt'):
+                gitDirPath = "\\".join(map(str,splitedPath))
+            else:
+                gitDirPath = "/".join(map(str,splitedPath))
+
+            g = git.cmd.Git(gitDirPath)
+            updateLog = "[GitUpdate]" + g.pull()
 
             coreLog.warning(updateLog)
             openbot.sendMessageGroup(updateLog)
-
-            os.chdir('OpenContactBot')
 
             restartPath = os.path.join(os.getcwd(), "restart.py")
             subprocess.Popen([sys.executable, restartPath])
@@ -61,7 +71,7 @@ class Util(object):
               versionAtServer = int(f.read(10).decode('utf-8'))
               print('[%s][Updater] Текущая версия: %s \n[%s][Updater] Версия на сервере: %s'%(time.strftime('%Y-%m-%d %H:%M:%S'), currentVersion, time.strftime('%Y-%m-%d %H:%M:%S'), versionAtServer))
 
-            if(currentVersion != versionAtServer):
+            if(currentVersion < versionAtServer):
                 return True
 
             return False
