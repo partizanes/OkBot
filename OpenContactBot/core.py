@@ -1,9 +1,10 @@
 # -*- coding: utf-8 -*-
 # by Part!zanes 2017
 
-import time
+import os, time, git
 import threading
 from log import Log
+from util import Util
 from config import Config
 from openbot import OpenBot
 from domainapi import DomainApi
@@ -18,6 +19,14 @@ dApi = DomainApi()
 checkhandler = CheckHandler()
 openbot = OpenBot(Config.getToken())
 cServHandler = cpanelServerHandler()
+
+if(Util.needUpdate()):
+    os.chdir('..')
+    g = git.cmd.Git(os.getcwd())
+    updateLog = g.pull()
+    coreLog.warning(updateLog)
+    openbot.sendMessageGroup(updateLog)
+    os.chdir('OpenContactBot')
 
 t = threading.Thread(target=openbot.listening, args=(dApi,))
 t.daemon = True

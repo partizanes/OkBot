@@ -78,6 +78,7 @@
   <ItemGroup>
     <Content Include="config.cfg" />
     <Content Include="requirements.txt" />
+    <Content Include="version" />
   </ItemGroup>
   <ItemGroup>
     <Folder Include="cpanelapi\" />

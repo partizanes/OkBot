@@ -174,7 +174,6 @@ class CheckHandler(object):
                     save_obj(activeRepTickets,'activeRepTickets')
 
                     self.CheckHandlerLog.info("[Reply][%s] Новый ответ.\n %s \n %s \n %s" % (ticket.ticket_id, ticket.email, ticket.subject, ticket.message))
-                    #self.openbot.sendMessageGroupInline("[Reply][%s] Новый ответ.\n %s \n %s \n %s" % (ticket.ticket_id, ticket.email, ticket.subject, ticket.message))
                     self.openbot.sendMessageGroup("[Reply][%s] Новый ответ.\n %s \n %s \n %s" % (ticket.ticket_id, ticket.email, ticket.subject, ticket.message))
 
     def checkNewMessage(self):
