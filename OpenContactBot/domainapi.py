@@ -284,7 +284,7 @@ class DomainApi(object):
                     status = int(answer['status'])
                     message = answer['statusmsg']
 
-                    if(status == 1):
+                    if(status == 1 or "does not exist!" in message):
                         url_delete = "https://domain.by/BackEnd/Support/" + soup.find(id="ctl00_contentHolder_TaskList_ucDelete_rptServiceList_ctl0%s_hlAction"%i).get('href')
                         
                         browser.open(url_delete)
@@ -294,12 +294,19 @@ class DomainApi(object):
                         if(browser.url == self.url_search):
                             self.dLog.info("[Domain.by] Задача удаления завершена: %s"%username)
 
+                    else:
+                        self.dLog.critical("[checkDeleteHosting][Cpanel] %s"%message)
+                        self.openbot.sendMessageGroup("[Domain.by] Хостинг не удален: %s .\nТекст ответа: %s"%(domain.encode("utf-8").decode("idna"), message))
+
 
                 tempListDeleteHosting.append(domain)
 
                 i += 1
             except KeyError as inst:
                 pass
+            except RuntimeError as inst:
+                 self.dLog.critical("[checkDeleteHosting][Cpanel] %s"%inst)
+                 self.openbot.sendMessageGroup("[Domain.by][RuntimeError]: %s"%(inst))
             except Exception as inst:
                 haveValue = False
 
