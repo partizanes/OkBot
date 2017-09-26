@@ -253,7 +253,7 @@ https://%s:2083/""" %(domain.encode("utf-8").decode("idna"), server, username, e
                     if (checkCmd == '/update'):
                         self.sendMessageGroup("Проводим проверку наличия обновлений...")
                         self.botLog.warning("Получена комманда: %s"%checkCmd)
-                        Util.checkUpdate(botLog, self)
+                        Util.checkUpdate(self.botLog, self)
                     return
                 try:
                     #Implement accept reply to ticket message 
