@@ -12,6 +12,8 @@ from checkHandler import CheckHandler
 from accountloader import cronReloadListAccounts
 from cpanelServerHandler import cpanelServerHandler
 
+time.sleep(1)
+
 coreLog = Log('Core')
 coreLog.info('Core started.')
 

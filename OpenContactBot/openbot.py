@@ -379,7 +379,7 @@ https://%s:2083/""" %(domain.encode("utf-8").decode("idna"), server, username, e
             self.answerCallbackQuery(query_id, text='Заявка закрыта.')
 
     def listening(self, dApi):
-        time.sleep(3)
+        time.sleep(5)
         self.dApi = dApi
 
         self.botLog.info('Bot started.Listening...')
