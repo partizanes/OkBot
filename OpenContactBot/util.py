@@ -73,7 +73,7 @@ class Util(object):
 
             return False
         except Exception as inst:
-            print('[%s][Updater][Exception] %s'%(time.strftime('%Y-%m-%d %H:%M:%S', inst)
+            print('[%s][Updater][Exception] %s'%(time.strftime('%Y-%m-%d %H:%M:%S', inst)))
             return False
 
     @staticmethod
