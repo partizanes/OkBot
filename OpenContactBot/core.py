@@ -1,7 +1,7 @@
 # -*- coding: utf-8 -*-
 # by Part!zanes 2017
 
-import os, time, git
+import time
 import threading
 from log import Log
 from util import Util
@@ -19,14 +19,6 @@ dApi = DomainApi()
 checkhandler = CheckHandler()
 openbot = OpenBot(Config.getToken())
 cServHandler = cpanelServerHandler()
-
-if(Util.needUpdate()):
-    os.chdir('..')
-    g = git.cmd.Git(os.getcwd())
-    updateLog = g.pull()
-    coreLog.warning(updateLog)
-    openbot.sendMessageGroup(updateLog)
-    os.chdir('OpenContactBot')
 
 t = threading.Thread(target=openbot.listening, args=(dApi,))
 t.daemon = True
@@ -49,6 +41,7 @@ t5.daemon = True
 t5.start()
 
 while 1:
-    time.sleep(30)
+    Util.checkUpdate(coreLog, openbot)
+    time.sleep(10800)
     #coreLog.info('tick.')
 

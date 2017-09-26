@@ -40,6 +40,9 @@
     <Compile Include="hdapi.py">
       <SubType>Code</SubType>
     </Compile>
+    <Compile Include="restart.py">
+      <SubType>Code</SubType>
+    </Compile>
     <Compile Include="util.py">
       <SubType>Code</SubType>
     </Compile>

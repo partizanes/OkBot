@@ -1,7 +1,6 @@
 # -*- coding: utf-8 -*-
 # by Part!zanes 2017
-import os
-import sys
+import os, sys, time, git
 import urllib.request
 
 class Util(object):
@@ -28,8 +27,29 @@ class Util(object):
         return(os.path.join(patch,*patchs))
 
     @staticmethod
+    def checkUpdate(coreLog, openbot):
+        if(Util.needUpdate()):
+            openbot.sendMessageGroup('Обнаружено обновление...')
+
+            os.chdir('..')
+            g = git.cmd.Git(os.getcwd())
+            updateLog = g.pull()
+
+            coreLog.warning(updateLog)
+            openbot.sendMessageGroup(updateLog)
+
+            os.chdir('OpenContactBot')
+
+            restartPath = os.path.join(os.getcwd(), "restart.py")
+            subprocess.Popen([sys.executable, restartPath])
+            exit()
+
+
+    @staticmethod
     def needUpdate():
         try:
+            print('[%s][Updater] Проверка наличия обновлений...'%time.strftime('%Y-%m-%d %H:%M:%S'))
+
             updateUrl = "https://raw.githubusercontent.com/partizanes/OkBot/master/OpenContactBot/version"
             patchToVersion = os.path.join(os.getcwd(), "version")
 
@@ -39,6 +59,7 @@ class Util(object):
 
             with urllib.request.urlopen(updateUrl) as f:
               versionAtServer = int(f.read(10).decode('utf-8'))
+              print('[%s][Updater] Текущая версия: %s \n[%s][Updater] Версия на сервере: %s'%(time.strftime('%Y-%m-%d %H:%M:%S'), currentVersion, time.strftime('%Y-%m-%d %H:%M:%S'), versionAtServer))
 
             if(currentVersion != versionAtServer):
                 return True
