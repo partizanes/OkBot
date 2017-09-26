@@ -229,6 +229,7 @@ https://%s:2083/""" %(domain.encode("utf-8").decode("idna"), server, username, e
 
                 if(message[0] == '/'):
                     checkCmd = message.split(' ')[0]
+                    self.botLog.warning("Получена комманда: %s"%checkCmd)
 
                     if(checkCmd == '/help'):
                         self.sendMessageGroup("""
@@ -249,11 +250,13 @@ https://%s:2083/""" %(domain.encode("utf-8").decode("idna"), server, username, e
 
 .ssh      - Добавляет пользователю возможность подключения по ssh.
 """)
-
+                        return
                     if (checkCmd == '/update'):
                         self.sendMessageGroup("Проводим проверку наличия обновлений...")
-                        self.botLog.warning("Получена комманда: %s"%checkCmd)
                         Util.checkUpdate(self.botLog, self)
+                        return
+                    if (checkCmd == '/version'):
+                        self.sendMessageGroup('Текущая версия: %s \nВерсия на сервере: %s'%(Util.getCurrentVersion(), Util.getVersionAtServer()))
                     return
                 try:
                     #Implement accept reply to ticket message 

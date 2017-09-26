@@ -63,20 +63,29 @@ class Util(object):
         try:
             print('[%s][Updater] Проверка наличия обновлений...'%time.strftime('%Y-%m-%d %H:%M:%S'))
 
-            updateUrl = "https://raw.githubusercontent.com/partizanes/OkBot/master/OpenContactBot/version"
-            patchToVersion = os.path.join(os.getcwd(), "version")
+            currentVersion = getCurrentVersion()
+            versionAtServer = getVersionAtServer()
 
-            fo = open(patchToVersion, "r")
-            currentVersion = int(fo.read())
-            fo.close()
-
-            with urllib.request.urlopen(updateUrl) as f:
-              versionAtServer = int(f.read(10).decode('utf-8'))
-              print('[%s][Updater] Текущая версия: %s \n[%s][Updater] Версия на сервере: %s'%(time.strftime('%Y-%m-%d %H:%M:%S'), currentVersion, time.strftime('%Y-%m-%d %H:%M:%S'), versionAtServer))
-
+            print('[%s][Updater] Текущая версия: %s \n[%s][Updater] Версия на сервере: %s'%(time.strftime('%Y-%m-%d %H:%M:%S'), currentVersion, time.strftime('%Y-%m-%d %H:%M:%S'), versionAtServer))
+            
             if(currentVersion < versionAtServer):
                 return True
 
             return False
         except Exception as inst:
             return False
+
+    @staticmethod
+    def getCurrentVersion(): 
+        fo = open(os.path.join(os.getcwd(), "version"), "r")
+        currentVersion = int(fo.read())
+        fo.close()
+
+        return currentVersion
+
+    def getVersionAtServer():
+        updateUrl = "https://raw.githubusercontent.com/partizanes/OkBot/master/OpenContactBot/version"
+
+        with urllib.request.urlopen(updateUrl) as f:
+              versionAtServer = int(f.read(10).decode('utf-8'))
+              return versionAtServer
