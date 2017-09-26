@@ -53,6 +53,9 @@ class Util(object):
             restartPath = os.path.join(os.getcwd(), "restart.py")
             subprocess.Popen([sys.executable, restartPath])
             exit()
+        else:
+            openbot.sendMessageGroup('Обновлений не обнаружено.')
+            print('[%s][Updater] Обновлений не обнаружено.'%time.strftime('%Y-%m-%d %H:%M:%S'))
 
 
     @staticmethod
