@@ -235,6 +235,8 @@ https://%s:2083/""" %(domain.encode("utf-8").decode("idna"), server, username, e
                         self.sendMessageGroup("""
 /help    - Данное меню.
 /update  - Проверка наличия обновлений.
+/version - Отображает версию ядра.
+/uptime  - Отображает время с момента запуска.
 
 Следующие команды используються , как ответ(reply) на сообщение:
 
@@ -257,6 +259,9 @@ https://%s:2083/""" %(domain.encode("utf-8").decode("idna"), server, username, e
                         return
                     if (checkCmd == '/version'):
                         self.sendMessageGroup('Текущая версия: %s \nВерсия на сервере: %s'%(Util.getCurrentVersion(), Util.getVersionAtServer()))
+                        return
+                    if (checkCmd == '/uptime'):
+                        self.sendMessageGroup('Время работы: %s'%(Util.getUpime()))
                     return
                 try:
                     #Implement accept reply to ticket message 

@@ -43,7 +43,7 @@ t5.daemon = True
 t5.start()
 
 while 1:
-    Util.checkUpdate(coreLog, openbot)
+    Util.checkUpdate(coreLog, openbot, False)
     time.sleep(10800)
     #coreLog.info('tick.')
 

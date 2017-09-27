@@ -3,6 +3,9 @@
 
 import os, sys, time, git, subprocess
 import urllib.request
+from datetime import datetime
+
+startTime = datetime.now()
 
 class Util(object):
 
@@ -28,7 +31,7 @@ class Util(object):
         return(os.path.join(patch,*patchs))
 
     @staticmethod
-    def checkUpdate(coreLog, openbot):
+    def checkUpdate(coreLog, openbot, sendmessage=True):
         if(Util.needUpdate()):
             openbot.sendMessageGroup('Обнаружено обновление...')
            
@@ -53,7 +56,7 @@ class Util(object):
             restartPath = os.path.join(os.getcwd(), "restart.py")
             subprocess.Popen([sys.executable, restartPath])
             exit()
-        else:
+        elif(sendmessage):
             openbot.sendMessageGroup('Обновлений не обнаружено.')
             print('[%s][Updater] Обновлений не обнаружено.'%time.strftime('%Y-%m-%d %H:%M:%S'))
 
@@ -83,10 +86,15 @@ class Util(object):
         fo.close()
 
         return currentVersion
-
+    
+    @staticmethod
     def getVersionAtServer():
         updateUrl = "https://raw.githubusercontent.com/partizanes/OkBot/master/OpenContactBot/version"
 
         with urllib.request.urlopen(updateUrl) as f:
               versionAtServer = int(f.read(10).decode('utf-8'))
               return versionAtServer
+
+    @staticmethod
+    def getUpime():
+        return  datetime.now() - startTime
