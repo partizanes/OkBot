@@ -115,5 +115,6 @@ class Config(object):
         for item in Config.getConfigValue('exclude', 'create').replace(' ', '').split(','):
             exclude_list.append(item)
 
+        exclude_list = list(filter(None, exclude_list))
         return exclude_list
         

@@ -340,7 +340,7 @@ https://%s:2083/""" %(domain.encode("utf-8").decode("idna"), server, username, e
                                 tempExcludeList = Config.getExcludeEmailList()
 
                                 if(subcommand in tempExcludeList):
-                                    self.botLog.debug(self.deleteMessage(inline_message_id))
+                                    self.deleteMessage(original_message_id)
                                     tempExcludeList.remove(subcommand)
                                 else:
                                     tempExcludeList.append(subcommand)
