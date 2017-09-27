@@ -282,11 +282,14 @@ https://%s:2083/""" %(domain.encode("utf-8").decode("idna"), server, username, e
 
                             if(command == '.restore'):
                                 try:
-                                    temp = self.restoreCpanelPassword(ticket_email)
-                                    self.botLog.warning(temp)
-                                    self.sendMessageGroup(temp)
+                                    reset_answer = self.restoreCpanelPassword(ticket_email)
+                                    self.botLog.warning(reset_answer)
+                                    self.sendMessageGroup(reset_answer)
 
-                                    #hdapi.postQuickReply(ticket_id, temp , HdTicketStatus.Close, self)
+                                    trueAnswer = ['не найдено зарегистрированых услуг', 'Сбросить пароль от хостинга']
+
+                                    if any(x in reset_answer for x in trueAnswer):
+                                        hdapi.postQuickReply(ticket_id, reset_answer , HdTicketStatus.Close, self)
                                 except Exception as exc:
                                     self.botLog.critical("[.restore] Во время выполнения возникло исключение: %s" %repr(exc))
                                     self.sendMessageGroup("[.restore] Во время выполнения возникло исключение: %s" %repr(exc))
