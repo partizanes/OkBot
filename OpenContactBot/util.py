@@ -97,4 +97,4 @@ class Util(object):
 
     @staticmethod
     def getUpime():
-        return  datetime.now() - startTime
+        return  str(datetime.now() - startTime).split('.')[0]
