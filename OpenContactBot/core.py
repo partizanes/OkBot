@@ -42,6 +42,8 @@ t5 = threading.Thread(target=cServHandler.start, args=(openbot,))
 t5.daemon = True
 t5.start()
 
+openbot.sendMessageGroup("Core started.")
+
 while 1:
     Util.checkUpdate(coreLog, openbot, False)
     time.sleep(10800)
