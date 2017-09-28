@@ -289,7 +289,8 @@ https://%s:2083/""" %(domain.encode("utf-8").decode("idna"), server, username, e
                                     trueAnswer = ['не найдено зарегистрированых услуг', 'Сбросить пароль от хостинга']
 
                                     if any(x in reset_answer for x in trueAnswer):
-                                        hdapi.postQuickReply(ticket_id, reset_answer , HdTicketStatus.Close, self)
+                                        hdapi.postQuickReply(ticket_id, reset_answer , HdTicketStatus.CLOSED, self)
+
                                 except Exception as exc:
                                     self.botLog.critical("[.restore] Во время выполнения возникло исключение: %s" %repr(exc))
                                     self.sendMessageGroup("[.restore] Во время выполнения возникло исключение: %s" %repr(exc))
@@ -319,7 +320,7 @@ https://%s:2083/""" %(domain.encode("utf-8").decode("idna"), server, username, e
                                     answer = self.grantAccessToSsh(ticket_email)
                                     self.botLog.warning(answer)
                                     self.sendMessageGroup(answer)
-                                    #hdapi.postQuickReply(ticket_id, temp , HdTicketStatus.Close, self)
+                                    #hdapi.postQuickReply(ticket_id, temp , HdTicketStatus.CLOSED, self)
                                 except Exception as exc:
                                     self.botLog.critical("[.ssh] Во время выполнения возникло исключение: %s" %repr(exc))
                                     self.sendMessageGroup("[.ssh] Во время выполнения возникло исключение: %s" %repr(exc))
