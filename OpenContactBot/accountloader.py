@@ -7,9 +7,9 @@ from cpaneluser import cpanelUser
 from log import Log
 from cache import *
 
-def loadDataFromServers():
+def loadDataFromServers(isForce=False):
 
-    if not (isOutdated('cpanelUsersAccounts')):
+    if not (isOutdated('cpanelUsersAccounts') or isForce):
             loadFromCache()
             return
 
