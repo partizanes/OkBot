@@ -318,10 +318,15 @@ https://%s:2083/""" %(domain.encode("utf-8").decode("idna"), server, username, e
 
                             if(command == '.ssh'):
                                 try:
-                                    answer = self.grantAccessToSsh(ticket_email)
-                                    self.botLog.warning(answer)
-                                    self.sendMessageGroup(answer)
-                                    #hdapi.postQuickReply(ticket_id, temp , HdTicketStatus.CLOSED, self)
+                                    reset_answer = self.grantAccessToSsh(ticket_email)
+                                    trueAnswer = ['не найдено зарегистрированых услуг', 'как в панели управления хостингом']
+
+                                    self.botLog.warning(reset_answer)
+                                    
+                                    if any(x in reset_answer for x in trueAnswer):
+                                        hdapi.postQuickReply(ticket_id, reset_answer , HdTicketStatus.CLOSED, self)
+                                    else:
+                                        self.sendMessageGroup(reset_answer)
                                 except Exception as exc:
                                     self.botLog.critical("[.ssh] Во время выполнения возникло исключение: %s" %repr(exc))
                                     self.sendMessageGroup("[.ssh] Во время выполнения возникло исключение: %s" %repr(exc))
