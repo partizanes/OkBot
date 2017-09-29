@@ -107,37 +107,15 @@ class CheckHandler(object):
             self.openbot.sendMessageGroup("[Ticket][%s] Новая Заявка.\n %s \n %s \n %s" % (ticket.ticket_id, ticket.email, ticket.subject, ticket.message))
             save_obj(activeTickets,'activeTickets')
 
-    def cleanUpMessage(self,message):
-        temp = ""
+    def cleanUpMessage(self, message):
+        message = re.sub(r'<br>|</p>','\n', message)
+        message = re.sub("<br />",' ', message)
+        message = re.sub("<.*?>","", message)
+        message = ''.join(message.split('"Отдел технической поддержки" :', 1)[:-1])
+        reg = re.compile(r"[\d]{2,2}.[\d]{2,2}.[\d]{2,4}, [\d]{2,2}:[\d]{2,2},")
+        message = ''.join(message.split((''.join(reg.findall(message))), 1)[:-1])
 
-        for line in message.splitlines():
-                        if line == message:
-                            return message
-                        if '-----Original Message-----' in line:
-                            return temp
-                        if 'From: Отдел технической поддержки' in line:
-                            continue
-                        if 'Sent: ' in line:
-                            continue
-                        if 'To: ' in line:
-                            continue
-                        if 'Subject: Re:' in line:
-                            continue
-                        if '## Пожалуйста, не удаляйте номер запроса' in line:
-                            continue
-                        if '## Пожалуйста, не удаляйте номер запроса' in line:
-                            continue
-                        if '## Don\'t remove the ticket number' in line:
-                            continue
-                        if 'С уважением,' in line:
-                            continue
-                        if 'Отдел технической поддержки Domain.BY' in line:
-                            continue
-                        if line == '':
-                            continue
-                        else:
-                            temp += line + '\n'
-        return temp
+        return message
 
     def checkNewReplies(self):
         replied_tickets = Datebase().getRepliesTicketsIdList()
