@@ -111,9 +111,6 @@ class CheckHandler(object):
         message = re.sub(r'<br>|</p>','\n', message)
         message = re.sub("<br />",' ', message)
         message = re.sub("<.*?>","", message)
-        message = ''.join(message.split('"Отдел технической поддержки" :', 1)[:-1])
-        reg = re.compile(r"[\d]{2,2}.[\d]{2,2}.[\d]{2,4}, [\d]{2,2}:[\d]{2,2},")
-        message = ''.join(message.split((''.join(reg.findall(message))), 1)[:-1])
 
         return message
 
