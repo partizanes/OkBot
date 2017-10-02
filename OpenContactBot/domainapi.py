@@ -1,3 +1,6 @@
+# -*- coding: utf-8 -*-
+# by Part!zanes 2017
+
 import re,time
 from log import Log
 from crypto import Crypto

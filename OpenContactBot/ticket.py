@@ -15,19 +15,6 @@ class Ticket(object):
         self.timezone = timezone
         self.email = email
 
-        #def ticketClose():
-
-
-#def enum(**named_values):
-#    return type('Enum', (), named_values)
-#
-#TicketStatus = enum(NEW='N', OPEN='O', CLOSED='C', ON_HOLD='H', SPAM='S')
-#
-#if('N' == TicketStatus.NEW):
-#    print('true')
-#
-
-
 def getActiveTicketsList():
     return activeTickets
 

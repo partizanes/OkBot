@@ -1,5 +1,6 @@
 # -*- coding: utf-8 -*-
 # by Part!zanes 2017
+
 import time
 import pickle
 from log import Log

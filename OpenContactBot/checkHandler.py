@@ -239,7 +239,6 @@ class CheckHandler(object):
     def start(self, openbot):
         time.sleep(1)
 
-
         self.CheckHandlerLog.info('CheckHandler started.')
         self.openbot = openbot
 

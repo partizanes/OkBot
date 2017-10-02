@@ -80,13 +80,18 @@ class Util(object):
             return False
 
     @staticmethod
-    def getCurrentVersion(): 
-        fo = open(os.path.join(os.getcwd(), "version"), "r")
-        currentVersion = int(fo.read())
-        fo.close()
+    def getCurrentVersion():
+        try:
+            fo = open(os.path.join(os.getcwd(), "version"), "r")
+            currentVersion = int(fo.read())
+            fo.close()
 
-        return currentVersion
-    
+            return currentVersion
+
+        except Exception as exc:
+            print('[%s][Exception] %s...'%(time.strftime('%Y-%m-%d %H:%M:%S'), exc))
+            return 0
+
     @staticmethod
     def getVersionAtServer():
         updateUrl = "https://raw.githubusercontent.com/partizanes/OkBot/master/OpenContactBot/version"

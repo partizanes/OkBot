@@ -34,11 +34,8 @@ class hdapi(object):
             'subject': subject,
             'reply': reply,
             'act':'quickreply',
-            #'bccaddress':'',
             'submit':'Послать ответ',
-            #'ccaddress':'',
             'dotktaction': status, 
-            #'reply_minutes':'',
             'canned':'0'
            }
 
