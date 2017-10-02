@@ -237,6 +237,7 @@ https://%s:2083/""" %(domain.encode("utf-8").decode("idna"), server, username, e
 /update  - Проверка наличия обновлений.
 /version - Отображает версию ядра.
 /uptime  - Отображает время с момента запуска.
+/exclude - Добавляет или удаляет доменное имя в список исключений. Пример: .exclude domain.by
 
 Следующие команды используються , как ответ(reply) на сообщение:
 
@@ -262,6 +263,27 @@ https://%s:2083/""" %(domain.encode("utf-8").decode("idna"), server, username, e
                         return
                     if (checkCmd == '/uptime'):
                         self.sendMessageGroup('Время работы: %s'%(Util.getUpime()))
+                        return
+                    if (checkCmd == '/exclude'):
+                        subcommand = message.split(' ')[1]
+
+                        if(subcommand is None or subcommand == ""):
+                            self.botLog.critical("[/exclude] Имя домена не указано.")
+                            return
+
+                        tempExcludeList = Config.getExcludeEmailList()
+
+                        if(subcommand in tempExcludeList):
+                            self.deleteMessage(original_message_id)
+                            tempExcludeList.remove(subcommand)
+                        else:
+                            tempExcludeList.append(subcommand)
+
+                        Config.setConfigValue('exclude', 'create', ",".join(tempExcludeList))
+                        Config.saveConfig()
+
+                        self.sendMessageGroup("[.exclude] Сохранен список исключений: %s" %(",".join(tempExcludeList)))
+                        return
                     return
                 try:
                     #Implement accept reply to ticket message 
