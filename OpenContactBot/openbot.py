@@ -1,7 +1,7 @@
 # -*- coding: utf-8 -*-
 # by Part!zanes 2017
 
-import re,sys,time,telepot,threading
+import os,re,sys,time,subprocess,telepot,threading
 from log import Log
 from hdapi import hdapi
 from config import Config
@@ -9,6 +9,7 @@ from datebase import Datebase
 from telepot.loop import MessageLoop
 from ticketStatus import HdTicketStatus
 from accountloader import getAccountsList
+from accountloader import loadDataFromServers
 from cpanelapiclient import cpanelApiClient
 from hdDepartaments import hdDepartaments as dept
 from ticket import activeTickets,activeRepTickets
@@ -233,11 +234,14 @@ https://%s:2083/""" %(domain.encode("utf-8").decode("idna"), server, username, e
 
                     if(checkCmd == '/help'):
                         self.sendMessageGroup("""
-/help    - Данное меню.
-/update  - Проверка наличия обновлений.
-/version - Отображает версию ядра.
-/uptime  - Отображает время с момента запуска.
-/exclude - Добавляет или удаляет доменное имя в список исключений. Пример: .exclude domain.by
+/help     - Данное меню.
+/update   - Проверка наличия обновлений.
+/version  - Отображает версию ядра.
+/uptime   - Отображает время с момента запуска.
+/exclude  - Добавляет или удаляет доменное имя в список исключений. 
+            Пример: .exclude domain.by
+/cpreload - Принудительно загружает список аккаунтов из cpanel.
+/restart  - Перезагрузка приложения.
 
 Следующие команды используються , как ответ(reply) на сообщение:
 
@@ -263,6 +267,15 @@ https://%s:2083/""" %(domain.encode("utf-8").decode("idna"), server, username, e
                         return
                     if (checkCmd == '/uptime'):
                         self.sendMessageGroup('Время работы: %s'%(Util.getUpime()))
+                        return
+                    if (checkCmd == '/cpreload'):
+                        loadDataFromServers(True)
+                        return 
+                    if (checkCmd == '/restart'):
+                        self.sendMessageGroup('Время работы: %s'%(Util.getUpime()))
+                        restartPath = os.path.join(os.getcwd(), "restart.py")
+                        subprocess.Popen([sys.executable, restartPath])
+                        os._exit(1)
                         return
                     if (checkCmd == '/exclude'):
                         subcommand = message.split(' ')[1]
