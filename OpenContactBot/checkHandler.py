@@ -92,7 +92,7 @@ class CheckHandler(object):
             results = Datebase().getNewTicketsRows()
 
             for row in results:
-                list.append(Ticket(row[0], row[1], row[2], row[3], row[4], row[5], row[6], row[7], row[8], row[9], row[10], self.getTicketAttachments()))
+                list.append(Ticket(row[0], row[1], row[2], row[3], row[4], row[5], row[6], row[7], row[8], row[9], row[10], self.getTicketAttachments(row[0])))
 
             return list
         except Exception as inst:
@@ -115,7 +115,7 @@ class CheckHandler(object):
 
             #append attachments to message 
             for k, v in ticket.attachment.items():
-                ticket.message += "\n<a href=\"%s\">%s</a>"%(k,v)
+                ticket.message += "\n<a href=\"%s\">%s</a>"%(v,k)
 
             self.CheckHandlerLog.info("[Ticket][%s] Новая Заявка.\n %s \n %s \n %s" % (ticket.ticket_id, ticket.email, ticket.subject, ticket.message))
             self.openbot.sendMessageGroup("[Ticket][%s] Новая Заявка.\n %s \n %s \n %s" % (ticket.ticket_id, ticket.email, ticket.subject, ticket.message), parse_mode='HTML') #parse_mode='HTML'  #disable_web_page_preview=True
