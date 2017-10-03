@@ -158,3 +158,9 @@ class Datebase(object):
          
          self.cur.execute(sql)
          return self.cur.fetchall()[0][0]
+
+    def getNewTicketAttachments(self, ticket_id):
+        sql = "SELECT att_id,attachment_name FROM hdp_ticket_attachments WHERE ticket_id = '%s' AND reply_id = 0" %(ticket_id)
+
+        self.cur.execute(sql)
+        return self.cur.fetchall()

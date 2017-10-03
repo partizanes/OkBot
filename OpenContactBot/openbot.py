@@ -67,13 +67,13 @@ class OpenBot(telepot.Bot):
             time.sleep(10)
             return self.sendMessageGroup(msg)
 
-    def sendMessageGroup(self, msg):
+    def sendMessageGroup(self, msg , parse_mode=None):
         #len(msg) can throw exception null pointer
         if(len(msg) > 4096):
             msg = msg[:4096-len(msg)]
 
         try:
-            self.sendMessage(GroupId, msg)
+            self.sendMessage(GroupId, msg, parse_mode, disable_web_page_preview=True)
         except:
             self.botLog.info("При отправке сообщения прозошла ошибка.Повторная попытка через 10 секунд...")
             time.sleep(10)

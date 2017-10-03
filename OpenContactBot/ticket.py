@@ -2,7 +2,7 @@
 # by Part!zanes 2017
 
 class Ticket(object):
-    def __init__(self, ticket_id, status, client_id, subject, message, client_last_activity, dept_id, ticket_created, sent_date, timezone, email):
+    def __init__(self, ticket_id, status, client_id, subject, message, client_last_activity, dept_id, ticket_created, sent_date, timezone, email, attachment=None):
         self.ticket_id = ticket_id
         self.status = status
         self.client_id = client_id
@@ -14,6 +14,7 @@ class Ticket(object):
         self.sent_date = sent_date
         self.timezone = timezone
         self.email = email
+        self.attachment = attachment
 
 def getActiveTicketsList():
     return activeTickets
