@@ -238,8 +238,7 @@ https://%s:2083/""" %(domain.encode("utf-8").decode("idna"), server, username, e
 /update   - Проверка наличия обновлений.
 /version  - Отображает версию ядра.
 /uptime   - Отображает время с момента запуска.
-/exclude  - Добавляет или удаляет доменное имя в список исключений. 
-            Пример: .exclude domain.by
+/exclude  - Добавляет или удаляет доменное имя в список исключений. Пример: .exclude domain.by
 /cpreload - Принудительно загружает список аккаунтов из cpanel.
 /restart  - Перезагрузка приложения.
 
@@ -253,9 +252,9 @@ https://%s:2083/""" %(domain.encode("utf-8").decode("idna"), server, username, e
 
 .close   - Перемещает заявку в закрытые.
 
-.exclude  - Добавляет или удаляет доменное имя в список исключений. Пример: .exclude domain.by
+.exclude - Добавляет или удаляет доменное имя в список исключений. Пример: .exclude domain.by
 
-.ssh      - Добавляет пользователю возможность подключения по ssh.
+.ssh     - Добавляет пользователю возможность подключения по ssh.
 """)
                         return
                     if (checkCmd == '/update'):
@@ -269,14 +268,15 @@ https://%s:2083/""" %(domain.encode("utf-8").decode("idna"), server, username, e
                         self.sendMessageGroup('Время работы: %s'%(Util.getUpime()))
                         return
                     if (checkCmd == '/cpreload'):
+                        self.sendMessageGroup('Принудительная загрузка хостинг аккаунтов.')
                         loadDataFromServers(True)
+                        logself.sendMessageGroupinfo("...Завершено.Найдено %s аккаунтов." %(len(cpanelUsersAccounts)))
                         return 
                     if (checkCmd == '/restart'):
                         self.sendMessageGroup('Время работы: %s'%(Util.getUpime()))
                         restartPath = os.path.join(os.getcwd(), "restart.py")
                         subprocess.Popen([sys.executable, restartPath])
-                        os._exit(1)
-                        return
+                        return os._exit(1)
                     if (checkCmd == '/exclude'):
                         subcommand = message.split(' ')[1]
 
