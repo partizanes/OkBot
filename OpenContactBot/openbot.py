@@ -240,7 +240,6 @@ https://%s:2083/""" %(domain.encode("utf-8").decode("idna"), server, username, e
 /uptime   - Отображает время с момента запуска.
 /exclude  - Добавляет или удаляет доменное имя в список исключений. Пример: .exclude domain.by
 /cpreload - Принудительно загружает список аккаунтов из cpanel.
-/restart  - Перезагрузка приложения.
 
 Следующие команды используються , как ответ(reply) на сообщение:
 
@@ -272,11 +271,6 @@ https://%s:2083/""" %(domain.encode("utf-8").decode("idna"), server, username, e
                         loadDataFromServers(True)
                         logself.sendMessageGroupinfo("...Завершено.Найдено %s аккаунтов." %(len(cpanelUsersAccounts)))
                         return 
-                    if (checkCmd == '/restart'):
-                        self.sendMessageGroup('Время работы: %s'%(Util.getUpime()))
-                        restartPath = os.path.join(os.getcwd(), "restart.py")
-                        subprocess.Popen([sys.executable, restartPath])
-                        return os._exit(1)
                     if (checkCmd == '/exclude'):
                         subcommand = message.split(' ')[1]
 
