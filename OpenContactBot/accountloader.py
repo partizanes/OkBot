@@ -24,7 +24,7 @@ def loadDataFromServers(isForce=False):
             log.critical(exc)
 
         for accountData in (answeData['data']['acct']):
-            cpanelUsersAccounts[accountData['domain']] =  cpanelUser(accountData['user'], accountData['domain'], hosting, accountData['email'])
+            cpanelUsersAccounts[accountData['domain']] =  cpanelUser(accountData['user'], accountData['domain'], hosting, accountData['email'], accountData['plan'])
 
     if(len(cpanelUsersAccounts) > 0):
         save_obj(cpanelUsersAccounts,'cpanelUsersAccounts')

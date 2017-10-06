@@ -160,7 +160,7 @@ https://%s:2083/""" %(domain.encode("utf-8").decode("idna"), server, username, e
         return answer
 
     def grantAccessToSsh(self, emailFrom):
-        answer = "Произведена активация ssh доступа."
+        answer = ""
         cpanelUsersAccounts = getAccountsList()
 
         #Получаем список всех хостинг услуг по адресу контактной почты
@@ -172,6 +172,11 @@ https://%s:2083/""" %(domain.encode("utf-8").decode("idna"), server, username, e
         for hostingService in ListOfHostingServices:
             hosting = cpanelUsersAccounts[hostingService.domain].server
             username = cpanelUsersAccounts[hostingService.domain].username
+            package = cpanelUsersAccounts[hostingService.domain].package
+
+            if("xS" in package):
+                answer = "Для аккаунта хостинга %s отсутствует возможность доступа по SSH: https://domain.by/info-help/hosting/#question_12 \n\n"%(hostingService.domain)
+                continue
 
             if(cpanelUsersAccounts[hostingService.domain].email not in hostingService.controlemail or cpanelUsersAccounts[hostingService.domain].email != emailFrom):
                 self.changeContactEmailInCpanel(emailFrom, hostingService, cpanelUsersAccounts)
@@ -179,6 +184,7 @@ https://%s:2083/""" %(domain.encode("utf-8").decode("idna"), server, username, e
                 self.botLog.debug('Контактная почта в панели хостинга совпадает с панелью доменов.')
             
             output = cpanelApiClient[hosting].call_v1('modifyacct',user=username,shell='jailshell')
+            answer += "Произведена активация ssh доступа для %s:\n"%(hostingService.domain)
             self.botLog.debug(output)
 
             answer += self.accessToSsh(hostingService.domain, hosting, username)
@@ -347,7 +353,7 @@ https://%s:2083/""" %(domain.encode("utf-8").decode("idna"), server, username, e
                             if(command == '.ssh'):
                                 try:
                                     reset_answer = self.grantAccessToSsh(ticket_email)
-                                    trueAnswer = ['не найдено зарегистрированых услуг', 'как в панели управления хостингом']
+                                    trueAnswer = ['не найдено зарегистрированых услуг', 'как в панели управления хостингом', 'отсутствует возможность доступа']
 
                                     self.botLog.warning(reset_answer)
                                     
