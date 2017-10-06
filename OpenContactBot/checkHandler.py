@@ -47,16 +47,17 @@ class CheckHandler(object):
                 if('Время ожидания операции истекло' in error):
                     self.CheckHandlerLog.info("[Таймаут][%s] Закрыт" % ticket.ticket_id)
                     self.openbot.sendMessageMe("[Таймаут][%s] Закрыт" % ticket.ticket_id)
-                    Datebase().setTicketClose(ticket.ticket_id)
-                    return
                 else:
                     self.CheckHandlerLog.info("[Таймаут][%s] Ошибка: %s" % (ticket.ticket_id, error))
                     self.openbot.sendMessageMe("[Таймаут][%s] Ошибка: %s" % (ticket.ticket_id, error))
 
+                Datebase().setTicketClose(ticket.ticket_id)
+                return
+
             except Exception as inst:
                 self.CheckHandlerLog.critical("[parseDomainbyTask][запуск хостинга] %s" % (inst))
                 self.CheckHandlerLog.critical(sys.exc_info()[0])
-
+            
         if re.match(u'Изменение тарифного плана виртуального хостинга для домена', ticket.subject) or (re.search(u'\<td\>В ДМС изменен тарифный план виртуального хостинга для домена', ticket.message) is not None):
             try:
                 domain = re.search(u'Изменение тарифного плана виртуального хостинга для домена (.+?)</td>', ticket.message).group(1)
