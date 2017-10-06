@@ -7,6 +7,6 @@ class cpanelUser(object):
         self.domain   = domain
         self.server   = server
         self.email    = email
-        self.package     = package
+        self.package  = package
 
         
