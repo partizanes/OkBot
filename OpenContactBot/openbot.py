@@ -275,8 +275,8 @@ https://%s:2083/""" %(domain.encode("utf-8").decode("idna"), server, username, e
                     if (checkCmd == '/cpreload'):
                         self.sendMessageGroup('Принудительная загрузка хостинг аккаунтов.')
                         loadDataFromServers(True)
-                        self.sendMessageGroup("...Завершено.Найдено %s аккаунтов." %(len(cpanelUsersAccounts)))
-                        self.botLog.info("...Завершено.Найдено %s аккаунтов." %(len(cpanelUsersAccounts)))
+                        self.sendMessageGroup("...Завершено.Найдено %s аккаунтов." %(len(getAccountsList())))
+                        self.botLog.info("...Загружено %s аккаунтов." %(len(getAccountsList())))
                         return 
                     if (checkCmd == '/exclude'):
                         subcommand = message.split(' ')[1]
