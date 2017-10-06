@@ -118,7 +118,7 @@ class CheckHandler(object):
                 ticket.message += "\n<a href=\"%s\">%s</a>"%(v,k)
 
             self.CheckHandlerLog.info("[Ticket][%s] Новая Заявка.\n %s \n %s \n %s" % (ticket.ticket_id, ticket.email, ticket.subject, ticket.message))
-            self.openbot.sendMessageGroup("[Ticket][%s] Новая Заявка.\n %s \n %s \n %s" % (ticket.ticket_id, ticket.email, ticket.subject, ticket.message), parse_mode='HTML') #parse_mode='HTML'  #disable_web_page_preview=True
+            self.openbot.sendMessageGroup("[Ticket][%s] Новая Заявка.\n %s \n %s \n %s" % (ticket.ticket_id, ticket.email, ticket.subject, ticket.message), 'HTML', False)
             save_obj(activeTickets,'activeTickets')
 
     def cleanUpMessage(self, message):
@@ -163,7 +163,7 @@ class CheckHandler(object):
                     save_obj(activeRepTickets,'activeRepTickets')
 
                     self.CheckHandlerLog.info("[Reply][%s] Новый ответ.\n %s \n %s \n %s" % (ticket.ticket_id, ticket.email, ticket.subject, ticket.message))
-                    self.openbot.sendMessageGroup("[Reply][%s] Новый ответ.\n %s \n %s \n %s" % (ticket.ticket_id, ticket.email, ticket.subject, ticket.message))
+                    self.openbot.sendMessageGroup("[Reply][%s] Новый ответ.\n %s \n %s \n %s" % (ticket.ticket_id, ticket.email, ticket.subject, ticket.message),'HTML', False)
 
     def checkNewMessage(self):
         tickets = self.getListTickets()

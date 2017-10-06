@@ -67,17 +67,17 @@ class OpenBot(telepot.Bot):
             time.sleep(10)
             return self.sendMessageGroup(msg)
 
-    def sendMessageGroup(self, msg , parse_mode=None):
+    def sendMessageGroup(self, msg, parse_mode=None, disable_notification=True):
         #len(msg) can throw exception null pointer
         if(len(msg) > 4096):
             msg = msg[:4096-len(msg)]
 
         try:
-            self.sendMessage(GroupId, msg, parse_mode, disable_web_page_preview=True)
+            self.sendMessage(GroupId, msg, parse_mode, True, disable_notification)
         except:
             self.botLog.info("При отправке сообщения прозошла ошибка.Повторная попытка через 10 секунд...")
             time.sleep(10)
-            return self.sendMessageGroup(msg)
+            return self.sendMessageGroup(msg, parse_mode, disable_notification)
 
     def checkAuth(self,id,username):
         try:
@@ -175,7 +175,7 @@ https://%s:2083/""" %(domain.encode("utf-8").decode("idna"), server, username, e
             package = cpanelUsersAccounts[hostingService.domain].package
 
             if("xS" in package):
-                answer = "Для аккаунта хостинга %s отсутствует возможность доступа по SSH: https://domain.by/info-help/hosting/#question_12 \n\n"%(hostingService.domain)
+                answer = "Для аккаунта хостинга %s отсутствует возможность доступа по SSH:\n https://domain.by/info-help/hosting/#question_12 \n\n"%(hostingService.domain)
                 continue
 
             if(cpanelUsersAccounts[hostingService.domain].email not in hostingService.controlemail or cpanelUsersAccounts[hostingService.domain].email != emailFrom):
