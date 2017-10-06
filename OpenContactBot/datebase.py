@@ -129,7 +129,7 @@ class Datebase(object):
             insert into hdp_ticket_replies (reporter_id,ticket_id,replied_on,reply,reporter,subject,
             change_status,private,readflag,draft,internal_message,reply_minutes,responded_from,resolution_item)
             values ('103', '%s', '%s', '%s', 'STAFF', '', '', '1', '', '', '', '0', '2', '0' )
-        """ %(ticket_id, str(datetime.now().strftime("%Y-%m-%d %H:%M:%S")), message)
+        """ %(ticket_id, str(datetime.utcnow().strftime("%Y-%m-%d %H:%M:%S")), message)
 
         self.dbLog.warning(sql + '\n')
         self.cur.execute(sql)

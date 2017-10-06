@@ -36,7 +36,7 @@ class cpanelServerHandler(object):
                 if(five > self.avgMax[key] and self.sendNotify[key] == False):
                     self.sendNotify[key] = True
                     self.csLog.critical("[%s] LoadAverage: %s" %(key, five))
-                    self.openbot.sendMessageGroup("[%s] LoadAverage: %s" %(key, five))
+                    self.openbot.sendMessageGroup("[%s] LoadAverage: %s" %(key, five), disable_notification=False)
                 elif(five < self.avgMax[key] and self.sendNotify[key] == True):
                     self.sendNotify[key] = False
 
