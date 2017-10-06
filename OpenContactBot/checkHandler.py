@@ -123,8 +123,29 @@ class CheckHandler(object):
 
     def cleanUpMessage(self, message):
         message = re.sub(r'<br>|</p>','\n', message)
-        message = re.sub("<br />",' ', message)
+        message = re.sub("<br />|</div>",' ', message)
         message = re.sub("<.*?>","", message)
+
+        reg1 = re.compile(r"^С уважением[.,].*$", re.M)
+        reg2 = re.compile(r"\-{2,}Original Message\-{2,}")
+        reg3 = re.compile(r"[\d]{2,2}.[\d]{2,2}.[\d]{1,}, [\d]{2,2}:[\d]{2,2},\s\"Отдел технической поддержки\"\s:")
+        reg4 = re.compile(r"[\d]{1,2}:[\d]{1,2},\s[\d]{1,2}\s\D+\d{1,4}\s\D.,\s\"Отдел технической поддержки\"")
+        reg5 = re.compile(r"\d{1,2}\D+\d{1,4}\s\D\.\,\s\d{1,2}:\d{1,2}\sпользователь\s")
+        reg6 = re.compile(r"[a-zA-zа-яА-ЯёЁ]+\d{1,}.\d{1,}.\d{1,}\s\d{1,}:\d{1,},\s\D+:")
+        reg7 = re.compile(r"[a-zA-zа-яА-ЯёЁ]+\,\s\d{1,}\s\D+\s\d{4}\s\D\.\,\s\d{1,}:\d{1,}\s\+")
+        reg8 = re.compile(r"^>[\D\d].*$", re.M)   
+        reg9 = re.compile(r"\n{1,}")
+
+        if reg8.findall(message):
+          message = reg8.sub('\n', message).strip('\n')
+
+        reglist = [reg1.findall(message), reg2.findall(message), reg3.findall(message), reg4.findall(message), reg5.findall(message),  reg6.findall(message), reg7.findall(message)]
+        for each in reglist:
+          if(len(each) > 0):
+            message = ''.join(message.split((''.join(each)), 1)[:-1])
+
+        if reg9.findall(message):
+          message = reg9.sub('\n', message).strip('\n')
 
         return message
 
