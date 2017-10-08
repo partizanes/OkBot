@@ -110,6 +110,19 @@ class Client(object):
             kwargs['cpanel_jsonapi_user'] = user
         return self._cpapi_call(**kwargs)
 
+    def uapi(self, module, function, user=None, **kwargs):
+        """
+        Calls the `module`::`function` UAPI function under the `user` cPanel
+        account.  The `user` field is required if authenticated to WHM.
+        """
+        kwargs.update({'cpanel_jsonapi_apiversion': 3,
+                       'cpanel_jsonapi_module': module,
+                       'cpanel_jsonapi_func': function})
+
+        if user:
+            kwargs['cpanel_jsonapi_user'] = user
+        return self._cpapi_call(**kwargs)
+
     def _cpapi_call(self, **kwargs):
         if self.port in (2086, 2087) and 'cpanel_jsonapi_user' not in kwargs:
             raise exceptions.InvalidParameters('User parameter required.')
