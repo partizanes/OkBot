@@ -329,14 +329,14 @@ https://%s:2083/""" %(domain.encode("utf-8").decode("idna"), server, username, e
 
                     if(checkCmd == '/help'):
                         self.sendMessageGroup("""
-/help        - Данное меню.
-/update      - Проверка наличия обновлений.
-/version     - Отображает версию ядра.
-/uptime      - Отображает время с момента запуска.
-/exclude     - Добавляет или удаляет доменное имя в список исключений. Пример: .exclude domain.by
-/cpreload    - Принудительно загружает список аккаунтов из cpanel.
-/blockmail   - Блокировка возможности авторизации для почтовго аккаунта
-/unblockmail - Разблокировка возможности авторизации для почтовго аккаунта
+/help     - Данное меню.
+/update   - Проверка наличия обновлений.
+/version  - Отображает версию ядра.
+/uptime   - Отображает время с момента запуска.
+/exclude  - Добавляет или удаляет доменное имя в список исключений. Пример: .exclude domain.by
+/cpreload - Принудительно загружает список аккаунтов из cpanel.
+/bemail   - Блокировка авторизации для почтовго аккаунта (/blockemail)
+/unemail  - Разблокировка авторизации для почтовго аккаунта (/unblockemail)
 
 Следующие команды используються , как ответ(reply) на сообщение:
 
@@ -388,10 +388,10 @@ https://%s:2083/""" %(domain.encode("utf-8").decode("idna"), server, username, e
 
                         self.sendMessageGroup("[.exclude] Сохранен список исключений: %s" %(",".join(tempExcludeList)))
                         return
-                    if(checkCmd == '/blockmail'):
+                    if(checkCmd in ['/bemail','/blockemail']):
                         self.blockByEmail(message)
                         return
-                    if(checkCmd == '/unblockmail'):
+                    if(checkCmd in ['/unemail','/unblockemail']):
                         self.unBlockEmail(message)
                         return
                     return
