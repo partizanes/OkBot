@@ -191,11 +191,10 @@ https://%s:2083/""" %(domain.encode("utf-8").decode("idna"), server, username, e
     
         return answer
 
-    def getServerbyEmail(self, email):
-        _domain = _email.split('@')[1]
+    def getServerbyEmail(self, _domain):
         cpanelUsersAccounts = getAccountsList()
 
-        self.botLog.info("Производится поиск домена %s на хостинге..."%_domain)
+        self.botLog.info("[getServerbyEmail] Производится поиск домена %s на хостинге..."%_domain)
 
         for key, capi in cpanelApiClient.items():
             _local = capi.call('domainuserdata',domain=_domain)
@@ -208,29 +207,36 @@ https://%s:2083/""" %(domain.encode("utf-8").decode("idna"), server, username, e
     def unBlockEmail(self, message):
         cpanelUsersAccounts = getAccountsList()
 
-        _email = message.split(' ')[1]
-        
-        if(_email is None or _email == "" or '@' not in _email):
-            self.botLog.critical("[/exclude] email не указан или указан неверно.")
+        if(len(message.split(' ')) < 2):
+            self.botLog.critical("[/unblockmail] Email не указан.")
+            self.sendMessageGroup("[/unblockmail] Email не указан.")
             return
 
-        _hosting = self.getServerbyEmail(_email)
+        _email = message.split(' ')[1]
+
+        if(_email == "" or '@' not in _email):
+            self.botLog.critical("[/unblockmail] Email указан неверно.")
+            self.sendMessageGroup("[/unblockmail] Email указан неверно.")
+            return
+
+        _domain = _email.split('@')[1]
+        _hosting = self.getServerbyEmail(_domain)
 
         if(_hosting is None):
-            self.botLog.debug("Аккаунт хостинга не найден : %s" %_email)
-            self.sendMessageGroup("Аккаунт хостинга не найден : %s" %_email)
+            self.botLog.debug("[/unblockmail] Аккаунт хостинга не найден : %s" %_email)
+            self.sendMessageGroup("[/unblockmail] Аккаунт хостинга не найден : %s" %_email)
             return
 
         _username = cpanelApiClient[_hosting].call_v1('domainuserdata',domain=_domain)['data']['userdata']['user']
-        self.botLog.debug("Имя пользователя: %s" %_username)
+        self.botLog.debug("[/unblockmail] Имя пользователя: %s" %_username)
 
         _answer = (cpanelApiClient[_hosting].uapi('Email','unsuspend_login',user=_username,email=_email))
         _status = int(_answer['result']['status'])
         _message = _answer['result']['messages']
 
         if(_status == 1):
-            self.botLog.info("Возможность входа для почтового аккаунта: %s разблокирована. Аккаунт хостинга: %s. Сервер: %s"%(_email, _username, key))
-            self.sendMessageGroup("Возможность входа для почтового аккаунта: %s разблокирована. Аккаунт хостинга: %s. Сервер: %s"%(_email, _username, key))
+            self.botLog.info("Возможность входа для почтового аккаунта: %s разблокирована. Аккаунт хостинга: %s. Сервер: %s"%(_email, _username, _hosting))
+            self.sendMessageGroup("Возможность входа для почтового аккаунта: %s разблокирована. Аккаунт хостинга: %s. Сервер: %s"%(_email, _username, _hosting))
             return
 
         self.botLog.critical("[/blockmail] Ошибка блокировки: %s"%(_message))
@@ -239,29 +245,36 @@ https://%s:2083/""" %(domain.encode("utf-8").decode("idna"), server, username, e
     def blockByEmail(self, message):
         cpanelUsersAccounts = getAccountsList()
 
-        _email = message.split(' ')[1]
-        
-        if(_email is None or _email == "" or '@' not in _email):
-            self.botLog.critical("[/exclude] email не указан или указан неверно.")
+        if(len(message.split(' ')) < 2):
+            self.botLog.critical("[/blockmail] Email не указан.")
+            self.sendMessageGroup("[/blockmail] Email не указан.")
             return
 
-        _hosting = self.getServerbyEmail(_email)
+        _email = message.split(' ')[1]
+
+        if(_email == "" or '@' not in _email):
+            self.botLog.critical("[/blockmail] Email не указан или указан неверно.")
+            self.sendMessageGroup("[/blockmail] Email не указан или указан неверно.")
+            return
+
+        _domain = _email.split('@')[1]
+        _hosting = self.getServerbyEmail(_domain)
 
         if(_hosting is None):
-            self.botLog.debug("Аккаунт хостинга не найден : %s" %_email)
-            self.sendMessageGroup("Аккаунт хостинга не найден : %s" %_email)
+            self.botLog.debug("[/blockmail] Аккаунт хостинга не найден : %s" %_email)
+            self.sendMessageGroup("[/blockmail] Аккаунт хостинга не найден : %s" %_email)
             return
 
         _username = cpanelApiClient[_hosting].call_v1('domainuserdata',domain=_domain)['data']['userdata']['user']
-        self.botLog.debug("Имя пользователя: %s" %_username)
+        self.botLog.debug("[/blockmail] Имя пользователя: %s" %_username)
 
         _answer = (cpanelApiClient[_hosting].uapi('Email','suspend_login',user=_username,email=_email))
         _status = int(_answer['result']['status'])
         _message = _answer['result']['messages']
 
         if(_status == 1):
-            self.botLog.info("Возможность входа для почтового аккаунта: %s заблокирована. Аккаунт хостинга: %s. Сервер: %s"%(_email, _username, key))
-            self.sendMessageGroup("Возможность входа для почтового аккаунта: %s заблокирована. Аккаунт хостинга: %s. Сервер: %s"%(_email, _username, key))
+            self.botLog.info("Возможность входа для почтового аккаунта: %s заблокирована. Аккаунт хостинга: %s. Сервер: %s"%(_email, _username, _hosting))
+            self.sendMessageGroup("Возможность входа для почтового аккаунта: %s заблокирована. Аккаунт хостинга: %s. Сервер: %s"%(_email, _username, _hosting))
             return
 
         self.botLog.critical("[/blockmail] Ошибка блокировки: %s"%(_message))
