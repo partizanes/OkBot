@@ -191,6 +191,43 @@ https://%s:2083/""" %(domain.encode("utf-8").decode("idna"), server, username, e
     
         return answer
 
+    def blockbyEmail(self, message):
+        cpanelUsersAccounts = getAccountsList()
+
+        _email = message.split(' ')[1]
+                       
+        if(_email is None or _email == "" or '@' not in _email):
+            self.botLog.critical("[/exclude] email не указан или указан неверно.")
+            return
+
+        _domain = _email.split('@')[1]
+
+        self.botLog.info("Производится поиск домена %s на хостинге..."%_domain)
+
+        for key, capi in cpanelApiClient.items():
+            _local = capi.call_v1('domainuserdata',domain=_domain)
+            _status = int(_local['metadata']['result'])
+
+            if( _status == 0):
+                continue
+
+            self.botLog.debug("Аккаунт найден на хостинге: %s "%key)
+                           
+            _username = cpanelApiClient[key].call_v1('domainuserdata',domain=_domain)['data']['userdata']['user']
+            self.botLog.debug("Имя пользователя: %s" %_username)
+
+            _answer = (cpanelApiClient[key].uapi('Email','suspend_login',user=_username,email=_email))
+            _status = int(_answer['result']['status'])
+            _message = _answer['result']['messages']
+
+            if(_status == 1):
+                self.botLog.info("Возможность входа для почтового аккаунта: %s заблокирована. Аккаунт хостинга: %s. Сервер: %s"%(_email, _username, key))
+                self.sendMessageGroup("Возможность входа для почтового аккаунта: %s заблокирована. Аккаунт хостинга: %s. Сервер: %s"%(_email, _username, key))
+                return
+
+            self.botLog.critical("[/blockmail] Ошибка блокировки: %s"%(_message))
+            self.sendMessageGroup("[/blockmail] Ошибка блокировки: %s"%(_message))
+
     def handle(self, msg):
         self.botLog.debug(msg)
         
@@ -297,6 +334,10 @@ https://%s:2083/""" %(domain.encode("utf-8").decode("idna"), server, username, e
 
                         self.sendMessageGroup("[.exclude] Сохранен список исключений: %s" %(",".join(tempExcludeList)))
                         return
+                    if(checkCmd == '/blockmail'):
+                        self.blockbyEmail(message)
+                        return
+
                     return
                 try:
                     #Implement accept reply to ticket message 
