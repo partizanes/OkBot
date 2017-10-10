@@ -123,30 +123,40 @@ class CheckHandler(object):
             save_obj(activeTickets,'activeTickets')
 
     def cleanUpMessage(self, message):
+
         message = re.sub(r'<br>|</p>','\n', message)
         message = re.sub("<br />|</div>",' ', message)
         message = re.sub("<.*?>","", message)
 
-        reg1 = re.compile(r"^С уважением[.,].*$", re.M)
-        reg2 = re.compile(r"\-{2,}Original Message\-{2,}")
-        reg3 = re.compile(r"[\d]{2,2}.[\d]{2,2}.[\d]{1,}, [\d]{2,2}:[\d]{2,2},\s\"Отдел технической поддержки\"\s:")
-        reg4 = re.compile(r"[\d]{1,2}:[\d]{1,2},\s[\d]{1,2}\s\D+\d{1,4}\s\D.,\s\"Отдел технической поддержки\"")
-        reg5 = re.compile(r"\d{1,2}\D+\d{1,4}\s\D\.\,\s\d{1,2}:\d{1,2}\sпользователь\s")
-        reg6 = re.compile(r"[a-zA-zа-яА-ЯёЁ]+\d{1,}.\d{1,}.\d{1,}\s\d{1,}:\d{1,},\s\D+:")
-        reg7 = re.compile(r"[a-zA-zа-яА-ЯёЁ]+\,\s\d{1,}\s\D+\s\d{4}\s\D\.\,\s\d{1,}:\d{1,}\s\+")
-        reg8 = re.compile(r"^>[\D\d].*$", re.M)   
-        reg9 = re.compile(r"\n{1,}")
-
-        if reg8.findall(message):
-          message = reg8.sub('\n', message).strip('\n')
-
-        reglist = [reg1.findall(message), reg2.findall(message), reg3.findall(message), reg4.findall(message), reg5.findall(message),  reg6.findall(message), reg7.findall(message)]
-        for each in reglist:
-          if(len(each) > 0):
-            message = ''.join(message.split((''.join(each)), 1)[:-1])
+        reg1 = re.compile(r"^[a-zA-zа-яА-ЯёЁ]+\,\s\d{2,2}\s\D+\s\d{4}\s\D\.\,\s\d{2,2}:\d{2,2}\s.*$", re.M)
+        reg2 = re.compile(r"^\-{2,}\D\-{2,}.*$", re.M)
+        reg3 = re.compile(r"^[\d]{2,2}.[\d]{2,2}.[\d]{4,4}\s[\d]{2,2}:[\d]{2,2},\s\D.*$", re.M)
+        reg4 = re.compile(r"^[\d]{2,2}:[\d]{2,2},\s[\d]{2,2}\s\D+\d{4,4}\s\D.,\s\D.*$", re.M)
+        reg5 = re.compile(r"^\d{1,}\D+\d{4,4}\s\D\.\,\s\d{1,}:\d{1,}\s\D.*$", re.M)
+        reg6 = re.compile(r"^[a-zA-Zа-яА-ЯёЁ]+\d{2,2}.\d{2,2}.\d{4,4}\s\d{2,2}:\d{2,2},\s\D.*$", re.M)
+        reg7 = re.compile(r"^[A-Za-zА-Яа-яеЁ]+,\s[\d]{1,}\s[A-Za-zА-Яа-яеЁ]+\s\d{4}\s[г]\.\,\s.*$", re.M)
+        reg8 = re.compile(r"^[A-Za-zА-Яа-яеЁ]+\s[\d]{2,2}.[\d]{2,2}.[\d]{4,4}\s[\d]{2,2}:[\d]{2,2},\s[A-Za-zА-Яа-яеЁ]+.*$", re.M)
+        reg9 = re.compile(r"^>[\D\d].*$", re.M)
+        reg10 = re.compile(r"\n{1,}")
+        reg11 = re.compile(r"^\-{2,}.*$", re.M)
+        reg12 = re.compile(r"^\_{2,}.*$", re.M)
 
         if reg9.findall(message):
-          message = reg9.sub('\n', message).strip('\n')
+            message = reg9.sub('\n', message).strip('\n')
+
+        reglist = [reg1.findall(message), reg2.findall(message), reg3.findall(message), reg4.findall(message), reg5.findall(message), reg6.findall(message), reg7.findall(message), reg8.findall(message)]
+        for each in reglist:
+            if(len(each) > 0):
+                message = ''.join(message.split((''.join(each[0])), 1)[:-1])
+
+        if reg11.findall(message):
+            message = reg11.sub('\n', message).strip('\n')
+
+        if reg12.findall(message):
+            message = reg12.sub('\n', message).strip('\n')
+
+        if reg10.findall(message):
+            message = reg10.sub('\n', message).strip('\n')
 
         return message
 
