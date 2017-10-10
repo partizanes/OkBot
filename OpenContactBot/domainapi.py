@@ -218,6 +218,20 @@ class DomainApi(object):
 
         return list
 
+    def removeFromExcludeList(self, domain):
+        exclude_list = cfg.getExcludeEmailList()
+
+        if(domain not in exclude_list):
+            return
+
+        exclude_list = list(filter(lambda a: a != domain, exclude_list))
+        cfg.setConfigValue('exclude', 'create', ",".join(exclude_list))
+        cfg.saveConfig()
+
+        self.dLog.info("[Domain.by] Аккаунт хостинга удален из исключений: %s"%domain)
+        self.openbot.sendMessageGroup("[Domain.by] Аккаунт хостинга удален из исключений: %s"%domain)
+
+
     def getDomainTasksList(self):
         global listCreateHosting
         global listDeleteHosting
@@ -233,6 +247,7 @@ class DomainApi(object):
             for createHosting in listCreateHosting:
                 self.dLog.info("[Domain.by] создание хостинга обработано вручную: %s"%createHosting)
                 self.openbot.sendMessageGroup("[Domain.by] создание хостинга обработано вручную: %s"%createHosting)
+                self.removeFromExcludeList(createHosting)
 
             listCreateHosting.clear()
             save_obj(listCreateHosting,'listCreateHosting')
