@@ -32,10 +32,12 @@ class OpenBot(telepot.Bot):
 
         try:
             self.sendMessage(PrivateId, msg)
-        except:
-            self.botLog.info("При отправке сообщения прозошла ошибка.Повторная попытка через 10 секунд...")
-            time.sleep(10)
-            return self.sendMessageMe(msg)
+        except Exception as exc:
+            self.botLog.critical("[sendMessageGroup] %s"%(exc))
+            self.sendMessageMe("[sendMessageGroup] %s"%(exc))
+            #self.botLog.info("При отправке сообщения прозошла ошибка.Повторная попытка через 10 секунд...")
+            #time.sleep(10)
+            #return self.sendMessageMe(msg)
     
     def disableButtonByTimeout(self, message):
         try:
@@ -74,10 +76,12 @@ class OpenBot(telepot.Bot):
 
         try:
             self.sendMessage(GroupId, msg, parse_mode, True, disable_notification)
-        except:
-            self.botLog.info("При отправке сообщения прозошла ошибка.Повторная попытка через 10 секунд...")
-            time.sleep(10)
-            return self.sendMessageGroup(msg, parse_mode, disable_notification)
+        except Exception as exc:
+            self.botLog.critical("[sendMessageGroup] %s"%(exc))
+            self.sendMessageMe("[sendMessageGroup] %s"%(exc))
+            #self.botLog.info("При отправке сообщения прозошла ошибка.Повторная попытка через 10 секунд...")
+            #time.sleep(10)
+            #return self.sendMessageGroup(msg, parse_mode, disable_notification)
 
     def checkAuth(self,id,username):
         try:
