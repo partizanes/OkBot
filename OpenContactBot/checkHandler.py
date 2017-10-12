@@ -169,8 +169,8 @@ class CheckHandler(object):
                 closedTickets = {k: activeRepTickets[k] for k  in activeRepTickets.keys() ^ set(replied_tickets)}
 
                 for rTicket in closedTickets:
-                    self.CheckHandlerLog.info("[Ответ][%s] обработан вручную." % rTicket)
-                    self.openbot.sendMessageMe("[Ответ][%s] обработан вручную." % rTicket)
+                    self.CheckHandlerLog.info("[Ответ][%s] закрыт." % rTicket)
+                    self.openbot.sendMessageGroup("[Ответ][%s] закрыт." % rTicket)
             except KeyError:
                 pass
 
