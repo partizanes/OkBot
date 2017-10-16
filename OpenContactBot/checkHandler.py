@@ -42,11 +42,12 @@ class CheckHandler(object):
     def parseDomainbyTask(self, ticket):
         if re.match(u'Ошибки при автоматическом запуске хостинга', ticket.subject):
             try:
-                error = re.search(u'Error: There was an error:\n(.+?)<br \/>', ticket.message).group(1)
-
-                if('Время ожидания операции истекло' in error):
+                if('Время ожидания операции истекло' in ticket.message):
                     self.CheckHandlerLog.info("[Таймаут][%s] Закрыт" % ticket.ticket_id)
                     self.openbot.sendMessageMe("[Таймаут][%s] Закрыт" % ticket.ticket_id)
+                elif('Данного хостинга нету на сервере' in ticket.message):
+                    self.CheckHandlerLog.info("[Таймаут][%s] Закрыт. Необходимо вручную поменять сервер на domain.by для данного аккаунта. При следущем детекте добавить соответсвующую обработку" % ticket.ticket_id)
+                    self.openbot.sendMessageGroup("[Таймаут][%s] Закрыт. Необходимо вручную поменять сервер на domain.by для данного аккаунта. При следущем детекте добавить соответсвующую обработку" % ticket.ticket_id)
                 else:
                     self.CheckHandlerLog.info("[Таймаут][%s] Ошибка: %s" % (ticket.ticket_id, error))
                     self.openbot.sendMessageMe("[Таймаут][%s] Ошибка: %s" % (ticket.ticket_id, error))
@@ -55,10 +56,8 @@ class CheckHandler(object):
                 return
 
             except Exception as inst:
-                self.openbot.sendMessageMe("[parseDomainbyTask][%s] Ошибка: %s" % (ticket.ticket_id, inst))
                 self.CheckHandlerLog.critical("[parseDomainbyTask][запуск хостинга] %s" % (inst))
                 self.CheckHandlerLog.critical(sys.exc_info()[0])
-                activeTickets[ticket.ticket_id] = ticket
             
         if re.match(u'Изменение тарифного плана виртуального хостинга для домена', ticket.subject) or (re.search(u'\<td\>В ДМС изменен тарифный план виртуального хостинга для домена', ticket.message) is not None):
             try:
