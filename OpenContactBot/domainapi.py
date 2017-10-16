@@ -339,7 +339,7 @@ class DomainApi(object):
 
     def checkCreateHosting(self, browser):
         soup=BeautifulSoup(browser.response.text, "html.parser")
-        recoveryHostingDns = ['s1.open.by', 's2.open.by', 's3.open.by', 's4.open.by', 's5.open.by', 's6.open.by', 'ns2.open.by']
+        recoveryHostingDns = ['s1.open.by', 's2.open.by', 's3.open.by', 's4.open.by', 's5.open.by', 's6.open.by', 'ns2.open.by', 'ns1.domain.by', 'ns2.domain.by']
         exclude_list = cfg.getExcludeEmailList()
 
         haveValue = True

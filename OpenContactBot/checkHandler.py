@@ -55,8 +55,10 @@ class CheckHandler(object):
                 return
 
             except Exception as inst:
+                self.openbot.sendMessageMe("[parseDomainbyTask][%s] Ошибка: %s" % (ticket.ticket_id, inst))
                 self.CheckHandlerLog.critical("[parseDomainbyTask][запуск хостинга] %s" % (inst))
                 self.CheckHandlerLog.critical(sys.exc_info()[0])
+                activeTickets[ticket.ticket_id] = ticket
             
         if re.match(u'Изменение тарифного плана виртуального хостинга для домена', ticket.subject) or (re.search(u'\<td\>В ДМС изменен тарифный план виртуального хостинга для домена', ticket.message) is not None):
             try:
