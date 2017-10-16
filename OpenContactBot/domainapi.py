@@ -103,7 +103,7 @@ class DomainApi(object):
             browser.open('https://domain.by/Domains/ShowPage?Length=7', method='post', data=dataToPost)
 
             #Добавляем все услуги хостинга из кабинета пользователя в общую переменную
-            listOfHosting.extend(re.findall('\<a class\=\"list_link\" href\=\"\/Settings\/Hosting\.aspx\?serviceId\=\d{1,10}\"\>(.+?)\<\/a\>', browser.response.text))
+            listOfHosting.extend(re.findall('openSansBold">(.+?)<\/div>\\r?\\n?\s{1,}?<div class="service_type openSansItalic">Виртуальный', browser.response.text))
 
         for hosting in listOfHosting:
             browser.open(self.url_search)

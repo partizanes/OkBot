@@ -337,10 +337,11 @@ https://%s:2083/""" %(domain.encode("utf-8").decode("idna"), server, username, e
 /update   - Проверка наличия обновлений.
 /version  - Отображает версию ядра.
 /uptime   - Отображает время с момента запуска.
-/exclude  - Добавляет или удаляет доменное имя в список исключений. Пример: .exclude domain.by
+/exclude  - Добавляет или удаляет доменное имя в список исключений. Пример: /exclude domain.by
 /cpreload - Принудительно загружает список аккаунтов из cpanel.
 /bemail   - Блокировка авторизации для почтовго аккаунта (/blockemail)
 /unemail  - Разблокировка авторизации для почтовго аккаунта (/unblockemail)
+/restore  - Функция для тестирования ответа сервера (/restore email)
 
 Следующие команды используються , как ответ(reply) на сообщение:
 
@@ -356,6 +357,10 @@ https://%s:2083/""" %(domain.encode("utf-8").decode("idna"), server, username, e
 
 .ssh     - Добавляет пользователю возможность подключения по ssh.
 """)
+                        return
+                    if (checkCmd == '/restore'):
+                        subcommand = message.split(' ')[1]
+                        self.sendMessageGroup('[/restore]%s'%(self.restoreCpanelPassword(subcommand)))
                         return
                     if (checkCmd == '/update'):
                         self.sendMessageGroup("Проводим проверку наличия обновлений...")
