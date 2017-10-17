@@ -39,6 +39,38 @@ class CheckHandler(object):
         except Exception as exc:
             pass
 
+    def managerParse(self, ticket):
+        self.CheckHandlerLog.info("[Dashka][%s] Dashkaaaa detected :D" % ticket.ticket_id)
+        self.openbot.sendMessageMe("[Dashka][%s] Dashkaaaa detected :D" % ticket.ticket_id)
+
+        if(re.match(u'Смена\s{1,}(ТП)?(тарифного)?'),ticket.subject):
+            try:
+                _domain = re.search('\s[a-zA-Z]{1,15}((-|\.)[a-zA-Z]{1,10})?((-|\.)[a-zA-Z]{1,10})?\.([a-zA-Z]{1,6})(\.|\s)', message).group(0)
+                _package = re.search('на (xS|S|M|L|XXL|MAX)', message).group(0).split()[1]
+
+                cpanelUsersAccounts = getAccountsList()
+                hosting = cpanelUsersAccounts[_domain].server
+                username = cpanelUsersAccounts[_domain].username
+
+                answer = cpanelApiClient[hosting].call('changepackage',user=username,pkg=_package)['result'][0]
+                status = int(answer['status'])
+                message = answer['statusmsg']
+
+                if(status == 1):
+                    self.CheckHandlerLog.info("[managerParse][%s][%s] смена тарифного плана. " % (ticket.ticket_id, _domain))
+                    self.openbot.sendMessageMe("[managerParse][%s][%s] смена тарифного плана. " % (ticket.ticket_id, _domain))
+                    hdapi.postQuickReply(ticket_id, "[OpenContactBot] Тарифный план изменен на %s для домена: %s "%(_package, _domain) , HdTicketStatus.CLOSED, self)
+                    return True
+                else:
+                    self.CheckHandlerLog.critical("[managerParse][%s][%s] %s." % (ticket.ticket_id, _domain, ticket.message))
+                    self.openbot.sendMessageMe("[managerParse][%s][%s] %s. " % (ticket.ticket_id, _domain, ticket.message))
+            except Exception as inst:
+                self.CheckHandlerLog.critical("[managerParse] %s" % (inst))
+                self.CheckHandlerLog.critical("[managerParse] %s" % (ticket.subject))
+                self.CheckHandlerLog.critical("[managerParse] %s" % (ticket.message))
+        
+        return False
+
     def parseDomainbyTask(self, ticket):
         if re.match(u'Ошибки при автоматическом запуске хостинга', ticket.subject):
             try:
@@ -272,6 +304,9 @@ class CheckHandler(object):
                 self.openbot.sendMessageMe("[Белтелеком][%s] Задержан" % ticket.ticket_id)
                 Datebase().setTickethold(ticket.ticket_id)
                 continue
+            if (ticket.client_id == 101373):
+                if(self.managerParse(ticket)):
+                    continue
             if (ticket.client_id == 94434):
                 self.parseDomainbyTask(ticket)
                 continue
@@ -282,7 +317,6 @@ class CheckHandler(object):
                 continue
             else:
                 self.undefinedTicket(ticket)
-
 
     def start(self, openbot):
         time.sleep(1)
