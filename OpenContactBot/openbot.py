@@ -123,6 +123,7 @@ https://%s:2083/""" %(domain.encode("utf-8").decode("idna"), server, username, e
 Хост:      %s или %s
 Порт:      20022
 Логин:     %s
+
         """ %(domain.encode("utf-8").decode("idna"), domain.encode("utf-8").decode("idna"), server, username))
     
     def changeContactEmailInCpanel(self, emailFrom, hostingService, cpanelUsersAccounts):
