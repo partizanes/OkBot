@@ -304,12 +304,14 @@ class CheckHandler(object):
                 self.openbot.sendMessageMe("[Белтелеком][%s] Задержан" % ticket.ticket_id)
                 Datebase().setTickethold(ticket.ticket_id)
                 continue
-            if re.match(u".jar", ticket.attachment):
-                self.CheckHandlerLog.info("[SPAM][%s] Заблокирован" % ticket.ticket_id)
-                self.openbot.sendMessageMe("[SPAM][%s] Заблокирован" % ticket.ticket_id)
-                Datebase().setSpamEmail(ticket.email)
-                Datebase().setTicketSpam(ticket.ticket_id)
-                return
+            if (len(ticket.attachment) > 0):
+                for key in ticket.attachment:
+                    if (".jar" in key):
+                        self.CheckHandlerLog.info("[SPAM][%s] Заблокирован" % ticket.ticket_id)
+                        self.openbot.sendMessageMe("[SPAM][%s] Заблокирован" % ticket.ticket_id)
+                        Datebase().setSpamEmail(ticket.email)
+                        Datebase().setTicketSpam(ticket.ticket_id)
+                        continue
             if (ticket.client_id == 101373):
                 if(self.managerParse(ticket)):
                     continue
@@ -340,5 +342,5 @@ class CheckHandler(object):
                 self.checkNewReplies()
                 time.sleep(30)
             except Exception as exc:
-                self.CheckHandlerLog.critical("[CheckHandler] %s" % exc)
-                self.openbot.sendMessageMe("[CheckHandler] %s" % exc)
+                self.CheckHandlerLog.critical("[MAINLOOP] %s" % exc)
+                self.openbot.sendMessageMe("[MAINLOOP] %s" % exc)
