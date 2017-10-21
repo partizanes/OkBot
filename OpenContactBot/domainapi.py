@@ -331,8 +331,13 @@ class DomainApi(object):
         deletedHosting = set(listDeleteHosting) ^ set(tempListDeleteHosting)
         
         for dHosting in deletedHosting:
-            self.dLog.info("[Domain.by] хостинг удалён: %s"%dHosting.encode("utf-8").decode("idna"))
-            self.openbot.sendMessageGroup("[Domain.by] хостин удалён: %s"%dHosting.encode("utf-8").decode("idna"))
+            #start debugline remove after fix 
+            self.dLog.debug("[Domain.by] %s "%(repr(dHosting).replace(' ',r'\s')))
+            self.dLog.sendMessageGroup("[Domain.by] %s "%(repr(dHosting).replace(' ',r'\s')))
+            #end debugline
+
+            self.dLog.info("[Domain.by] хостинг удалён: %s "%(dHosting.encode("utf-8").decode("idna")))
+            self.openbot.sendMessageGroup("[Domain.by] хостинг удалён: %s"%(dHosting.encode("utf-8").decode("idna")))
 
         listDeleteHosting = tempListDeleteHosting
         save_obj(listDeleteHosting,'listDeleteHosting')
