@@ -5,8 +5,10 @@ import re
 import sys
 import time
 from log import Log
+from hdapi import hdapi
 from ticket import Ticket
 from datebase import Datebase
+from ticketStatus import HdTicketStatus
 from accountloader import loadDataFromServers
 from accountloader import getAccountsList
 from cpanelapiclient import cpanelApiClient
@@ -43,10 +45,10 @@ class CheckHandler(object):
         self.CheckHandlerLog.info("[Dashka][%s] Dashkaaaa detected :D" % ticket.ticket_id)
         self.openbot.sendMessageMe("[Dashka][%s] Dashkaaaa detected :D" % ticket.ticket_id)
 
-        if(re.match(u'Смена\s{1,}(ТП)?(тарифного)?'),ticket.subject):
+        if(re.match(u'Смена\s{1,}(ТП)?(тарифного)?',ticket.subject)):
             try:
-                _domain = re.search('\s[a-zA-Z]{1,15}((-|\.)[a-zA-Z]{1,10})?((-|\.)[a-zA-Z]{1,10})?\.([a-zA-Z]{1,6})(\.|\s)', message).group(0)
-                _package = re.search('на (xS|S|M|L|XXL|MAX)', message).group(0).split()[1]
+                _domain = (re.search('\s[a-zA-Z]{1,15}((-|\.)[a-zA-Z]{1,10})?((-|\.)[a-zA-Z]{1,10})?\.([a-zA-Z]{1,6})(\.|\s)', ticket.message).group(0)).strip().lower()
+                _package = re.search('на (xS|S|M|L|XXL|MAX)', ticket.message).group(0).split()[1]
 
                 cpanelUsersAccounts = getAccountsList()
                 hosting = cpanelUsersAccounts[_domain].server
@@ -59,16 +61,14 @@ class CheckHandler(object):
                 if(status == 1):
                     self.CheckHandlerLog.info("[managerParse][%s][%s] смена тарифного плана. " % (ticket.ticket_id, _domain))
                     self.openbot.sendMessageMe("[managerParse][%s][%s] смена тарифного плана. " % (ticket.ticket_id, _domain))
-                    hdapi.postQuickReply(ticket_id, "[OpenContactBot] Тарифный план изменен на %s для домена: %s "%(_package, _domain) , HdTicketStatus.CLOSED, self)
+                    hdapi.postQuickReply(ticket.ticket_id, "[OpenContactBot] Тарифный план изменен на %s для домена: %s "%(_package, _domain) , HdTicketStatus.CLOSED, self.openbot)
                     return True
                 else:
                     self.CheckHandlerLog.critical("[managerParse][%s][%s] %s." % (ticket.ticket_id, _domain, ticket.message))
                     self.openbot.sendMessageMe("[managerParse][%s][%s] %s. " % (ticket.ticket_id, _domain, ticket.message))
             except Exception as inst:
-                self.CheckHandlerLog.critical("[managerParse] %s" % (inst))
-                self.CheckHandlerLog.critical("[managerParse] %s" % (ticket.subject))
-                self.CheckHandlerLog.critical("[managerParse] %s" % (ticket.message))
-        
+                self.CheckHandlerLog.critical("[managerParse] %s" % type(inst))
+                self.CheckHandlerLog.critical("[managerParse] %s" % inst.args)
         return False
 
     def parseDomainbyTask(self, ticket):
