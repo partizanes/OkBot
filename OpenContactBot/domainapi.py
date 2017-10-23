@@ -256,8 +256,8 @@ class DomainApi(object):
             self.checkDeleteHosting(browser.response.text, browser)
         else:
             for deleteHosting in listDeleteHosting:
-                self.dLog.info("[Domain.by] хостин удалён: %s"%deleteHosting)
-                self.openbot.sendMessageGroup("[Domain.by] хостин удалён: %s"%deleteHosting)
+                self.dLog.info("[Domain.by] хостинг удалён: %s "%deleteHosting.encode("utf-8").decode("idna"))
+                self.openbot.sendMessageGroup("[Domain.by] хостинг удалён: %s"%deleteHosting.encode("utf-8").decode("idna"))
 
             listDeleteHosting.clear()
             save_obj(listDeleteHosting,'listDeleteHosting')
@@ -331,13 +331,8 @@ class DomainApi(object):
         deletedHosting = set(listDeleteHosting) ^ set(tempListDeleteHosting)
         
         for dHosting in deletedHosting:
-            #start debugline remove after fix 
-            self.dLog.debug("[Domain.by] %s "%(repr(dHosting).replace(' ',r'\s')))
-            self.dLog.sendMessageGroup("[Domain.by] %s "%(repr(dHosting).replace(' ',r'\s')))
-            #end debugline
-
-            self.dLog.info("[Domain.by] хостинг удалён: %s "%(dHosting.encode("utf-8").decode("idna")))
-            self.openbot.sendMessageGroup("[Domain.by] хостинг удалён: %s"%(dHosting.encode("utf-8").decode("idna")))
+            self.dLog.info("[Domain.by] хостинг удалён: %s "%dHosting.encode("utf-8").decode("idna"))
+            self.openbot.sendMessageGroup("[Domain.by] хостинг удалён: %s"%dHosting.encode("utf-8").decode("idna"))
 
         listDeleteHosting = tempListDeleteHosting
         save_obj(listDeleteHosting,'listDeleteHosting')
