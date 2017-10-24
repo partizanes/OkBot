@@ -408,14 +408,15 @@ https://%s:2083/""" %(domain.encode("utf-8").decode("idna"), server, username, e
                 try:
                     #Implement accept reply to ticket message 
                     if msg['reply_to_message'] is not None:
+
+                        #The don`t ticket`s reply
+                        if(re.search('\[(Ticket|Reply)]\[(.+?)]', msg['reply_to_message']['text']) is None):
+                            self.botLog.debug("[handle][NOT_ERROR] Не удалось извлечь идентификатор заявки.\n")
+                            return
+
                         ticket_id = re.search('\[(Ticket|Reply)]\[(.+?)]', msg['reply_to_message']['text']).group(2)
                         original_message_id = (GroupId, msg['reply_to_message']['message_id'])
                         ticket_email = Datebase().getEmailByTicketId(ticket_id)
-
-                        if(ticket_id is None):
-                            self.botLog.critical("[handle][group] Не удалось извлечь идентификатор заявки.\n Отладочная информация: \n %s" %(msg))
-                            self.sendMessageGroup("[handle][group] Не удалось извлечь идентификатор заявки.\n Отладочная информация: \n %s" %(msg))
-                            return
 
                         if(message[0] == '.'):
                             command = message.split(' ')[0]
