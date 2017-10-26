@@ -85,11 +85,12 @@ class CheckHandler(object):
                     self.openbot.sendMessageMe("[Таймаут][%s] Ошибка: %s" % (ticket.ticket_id, error))
 
                 Datebase().setTicketClose(ticket.ticket_id)
-                return
+                return True
 
             except Exception as inst:
                 self.CheckHandlerLog.critical("[parseDomainbyTask][запуск хостинга] %s" % (inst))
                 self.CheckHandlerLog.critical(sys.exc_info()[0])
+        return False
             
         if re.match(u'Изменение тарифного плана виртуального хостинга для домена', ticket.subject) or (re.search(u'\<td\>В ДМС изменен тарифный план виртуального хостинга для домена', ticket.message) is not None):
             try:
@@ -316,8 +317,8 @@ class CheckHandler(object):
                 if(self.managerParse(ticket)):
                     continue
             if (ticket.client_id == 94434):
-                self.parseDomainbyTask(ticket)
-                continue
+                if(self.parseDomainbyTask(ticket)):
+                    continue
             if ticket.email in emailSpamList:
                 self.CheckHandlerLog.info("[Spam][%s] Перемещен" % ticket.ticket_id)
                 self.openbot.sendMessageMe("[Spam][%s] Перемещен" % ticket.ticket_id)
