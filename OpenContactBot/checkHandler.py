@@ -90,7 +90,7 @@ class CheckHandler(object):
             except Exception as inst:
                 self.CheckHandlerLog.critical("[parseDomainbyTask][запуск хостинга] %s" % (inst))
                 self.CheckHandlerLog.critical(sys.exc_info()[0])
-        return False
+                return False
             
         if re.match(u'Изменение тарифного плана виртуального хостинга для домена', ticket.subject) or (re.search(u'\<td\>В ДМС изменен тарифный план виртуального хостинга для домена', ticket.message) is not None):
             try:
@@ -114,12 +114,15 @@ class CheckHandler(object):
                 else:
                     self.CheckHandlerLog.critical("[Package][%s][%s] %s." % (ticket.ticket_id, domain, ticket.message))
                     self.openbot.sendMessageMe("[Package][%s][%s] %s. " % (ticket.ticket_id, domain, ticket.message))
+                return True
             except Exception as inst:
                 self.CheckHandlerLog.critical("[Package] %s" % (inst))
                 self.CheckHandlerLog.critical(sys.exc_info()[0])
+                return False
         else:
             self.CheckHandlerLog.critical("[parseDomainbyTask][%s] Заявка не классифицирована." % (ticket.ticket_id))
             self.openbot.sendMessageMe("[parseDomainbyTask][%s] Заявка не классифицирована. " % (ticket.ticket_id))
+            return False
 
     def getListTickets(self):
         try:
