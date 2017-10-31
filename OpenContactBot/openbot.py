@@ -102,9 +102,9 @@ class OpenBot(telepot.Bot):
             time.sleep(10)
             return self.send(username, chat_id, msg, answer)
 
-    def resetCpanelPasswordText(self, domain,  server, username, email):
+    def resetCpanelPasswordText(self, domain, server, username, email, state):
         return ("""
-Сбросить пароль от хостинга %s, вы можете по ссылке:
+Сбросить пароль от хостинга %s(%s), вы можете по ссылке:
 https://%s:2083/resetpass?start=1
 
 Логин: %s
@@ -114,17 +114,17 @@ https://%s:2083/resetpass?start=1
 Не закрывая данную вкладку , зайдите на почту и скопируйте код безопасности ,после чего вам будет доступно меню ввода нового пароля.
                            
 Для входа в панель управления хостингом используйте ссылку:
-https://%s:2083/""" %(domain.encode("utf-8").decode("idna"), server, username, email, server))
+https://%s:2083/""" %(domain.encode("utf-8").decode("idna"), state, server, username, email, server))
 
-    def accessToSsh(self, domain, server, username):
+    def accessToSsh(self, domain, server, username, state):
         return ("""
-Для доступа к %s используйте имя пользователя и пароль, как в панели управления хостингом.
+Для доступа к %s(%s) используйте имя пользователя и пароль, как в панели управления хостингом.
 
 Хост:      %s или %s
 Порт:      20022
 Логин:     %s
 
-        """ %(domain.encode("utf-8").decode("idna"), domain.encode("utf-8").decode("idna"), server, username))
+        """ %(domain.encode("utf-8").decode("idna"), state, domain.encode("utf-8").decode("idna"), server, username))
     
     def changeContactEmailInCpanel(self, emailFrom, hostingService, cpanelUsersAccounts):
         self.botLog.warning('Адрес контактной почты в панели хостинга отличается от панели доменов или от адреса отправителя.')
@@ -160,7 +160,7 @@ https://%s:2083/""" %(domain.encode("utf-8").decode("idna"), server, username, e
             else:
                 self.botLog.debug('Контактная почта в панели хостинга совпадает с панелью доменов.')
 
-            answer += self.resetCpanelPasswordText(hostingService.domain, cpanelUsersAccounts[hostingService.domain].server, cpanelUsersAccounts[hostingService.domain].username, cpanelUsersAccounts[hostingService.domain].email)
+            answer += self.resetCpanelPasswordText(hostingService.domain, cpanelUsersAccounts[hostingService.domain].server, cpanelUsersAccounts[hostingService.domain].username, cpanelUsersAccounts[hostingService.domain].email, hostingService.state)
 
         return answer
 
@@ -192,7 +192,7 @@ https://%s:2083/""" %(domain.encode("utf-8").decode("idna"), server, username, e
             answer += "Произведена активация ssh доступа для %s:\n"%(hostingService.domain)
             self.botLog.debug(output)
 
-            answer += self.accessToSsh(hostingService.domain, hosting, username)
+            answer += self.accessToSsh(hostingService.domain, hosting, username, hostingService.state)
     
         return answer
 

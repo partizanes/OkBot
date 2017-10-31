@@ -136,7 +136,7 @@ class DomainApi(object):
                     if(re.search('[а-яА-Я]', domain)):
                         domain = domain.encode("idna").decode("utf-8")
 
-                    if(state == 'оплачен' or not active):
+                    if(state == 'оплачен' or state == 'приостановлен' or not active):
                         tempListOfHosting.append(Service(domain, state, date, contract, client, type, email, controlEmail))
                     else:
                         self.dLog.critical("Пропущена услуга: Домен:%s Статус:%s" %(domain,state))
