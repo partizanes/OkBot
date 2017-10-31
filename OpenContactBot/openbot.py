@@ -503,7 +503,11 @@ https://%s:2083/""" %(domain.encode("utf-8").decode("idna"), state, server, user
 
                                 self.sendMessageGroup("[.exclude] Сохранен список исключений: %s" %(",".join(tempExcludeList)))
                                 return
- 
+
+                            self.botLog.critical("[command] Команда не обработана: %s" %command)
+                            self.sendMessageGroup("[command] Команда не обработана: %s" %command)
+                            return
+
                         hdapi.postQuickReply(ticket_id, msg['text'] , HdTicketStatus.OPEN, self)
 
                 except Exception as exc:
