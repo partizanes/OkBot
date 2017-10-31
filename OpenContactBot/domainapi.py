@@ -231,7 +231,6 @@ class DomainApi(object):
         self.dLog.info("[Domain.by] Аккаунт хостинга удален из исключений: %s"%domain)
         self.openbot.sendMessageGroup("[Domain.by] Аккаунт хостинга удален из исключений: %s"%domain)
 
-
     def getDomainTasksList(self):
         global listCreateHosting
         global listDeleteHosting
@@ -278,6 +277,8 @@ class DomainApi(object):
 
                 if(re.search('[а-яА-Я]', domain)):
                     domain = domain.encode("idna").decode("utf-8")
+
+                tempListDeleteHosting.append(domain)
                 
                 if(domain not in listDeleteHosting):
                     self.dLog.info("[Domain.by] хостинг на удаление: %s"%domain.encode("utf-8").decode("idna"))
@@ -315,9 +316,6 @@ class DomainApi(object):
                     else:
                         self.dLog.critical("[checkDeleteHosting][Cpanel] %s"%message)
                         self.openbot.sendMessageGroup("[Domain.by] Хостинг не удален: %s .\nТекст ответа: %s"%(domain.encode("utf-8").decode("idna"), message))
-
-
-                tempListDeleteHosting.append(domain)
 
                 i += 1
             except KeyError as inst:
