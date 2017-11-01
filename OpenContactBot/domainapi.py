@@ -278,6 +278,9 @@ class DomainApi(object):
                 if(re.search('[а-яА-Я]', domain)):
                     domain = domain.encode("idna").decode("utf-8")
 
+                if(domain not in exclude_list):
+                    listDeleteHosting.remove(domain)
+
                 tempListDeleteHosting.append(domain)
                 
                 if(domain not in listDeleteHosting):
