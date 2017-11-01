@@ -443,7 +443,7 @@ class DomainApi(object):
         
         while 1:
                 try:
-                    time.sleep(30)
+                    time.sleep(180)
                     self.getDomainTasksList()
                 except Exception as exc:
                     self.dLog.critical("[DomainApi] %s" % exc)
