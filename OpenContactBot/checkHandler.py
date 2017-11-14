@@ -262,6 +262,8 @@ class CheckHandler(object):
 
         for ticket in tickets:
             time.sleep(0.5)
+            if (ticket.ticket_id in activeTickets):
+                continue
             if re.match("\[s.\.open.by\] New account: \w{1,16}", ticket.subject):
                 self.CheckHandlerLog.info("[Создание][%s] Закрыт" % ticket.ticket_id)
                 self.openbot.sendMessageMe("[Создание][%s] Закрыт" % ticket.ticket_id)
