@@ -404,6 +404,10 @@ https://%s:2083/""" %(domain.encode("utf-8").decode("idna"), state, server, user
                     if(checkCmd in ['/unemail','/unblockemail']):
                         self.unBlockEmail(message)
                         return
+
+                    self.botLog.critical("[command] Команда не обработана: %s" %command)
+                    self.sendMessageGroup("[command] Команда не обработана: %s" %command)
+
                     return
                 try:
                     #Implement accept reply to ticket message 
