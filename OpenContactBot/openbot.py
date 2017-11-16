@@ -405,8 +405,8 @@ https://%s:2083/""" %(domain.encode("utf-8").decode("idna"), state, server, user
                         self.unBlockEmail(message)
                         return
 
-                    self.botLog.critical("[command] Команда не обработана: %s" %command)
-                    self.sendMessageGroup("[command] Команда не обработана: %s" %command)
+                    self.botLog.critical("[command] Команда не обработана: %s" %checkCmd)
+                    self.sendMessageGroup("[command] Команда не обработана: %s" %checkCmd)
 
                     return
                 try:
