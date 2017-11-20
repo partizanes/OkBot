@@ -329,7 +329,12 @@ https://%s:2083/""" %(domain.encode("utf-8").decode("idna"), state, server, user
             elif(chat_type == 'group'):
 
                 if(message[0] == '/'):
-                    checkCmd = message.split(' ')[0]
+
+                    if(len(message.split(' ')) > 1):
+                        checkCmd = message.split(' ')[0]
+                    else:
+                        checkCmd = message
+
                     self.botLog.warning("Получена комманда: %s"%checkCmd)
 
                     if(checkCmd == '/help'):
@@ -380,10 +385,12 @@ https://%s:2083/""" %(domain.encode("utf-8").decode("idna"), state, server, user
                         self.botLog.info("...Загружено %s аккаунтов." %(len(getAccountsList())))
                         return 
                     if (checkCmd == '/exclude'):
-                        subcommand = message.split(' ')[1]
 
-                        if(subcommand is None or subcommand == ""):
+                        if(len(message.split(' ')) > 1):
+                            subcommand = message.split(' ')[1]
+                        else:
                             self.botLog.critical("[/exclude] Имя домена не указано.")
+                            self.sendMessageGroup("Имя домена не указано. Cписок исключений: %s" %(",".join(Config.getExcludeEmailList())))
                             return
 
                         tempExcludeList = Config.getExcludeEmailList()
