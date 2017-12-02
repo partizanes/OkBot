@@ -219,7 +219,7 @@ class DomainApi(object):
         return list
 
     def removeFromExcludeList(self, domain):
-        exclude_list = cfg.getExcludeEmailList()
+        exclude_list = cfg.getExcludeDomainList()
 
         if(domain not in exclude_list):
             return
@@ -264,7 +264,7 @@ class DomainApi(object):
     def checkDeleteHosting(self, value, browser):
         global listDeleteHosting
         tempListDeleteHosting = []
-        exclude_list = cfg.getExcludeEmailList()
+        exclude_list = cfg.getExcludeDomainList()
 
         soup=BeautifulSoup(value, "html.parser")
 
@@ -341,7 +341,7 @@ class DomainApi(object):
     def checkCreateHosting(self, browser):
         soup=BeautifulSoup(browser.response.text, "html.parser")
         recoveryHostingDns = ['s1.open.by', 's2.open.by', 's3.open.by', 's4.open.by', 's5.open.by', 's6.open.by', 'ns2.open.by', 'ns1.domain.by', 'ns2.domain.by']
-        exclude_list = cfg.getExcludeEmailList()
+        exclude_list = cfg.getExcludeDomainList()
 
         haveValue = True
         i = 1

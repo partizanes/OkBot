@@ -390,10 +390,10 @@ https://%s:2083/""" %(domain.encode("utf-8").decode("idna"), state, server, user
                             subcommand = message.split(' ')[1]
                         else:
                             self.botLog.critical("[/exclude] Имя домена не указано.")
-                            self.sendMessageGroup("Имя домена не указано. Cписок исключений: %s" %(",".join(Config.getExcludeEmailList())))
+                            self.sendMessageGroup("Имя домена не указано. Cписок исключений: %s" %(",".join(Config.getExcludeDomainList())))
                             return
 
-                        tempExcludeList = Config.getExcludeEmailList()
+                        tempExcludeList = Config.getExcludeDomainList()
 
                         if(subcommand in tempExcludeList):
                             tempExcludeList.remove(subcommand)
@@ -498,7 +498,7 @@ https://%s:2083/""" %(domain.encode("utf-8").decode("idna"), state, server, user
                                     self.botLog.critical("[.exclude] Имя домена не указано.")
                                     return
 
-                                tempExcludeList = Config.getExcludeEmailList()
+                                tempExcludeList = Config.getExcludeDomainList()
 
                                 if(subcommand in tempExcludeList):
                                     self.deleteMessage(original_message_id)
