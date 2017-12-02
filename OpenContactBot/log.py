@@ -10,7 +10,7 @@ init()
 class Log(object):
     def __init__(self, Module=None):
         self.Module = Module
-        logging.basicConfig(format = u'[%(asctime)s][%(levelname)s][' + self.Module + '] %(message)s', level = logging.DEBUG, datefmt='%Y-%m-%d %H:%M:%S', filename = u'bot.log')
+        logging.basicConfig(format = u'[%(asctime)s][%(levelname)s][' + self.Module + '] %(message)s', level = logging.INFO, datefmt='%Y-%m-%d %H:%M:%S', filename = u'bot.log')
 
     def debug(self, message):
         logging.debug( u'%s'%(message))

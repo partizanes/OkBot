@@ -229,7 +229,7 @@ https://%s:2083/""" %(domain.encode("utf-8").decode("idna"), state, server, user
         _hosting = self.getServerbyEmail(_domain)
 
         if(_hosting is None):
-            self.botLog.debug("[/unblockmail] Аккаунт хостинга не найден : %s" %_email)
+            self.botLog.info("[/unblockmail] Аккаунт хостинга не найден : %s" %_email)
             self.sendMessageGroup("[/unblockmail] Аккаунт хостинга не найден : %s" %_email)
             return
 
@@ -267,7 +267,7 @@ https://%s:2083/""" %(domain.encode("utf-8").decode("idna"), state, server, user
         _hosting = self.getServerbyEmail(_domain)
 
         if(_hosting is None):
-            self.botLog.debug("[/blockmail] Аккаунт хостинга не найден : %s" %_email)
+            self.botLog.info("[/blockmail] Аккаунт хостинга не найден : %s" %_email)
             self.sendMessageGroup("[/blockmail] Аккаунт хостинга не найден : %s" %_email)
             return
 
@@ -423,7 +423,7 @@ https://%s:2083/""" %(domain.encode("utf-8").decode("idna"), state, server, user
 
                         #The don`t ticket`s reply
                         if(re.search('\[(Ticket|Reply)]\[(.+?)]', msg['reply_to_message']['text']) is None):
-                            self.botLog.debug("[handle][NOT_ERROR] Не удалось извлечь идентификатор заявки.\n")
+                            self.botLog.error("[handle][NOT_ERROR] Не удалось извлечь идентификатор заявки.\n")
                             return
 
                         ticket_id = re.search('\[(Ticket|Reply)]\[(.+?)]', msg['reply_to_message']['text']).group(2)
