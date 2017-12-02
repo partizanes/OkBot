@@ -33,8 +33,8 @@ class OpenBot(telepot.Bot):
         try:
             self.sendMessage(PrivateId, msg)
         except Exception as exc:
-            self.botLog.critical("[sendMessageGroup] %s"%(exc))
-            self.sendMessageMe("[sendMessageGroup] %s"%(exc))
+            self.botLog.critical("[sendMessageMe] %s"%(exc))
+            self.sendMessageMe("[sendMessageMe] %s"%(exc))
             #self.botLog.info("При отправке сообщения прозошла ошибка.Повторная попытка через 10 секунд...")
             #time.sleep(10)
             #return self.sendMessageMe(msg)
@@ -77,11 +77,12 @@ class OpenBot(telepot.Bot):
         try:
             self.sendMessage(GroupId, msg, parse_mode, True, disable_notification)
         except Exception as exc:
-            self.botLog.critical("[sendMessageGroup] %s"%(exc))
-            self.sendMessageMe("[sendMessageGroup] %s"%(exc))
-            #self.botLog.info("При отправке сообщения прозошла ошибка.Повторная попытка через 10 секунд...")
-            #time.sleep(10)
-            #return self.sendMessageGroup(msg, parse_mode, disable_notification)
+            #if message contain Unsupported values in current parse_mode
+            if(exc.error_code == 400 and "Unsupported start tag" in exc.description):
+                self.sendMessage(GroupId, msg, None, True, disable_notification)
+            else:
+                self.botLog.critical("[sendMessageGroup] %s"%(exc))
+                self.sendMessageMe("[sendMessageGroup] %s"%(exc))
 
     def checkAuth(self,id,username):
         try:
