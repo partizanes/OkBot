@@ -13,6 +13,16 @@ from cpanelapiclient import cpanelApiClient
 
 listDeleteHosting = []
 listCreateHosting = []
+listBlockHosting = []
+
+hostingServerDmsList = { 
+                        's2.open.by' : '2',
+                        's3.open.by' : '3',
+                        's4.open.by' : '5',
+                        's5.open.by' : '8',
+                        's6.open.by' : '9',
+                        's7.open.by' : '12'
+                        }
 
 class Service(object):
     def __init__(self, domain, state, date, contract, client, type, email, controlemail):
@@ -31,6 +41,20 @@ class DomainApi(object):
     url_search = 'https://domain.by/BackEnd/Support/Search.aspx'
     url = 'https://domain.by'
 
+
+    def _get_form_post_data(self, browser):
+        form = browser.get_form('aspnetForm')
+        view_state = form['__VIEWSTATE']
+        generator = form['__VIEWSTATEGENERATOR']
+        validation = form['__EVENTVALIDATION']
+        data = dict(
+            __EVENTTARGET="",
+            __EVENTARGUMENT="",
+            __VIEWSTATE=view_state.value,
+            __VIEWSTATEGENERATOR=generator.value,
+            __EVENTVALIDATION=validation.value,
+        )
+        return data
 
     def getAuth(self):
         login_url = self.url + '/Login.aspx'
@@ -260,6 +284,68 @@ class DomainApi(object):
 
             listDeleteHosting.clear()
             save_obj(listDeleteHosting,'listDeleteHosting')
+
+        #Fix block error in dms
+        if('ctl00_contentHolder_TaskList_ucStop_lblActionType' in browser.response.text):
+            self.checkBlockError(browser)
+        else:
+            for blockHosting in listBlockHosting:
+                self.dLog.info("[Domain.by] Исправлена ошибка блокировки в дмс: %s "%blockHosting.encode("utf-8").decode("idna"))
+                self.openbot.sendMessageGroup("[Domain.by] Исправлена ошибка блокировки в дмс: %s"%blockHosting.encode("utf-8").decode("idna"))
+
+            listBlockHosting.clear()
+            save_obj(listBlockHosting,'listDeleteHosting')
+
+    def checkBlockError(self, browser):
+        exclude_list = cfg.getExcludeDomainList()
+
+        soup=BeautifulSoup(browser.response.text, "html.parser")
+
+        haveValue = True
+        i = 1
+
+        temp = []
+        while(haveValue):
+            try:
+                domain = soup.find(id="ctl00_contentHolder_TaskList_ucStop_rptServiceList_ctl0%s_lblDomain"%i).text
+                status = soup.find(id="ctl00_contentHolder_TaskList_ucStop_rptServiceList_ctl0%s_lblCpanelError"%i).text
+                url_block = "https://domain.by/BackEnd/Support/" + soup.find(id="ctl00_contentHolder_TaskList_ucStop_rptServiceList_ctl0%s_hlAction"%i).get('href')
+
+                if(domain not in listBlockHosting):
+                    self.dLog.info("[Domain.by] Обнаружена ошибка блокировки: %s"%domain)
+                    self.openbot.sendMessageGroup("[Domain.by] Обнаружена ошибка блокировки: %s"%domain)
+                    listBlockHosting.append(domain)
+                    
+                    if(len(listBlockHosting) > 0):
+                        save_obj(listBlockHosting,'listBlockHosting')
+
+                    if(domain in exclude_list):
+                        self.dLog.info("[Domain.by] [Ошибка блокировки] %s в списке исключений."%domain)
+                        self.openbot.sendMessageGroup("[Domain.by] [Ошибка блокировки]  %s в списке исключений."%domain)
+                        i += 1
+                        continue
+
+                    browser.open(url_block)
+
+                    hosting = getAccountsList()[domain].server
+                    self.dLog.info("[Domain.by] [Ошибка блокировки] Расположен на сервере: %s"%hosting)
+
+                    dataToPost = self._get_form_post_data(browser)
+                    dataToPost["ctl00$contentHolder$HostingServersList$HostingServers"] = hostingServerDmsList[hosting]
+                    dataToPost["ctl00$contentHolder$cbCpanelSynchro"] = "on"
+                    dataToPost["ctl00$contentHolder$btnStop"] = "Блокировать"
+
+                    browser.open(url_block, method='post', data=dataToPost)
+
+                i += 1
+
+            except KeyError as inst:
+                pass
+            except RuntimeError as inst:
+                 self.dLog.critical("[checkBlockError] %s"%inst)
+                 self.openbot.sendMessageGroup("[Domain.by][checkBlockError][RuntimeError]: %s"%(inst))
+            except Exception as inst:
+                haveValue = False
 
     def checkDeleteHosting(self, value, browser):
         global listDeleteHosting
