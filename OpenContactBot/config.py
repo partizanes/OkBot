@@ -107,6 +107,18 @@ class Config(object):
     @staticmethod
     def getHdSession():
         return Config.getConfigValue('hd', 'session')
+    
+    @staticmethod
+    def getSmtpServer():
+        return Config.getConfigValue('mail', 'server')
+    
+    @staticmethod
+    def getMailFrom():
+        return Config.getConfigValue('mail', 'from')
+
+    @staticmethod
+    def getDnsAdmin():
+        return Config.getConfigValue('mail', 'dmsadmin')
 
     @staticmethod
     def getExcludeDomainList():

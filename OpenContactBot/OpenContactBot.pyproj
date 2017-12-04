@@ -4,7 +4,7 @@
     <SchemaVersion>2.0</SchemaVersion>
     <ProjectGuid>2e242274-1434-4f03-8739-d1e4cb531442</ProjectGuid>
     <ProjectHome>.</ProjectHome>
-    <StartupFile>core.py</StartupFile>
+    <StartupFile>mail.py</StartupFile>
     <SearchPath>
     </SearchPath>
     <WorkingDirectory>.</WorkingDirectory>
@@ -41,6 +41,9 @@
       <SubType>Code</SubType>
     </Compile>
     <Compile Include="ipmiServerHandler.py">
+      <SubType>Code</SubType>
+    </Compile>
+    <Compile Include="mail.py">
       <SubType>Code</SubType>
     </Compile>
     <Compile Include="restart.py">

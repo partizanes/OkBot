@@ -3,6 +3,7 @@
 
 import re,time
 from log import Log
+from mail import sendMail
 from crypto import Crypto
 from bs4 import BeautifulSoup
 from config import Config as cfg
@@ -336,6 +337,9 @@ class DomainApi(object):
                     dataToPost["ctl00$contentHolder$btnStop"] = "Блокировать"
 
                     browser.open(url_block, method='post', data=dataToPost)
+
+                    self.dLog.info('Для доменного имени %s необходимо произвести смену хостинг сервера на %s'%(domain, hosting))
+                    sendMail(cfg.getDnsAdmin(), 'Смена сервера хостинга для заблокированного домена', 'Для доменного имени %s необходимо произвести смену хостинг сервер на %s'%(domain, hosting))
 
                 i += 1
 
