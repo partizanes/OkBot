@@ -4,7 +4,7 @@
     <SchemaVersion>2.0</SchemaVersion>
     <ProjectGuid>2e242274-1434-4f03-8739-d1e4cb531442</ProjectGuid>
     <ProjectHome>.</ProjectHome>
-    <StartupFile>mail.py</StartupFile>
+    <StartupFile>core.py</StartupFile>
     <SearchPath>
     </SearchPath>
     <WorkingDirectory>.</WorkingDirectory>

@@ -312,17 +312,20 @@ class DomainApi(object):
                 status = soup.find(id="ctl00_contentHolder_TaskList_ucStop_rptServiceList_ctl0%s_lblCpanelError"%i).text
                 url_block = "https://domain.by/BackEnd/Support/" + soup.find(id="ctl00_contentHolder_TaskList_ucStop_rptServiceList_ctl0%s_hlAction"%i).get('href')
 
+                if(re.search('[а-яА-Я]', domain)):
+                    domain = domain.encode("idna").decode("utf-8")
+
                 if(domain not in listBlockHosting):
-                    self.dLog.info("[Domain.by] Обнаружена ошибка блокировки: %s"%domain)
-                    self.openbot.sendMessageGroup("[Domain.by] Обнаружена ошибка блокировки: %s"%domain)
+                    self.dLog.info("[Domain.by] Обнаружена ошибка блокировки: %s"%domain.encode("utf-8").decode("idna"))
+                    self.openbot.sendMessageGroup("[Domain.by] Обнаружена ошибка блокировки: %s"%domain.encode("utf-8").decode("idna"))
                     listBlockHosting.append(domain)
                     
                     if(len(listBlockHosting) > 0):
                         save_obj(listBlockHosting,'listBlockHosting')
 
                     if(domain in exclude_list):
-                        self.dLog.info("[Domain.by] [Ошибка блокировки] %s в списке исключений."%domain)
-                        self.openbot.sendMessageGroup("[Domain.by] [Ошибка блокировки]  %s в списке исключений."%domain)
+                        self.dLog.info("[Domain.by] [Ошибка блокировки] %s в списке исключений."%domain.encode("utf-8").decode("idna"))
+                        self.openbot.sendMessageGroup("[Domain.by] [Ошибка блокировки]  %s в списке исключений."%domain.encode("utf-8").decode("idna"))
                         i += 1
                         continue
 
@@ -338,8 +341,8 @@ class DomainApi(object):
 
                     browser.open(url_block, method='post', data=dataToPost)
 
-                    self.dLog.info('Для доменного имени %s необходимо произвести смену хостинг сервера на %s'%(domain, hosting))
-                    sendMail(cfg.getDnsAdmin(), 'Смена сервера хостинга для заблокированного домена', 'Для доменного имени %s необходимо произвести смену хостинг сервер на %s'%(domain, hosting))
+                    self.dLog.info('Для доменного имени %s необходимо произвести смену хостинг сервера на %s'%(domain.encode("utf-8").decode("idna"), hosting))
+                    sendMail(cfg.getDnsAdmin(), 'Смена сервера хостинга для заблокированного домена', 'Для доменного имени %s необходимо произвести смену хостинг сервер на %s'%(domain.encode("utf-8").decode("idna"), hosting))
 
                 i += 1
 
@@ -533,7 +536,7 @@ class DomainApi(object):
         
         while 1:
                 try:
-                    time.sleep(180)
+                    #time.sleep(180)
                     self.getDomainTasksList()
                 except Exception as exc:
                     self.dLog.critical("[DomainApi] %s" % exc)
