@@ -312,6 +312,12 @@ class DomainApi(object):
                 status = soup.find(id="ctl00_contentHolder_TaskList_ucStop_rptServiceList_ctl0%s_lblCpanelError"%i).text
                 url_block = "https://domain.by/BackEnd/Support/" + soup.find(id="ctl00_contentHolder_TaskList_ucStop_rptServiceList_ctl0%s_hlAction"%i).get('href')
 
+                self.dLog.info("[checkBlockError] Статус блокировки: %s"%status)
+
+                if(status != "Ошибка"):
+                    i += 1
+                    continue
+
                 if(re.search('[а-яА-Я]', domain)):
                     domain = domain.encode("idna").decode("utf-8")
 
