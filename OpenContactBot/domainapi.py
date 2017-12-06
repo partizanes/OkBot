@@ -342,7 +342,7 @@ class DomainApi(object):
                     browser.open(url_block, method='post', data=dataToPost)
 
                     self.dLog.info('Для доменного имени %s необходимо произвести смену хостинг сервера на %s'%(domain.encode("utf-8").decode("idna"), hosting))
-                    sendMail(cfg.getDnsAdmin(), 'Смена сервера хостинга для заблокированного домена', 'Для доменного имени %s необходимо произвести смену хостинг сервер на %s'%(domain.encode("utf-8").decode("idna"), hosting))
+                    sendMail(cfg.getDnsAdmin(), 'Смена сервера хостинга для заблокированного домена', 'Для доменного имени %s необходимо произвести смену хостинг сервера на %s'%(domain.encode("utf-8").decode("idna"), hosting))
 
                 i += 1
 
