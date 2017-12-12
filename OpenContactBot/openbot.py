@@ -210,6 +210,83 @@ https://%s:2083/""" %(domain.encode("utf-8").decode("idna"), state, server, user
                 return key
         return None
 
+    def suspendOutgoingEmail(self, message):
+        cpanelUsersAccounts = getAccountsList()
+
+        if(len(message.split(' ')) < 2):
+            self.botLog.critical("[/suspendOutgoingEmail] Email не указан.")
+            self.sendMessageGroup("[/suspendOutgoingEmail] Email не указан.")
+            return
+
+        _email = message.split(' ')[1]
+
+        if(_email == "" or '@' not in _email):
+            self.botLog.critical("[/suspendOutgoingEmail] Email указан неверно.")
+            self.sendMessageGroup("[/suspendOutgoingEmail] Email указан неверно.")
+            return
+
+        _domain = _email.split('@')[1]
+        _hosting = self.getServerbyEmail(_domain)
+
+        if(_hosting is None):
+            self.botLog.info("[/suspendOutgoingEmail] Аккаунт хостинга не найден : %s" %_email)
+            self.sendMessageGroup("[/suspendOutgoingEmail] Аккаунт хостинга не найден : %s" %_email)
+            return
+
+        _username = cpanelApiClient[_hosting].call_v1('domainuserdata', domain=_domain)['data']['userdata']['user']
+        self.botLog.debug("[/suspendOutgoingEmail] Имя пользователя: %s" %_username)
+
+        _answer = cpanelApiClient[_hosting].call_v1('suspend_outgoing_email', user=_username)
+        _status = int(_answer['result']['status'])
+        _message = _answer['result']['messages']
+
+        if(_status == 1):
+            self.botLog.info("Возможность отправки почты для: %s заблокирована. Сервер: %s"%(_username, _hosting))
+            self.sendMessageGroup("Возможность отправки почты для: %s заблокирована. Сервер: %s"%(_username, _hosting))
+            return
+
+        self.botLog.critical("[/suspendOutgoingEmail] Ошибка блокировки: %s"%(_message))
+        self.sendMessageGroup("[/suspendOutgoingEmail] Ошибка блокировки: %s"%(_message))
+
+    def unSuspendOutgoingEmail(self, message):
+        cpanelUsersAccounts = getAccountsList()
+
+        if(len(message.split(' ')) < 2):
+            self.botLog.critical("[/unSuspendOutgoingEmail] Email не указан.")
+            self.sendMessageGroup("[/unSuspendOutgoingEmail] Email не указан.")
+            return
+
+        _email = message.split(' ')[1]
+
+        if(_email == "" or '@' not in _email):
+            self.botLog.critical("[/unSuspendOutgoingEmail] Email указан неверно.")
+            self.sendMessageGroup("[/unSuspendOutgoingEmail] Email указан неверно.")
+            return
+
+        _domain = _email.split('@')[1]
+        _hosting = self.getServerbyEmail(_domain)
+
+        if(_hosting is None):
+            self.botLog.info("[/unSuspendOutgoingEmail] Аккаунт хостинга не найден : %s" %_email)
+            self.sendMessageGroup("[/unSuspendOutgoingEmail] Аккаунт хостинга не найден : %s" %_email)
+            return
+
+        _username = cpanelApiClient[_hosting].call_v1('domainuserdata', domain=_domain)['data']['userdata']['user']
+        self.botLog.debug("[/unSuspendOutgoingEmail] Имя пользователя: %s" %_username)
+
+        _answer = cpanelApiClient[_hosting].call_v1('unsuspend_outgoing_email', user=_username)
+        _status = int(_answer['result']['status'])
+        _message = _answer['result']['messages']
+
+        if(_status == 1):
+            self.botLog.info("Возможность отправки почты для: %s разблокирована. Сервер: %s"%(_username, _hosting))
+            self.sendMessageGroup("Возможность отправки почты для: %s разблокирована. Сервер: %s"%(_username, _hosting))
+            return
+
+        self.botLog.critical("[/unSuspendOutgoingEmail] Ошибка разблокировки: %s"%(_message))
+        self.sendMessageGroup("[/unSuspendOutgoingEmail] Ошибка разблокировки: %s"%(_message))
+
+
     def unBlockEmail(self, message):
         cpanelUsersAccounts = getAccountsList()
 
@@ -233,10 +310,10 @@ https://%s:2083/""" %(domain.encode("utf-8").decode("idna"), state, server, user
             self.sendMessageGroup("[/unblockmail] Аккаунт хостинга не найден : %s" %_email)
             return
 
-        _username = cpanelApiClient[_hosting].call_v1('domainuserdata',domain=_domain)['data']['userdata']['user']
+        _username = cpanelApiClient[_hosting].call_v1('domainuserdata', domain=_domain)['data']['userdata']['user']
         self.botLog.debug("[/unblockmail] Имя пользователя: %s" %_username)
 
-        _answer = (cpanelApiClient[_hosting].uapi('Email','unsuspend_login',user=_username,email=_email))
+        _answer = (cpanelApiClient[_hosting].uapi('Email','unsuspend_login', user=_username, email=_email))
         _status = int(_answer['result']['status'])
         _message = _answer['result']['messages']
 
@@ -344,11 +421,13 @@ https://%s:2083/""" %(domain.encode("utf-8").decode("idna"), state, server, user
 /update   - Проверка наличия обновлений.
 /version  - Отображает версию ядра.
 /uptime   - Отображает время с момента запуска.
-/exclude  - Добавляет или удаляет доменное имя в список исключений. Пример: /exclude domain.by
+/exclude  - Добавляет или удаляет доменное имя в список исключений. (/exclude domain.by)
 /cpreload - Принудительно загружает список аккаунтов из cpanel.
 /bemail   - Блокировка авторизации для почтового аккаунта (/blockemail)
 /unemail  - Разблокировка авторизации для почтового аккаунта (/unblockemail)
 /restore  - Функция для тестирования ответа сервера (/restore email)
+/smail    - Блокировка возможности отправки исходящей почты для аккаунта (/suspendemail email)
+/unsmail  - Разблокировка возможности отправки исходящей почты для аккаунта (/unsuspendemail email)
 
 Следующие команды используются , как ответ(reply) на сообщение:
 
@@ -411,6 +490,12 @@ https://%s:2083/""" %(domain.encode("utf-8").decode("idna"), state, server, user
                         return
                     if(checkCmd in ['/unemail','/unblockemail']):
                         self.unBlockEmail(message)
+                        return
+                    if(checkCmd in ['/smail','/suspendemail']):
+                        self.suspendOutgoingEmail(message)
+                        return
+                    if(checkCmd in ['/unsmail','unsuspendemail']):
+                        self.unSuspendOutgoingEmail(message)
                         return
 
                     self.botLog.critical("[command] Команда не обработана: %s" %checkCmd)
