@@ -237,8 +237,7 @@ https://%s:2083/""" %(domain.encode("utf-8").decode("idna"), state, server, user
         self.botLog.debug("[/suspendOutgoingEmail] Имя пользователя: %s" %_username)
 
         _answer = cpanelApiClient[_hosting].call_v1('suspend_outgoing_email', user=_username)
-        _status = int(_answer['result']['status'])
-        _message = _answer['result']['messages']
+        _status = int(_answer['metadata']['result'])
 
         if(_status == 1):
             self.botLog.info("Возможность отправки почты для: %s заблокирована. Сервер: %s"%(_username, _hosting))
@@ -275,8 +274,7 @@ https://%s:2083/""" %(domain.encode("utf-8").decode("idna"), state, server, user
         self.botLog.debug("[/unSuspendOutgoingEmail] Имя пользователя: %s" %_username)
 
         _answer = cpanelApiClient[_hosting].call_v1('unsuspend_outgoing_email', user=_username)
-        _status = int(_answer['result']['status'])
-        _message = _answer['result']['messages']
+        _status = int(_answer['metadata']['result'])
 
         if(_status == 1):
             self.botLog.info("Возможность отправки почты для: %s разблокирована. Сервер: %s"%(_username, _hosting))
