@@ -31,9 +31,13 @@ class Util(object):
         return(os.path.join(patch,*patchs))
 
     @staticmethod
-    def checkUpdate(coreLog, openbot, sendmessage=True):
-        if(Util.needUpdate()):
-            openbot.sendMessageGroup('Обнаружено обновление...')
+    def checkUpdate(coreLog, openbot, force=False, sendmessage=True):
+        if(Util.needUpdate() or force):
+            
+            if(force):
+                openbot.sendMessageGroup('Принудительное обновление...')
+            else:
+                openbot.sendMessageGroup('Обнаружено обновление...')
            
             curPath = os.getcwd()
 

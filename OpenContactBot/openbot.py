@@ -450,6 +450,10 @@ https://%s:2083/""" %(domain.encode("utf-8").decode("idna"), state, server, user
                         self.sendMessageGroup("Проводим проверку наличия обновлений...")
                         Util.checkUpdate(self.botLog, self)
                         return
+                    if (checkCmd == '/fupdate'):
+                        self.sendMessageGroup("Производим принудительное обновление...")
+                        Util.checkUpdate(self.botLog, self, True)
+                        return
                     if (checkCmd == '/version'):
                         self.sendMessageGroup('Текущая версия: %s \nВерсия на сервере: %s'%(Util.getCurrentVersion(), Util.getVersionAtServer()))
                         return
