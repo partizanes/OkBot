@@ -45,7 +45,7 @@ t5.start()
 openbot.sendMessageGroup("Core started.")
 
 while 1:
-    Util.checkUpdate(coreLog, openbot, False)
+    Util.checkUpdate(coreLog, openbot, False, False)
     time.sleep(10800)
     #coreLog.info('tick.')
 

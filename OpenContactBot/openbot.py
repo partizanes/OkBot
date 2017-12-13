@@ -417,6 +417,7 @@ https://%s:2083/""" %(domain.encode("utf-8").decode("idna"), state, server, user
                         self.sendMessageGroup("""
 /help     - Данное меню.
 /update   - Проверка наличия обновлений.
+/fupdate  - Принудительное обновление.
 /version  - Отображает версию ядра.
 /uptime   - Отображает время с момента запуска.
 /exclude  - Добавляет или удаляет доменное имя в список исключений. (/exclude domain.by)
