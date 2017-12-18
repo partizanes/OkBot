@@ -312,8 +312,6 @@ class DomainApi(object):
                 status = soup.find(id="ctl00_contentHolder_TaskList_ucStop_rptServiceList_ctl0%s_lblCpanelError"%i).text
                 url_block = "https://domain.by/BackEnd/Support/" + soup.find(id="ctl00_contentHolder_TaskList_ucStop_rptServiceList_ctl0%s_hlAction"%i).get('href')
 
-                self.dLog.info("[checkBlockError] Статус блокировки: %s"%status)
-
                 if(status != "Ошибка"):
                     i += 1
                     continue
@@ -353,6 +351,9 @@ class DomainApi(object):
                 i += 1
 
             except KeyError as inst:
+                i += 1
+                self.dLog.critical("[checkBlockError] %s не найден на хостинге."%domain)
+                self.openbot.sendMessageGroup("[checkBlockError] %s не найден на хостинге."%domain)
                 pass
             except RuntimeError as inst:
                  self.dLog.critical("[checkBlockError] %s"%inst)
