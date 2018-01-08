@@ -15,6 +15,7 @@ from cpanelapiclient import cpanelApiClient
 listDeleteHosting = []
 listCreateHosting = []
 listBlockHosting = []
+listUnBlockHosting = []
 
 hostingServerDmsList = { 
                         's2.open.by' : '2',
@@ -296,6 +297,77 @@ class DomainApi(object):
 
             listBlockHosting.clear()
             save_obj(listBlockHosting,'listDeleteHosting')
+
+        if('ctl00_contentHolder_TaskList_ucUnblock_lblActionType' in browser.response.text):
+            self.checkUnBlockError(browser)
+        else:
+            for unBlockHosting in listUnBlockHosting:
+                self.dLog.info("[Domain.by] Исправлена ошибка разблокировки в дмс: %s "%blockHosting.encode("utf-8").decode("idna"))
+                self.openbot.sendMessageGroup("[Domain.by] Исправлена ошибка разблокировки в дмс: %s"%blockHosting.encode("utf-8").decode("idna"))
+    
+    def checkUnBlockError(self, browser):
+        exclude_list = cfg.getExcludeDomainList()
+
+        soup=BeautifulSoup(browser.response.text, "html.parser")
+
+        haveValue = True
+        i = 1
+
+        temp = []
+        while(haveValue):
+            try:
+                domain = soup.find(id="ctl00_contentHolder_TaskList_ucUnblock_rptServiceList_ctl0%s_lblDomain"%i).text
+                status = soup.find(id="ctl00_contentHolder_TaskList_ucUnblock_rptServiceList_ctl0%s_lblCpanelError"%i).text
+                url_block = "https://domain.by/BackEnd/Support/" + soup.find(id="ctl00_contentHolder_TaskList_ucUnblock_rptServiceList_ctl0%s_hlAction"%i).get('href')
+
+                if(status != "Ошибка"):
+                    i += 1
+                    continue
+
+                if(re.search('[а-яА-Я]', domain)):
+                    domain = domain.encode("idna").decode("utf-8")
+
+                if(domain not in listUnBlockHosting):
+                    self.dLog.info("[Domain.by] Обнаружена ошибка разблокировки: %s"%domain.encode("utf-8").decode("idna"))
+                    self.openbot.sendMessageGroup("[Domain.by] Обнаружена ошибка разблокировки: %s"%domain.encode("utf-8").decode("idna"))
+                    listUnBlockHosting.append(domain)
+
+                    if(len(listUnBlockHosting) > 0):
+                        save_obj(listUnBlockHosting,'listUnBlockHosting')
+
+                    if(domain in exclude_list):
+                        self.dLog.info("[Domain.by] [Ошибка разблокировки] %s в списке исключений."%domain.encode("utf-8").decode("idna"))
+                        self.openbot.sendMessageGroup("[Domain.by] [Ошибка разблокировки]  %s в списке исключений."%domain.encode("utf-8").decode("idna"))
+                        i += 1
+                        continue
+
+                    browser.open(url_block)
+
+                    hosting = getAccountsList()[domain].server
+                    self.dLog.info("[Domain.by] [Ошибка разблокировки] Расположен на сервере: %s"%hosting)
+
+                    dataToPost = self._get_form_post_data(browser)
+                    dataToPost["ctl00$contentHolder$HostingServersList$HostingServers"] = hostingServerDmsList[hosting]
+                    dataToPost["ctl00$contentHolder$cbCpanelSynchro"] = "on"
+                    dataToPost["ctl00$contentHolder$btnUnblock"] = "Разблокировать"
+
+                    browser.open(url_block, method='post', data=dataToPost)
+
+                    self.dLog.info('Для доменного имени %s необходимо произвести смену хостинг сервера на %s'%(domain.encode("utf-8").decode("idna"), hosting))
+                    self.openbot.sendMessageGroup('Для доменного имени %s необходимо произвести смену хостинг сервера на %s'%(domain.encode("utf-8").decode("idna"), hosting))
+
+                i += 1
+
+            except KeyError as inst:
+                i += 1
+                self.dLog.critical("[checkUnBlockError] %s не найден на хостинге."%domain)
+                self.openbot.sendMessageGroup("[checkUnBlockError] %s не найден на хостинге."%domain)
+                pass
+            except RuntimeError as inst:
+                 self.dLog.critical("[checkUnBlockError] %s"%inst)
+                 self.openbot.sendMessageGroup("[Domain.by][checkUnBlockError][RuntimeError]: %s"%(inst))
+            except Exception as inst:
+                haveValue = False
 
     def checkBlockError(self, browser):
         exclude_list = cfg.getExcludeDomainList()
