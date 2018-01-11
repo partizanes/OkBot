@@ -316,7 +316,7 @@ class DomainApi(object):
         temp = []
         while(haveValue):
             try:
-                domain = soup.find(id="ctl00_contentHolder_TaskList_ucUnblock_rptServiceList_ctl0%s_lblDomain"%i).text
+                domain = soup.find(id="ctl00_contentHolder_TaskList_ucUnblock_rptServiceList_ctl0%s_lblDomain"%i).text.replace('www.', '')
                 status = soup.find(id="ctl00_contentHolder_TaskList_ucUnblock_rptServiceList_ctl0%s_lblCpanelError"%i).text
                 url_block = "https://domain.by/BackEnd/Support/" + soup.find(id="ctl00_contentHolder_TaskList_ucUnblock_rptServiceList_ctl0%s_hlAction"%i).get('href')
 
@@ -380,7 +380,7 @@ class DomainApi(object):
         temp = []
         while(haveValue):
             try:
-                domain = soup.find(id="ctl00_contentHolder_TaskList_ucStop_rptServiceList_ctl0%s_lblDomain"%i).text
+                domain = soup.find(id="ctl00_contentHolder_TaskList_ucStop_rptServiceList_ctl0%s_lblDomain"%i).text.replace('www.', '')
                 status = soup.find(id="ctl00_contentHolder_TaskList_ucStop_rptServiceList_ctl0%s_lblCpanelError"%i).text
                 url_block = "https://domain.by/BackEnd/Support/" + soup.find(id="ctl00_contentHolder_TaskList_ucStop_rptServiceList_ctl0%s_hlAction"%i).get('href')
 
