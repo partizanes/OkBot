@@ -278,7 +278,10 @@ class DomainApi(object):
             save_obj(listCreateHosting,'listCreateHosting')
 
         if('ctl00_contentHolder_TaskList_ucDelete_lblActionType' in browser.response.text):
-            self.checkDeleteHosting(browser.response.text, browser)
+            try:
+                self.checkDeleteHosting(browser.response.text, browser)
+            except Exception as exc:
+                self.dLog.critical("[checkDeleteHosting] %s"%exc)
         else:
             for deleteHosting in listDeleteHosting:
                 self.dLog.info("[Domain.by] хостинг удалён: %s "%deleteHosting.encode("utf-8").decode("idna"))
@@ -494,11 +497,13 @@ class DomainApi(object):
 
                 i += 1
             except KeyError as inst:
+                self.dLog.critical("[checkDeleteHosting][KeyError] %s"%inst)
                 pass
             except RuntimeError as inst:
                  self.dLog.critical("[checkDeleteHosting][Cpanel] %s"%inst)
                  self.openbot.sendMessageGroup("[Domain.by][RuntimeError]: %s"%(inst))
             except Exception as inst:
+                self.dLog.critical("[checkDeleteHosting][Exception] %s"%inst)
                 haveValue = False
 
         deletedHosting = set(listDeleteHosting) ^ set(tempListDeleteHosting)
