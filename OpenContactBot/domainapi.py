@@ -466,7 +466,6 @@ class DomainApi(object):
                     if(domain in exclude_list):
                         self.dLog.info("[Domain.by] %s в списке исключений."%domain.encode("utf-8").decode("idna"))
                         self.openbot.sendMessageGroup("[Domain.by] %s в списке исключений."%domain.encode("utf-8").decode("idna"))
-                        i += 1
                         continue
 
                     cpanelUsersAccounts = getAccountsList()
@@ -495,7 +494,6 @@ class DomainApi(object):
                         self.dLog.critical("[checkDeleteHosting][Cpanel] %s"%message)
                         self.openbot.sendMessageGroup("[Domain.by] Хостинг не удален: %s .\nТекст ответа: %s"%(domain.encode("utf-8").decode("idna"), message))
 
-                i += 1
             except KeyError as inst:
                 self.dLog.critical("[checkDeleteHosting][KeyError] %s"%inst)
                 pass
@@ -505,6 +503,8 @@ class DomainApi(object):
             except Exception as inst:
                 self.dLog.critical("[checkDeleteHosting][Exception] %s"%inst)
                 haveValue = False
+            finally:
+                i += 1
 
         deletedHosting = set(listDeleteHosting) ^ set(tempListDeleteHosting)
         
