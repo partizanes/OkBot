@@ -279,6 +279,11 @@ class CheckHandler(object):
                 self.openbot.sendMessageMe("[Pазблокировка][%s] Закрыт" % ticket.ticket_id)
                 Datebase().setTicketClose(ticket.ticket_id)
                 continue
+           if re.match("\[s.\.open.by\] Upgrade/Downgrade:", ticket.subject):
+                self.CheckHandlerLog.info("[Package][%s] Закрыт" % ticket.ticket_id)
+                self.openbot.sendMessageMe("[PPackage][%s] Закрыт" % ticket.ticket_id)
+                Datebase().setTicketClose(ticket.ticket_id)
+                continue
             if re.match("\[s.\.open.by\] Disk Usage Warning: The user", ticket.subject):
                 try:
                     account = re.search('Disk quota notification for \“(.+?)\”\.', ticket.message).group(1)
