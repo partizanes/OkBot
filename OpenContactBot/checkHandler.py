@@ -281,8 +281,11 @@ class CheckHandler(object):
                 continue
             if re.match("\[s.\.open.by\] Upgrade/Downgrade:", ticket.subject):
                 self.CheckHandlerLog.info("[Package][%s] Закрыт" % ticket.ticket_id)
-                self.openbot.sendMessageMe("[PPackage][%s] Закрыт" % ticket.ticket_id)
+                self.openbot.sendMessageMe("[Package][%s] Закрыт" % ticket.ticket_id)
                 Datebase().setTicketClose(ticket.ticket_id)
+                continue
+            if re.match("Undelivered Mail Returned to Sender", ticket.subject):
+                self.CheckHandlerLog.info("[Undelivered][%s] Пропущен" % ticket.ticket_id)
                 continue
             if re.match("\[s.\.open.by\] Disk Usage Warning: The user", ticket.subject):
                 try:
