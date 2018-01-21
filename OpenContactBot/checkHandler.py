@@ -285,7 +285,6 @@ class CheckHandler(object):
                 Datebase().setTicketClose(ticket.ticket_id)
                 continue
             if re.match("Undelivered Mail Returned to Sender", ticket.subject):
-                self.CheckHandlerLog.info("[Undelivered][%s] Пропущен" % ticket.ticket_id)
                 continue
             if re.match("\[s.\.open.by\] Disk Usage Warning: The user", ticket.subject):
                 try:
