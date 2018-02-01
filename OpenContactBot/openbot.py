@@ -176,25 +176,29 @@ https://%s:2083/""" %(domain.encode("utf-8").decode("idna"), state, server, user
             return "На данный контактный адрес почты не найдено зарегистрированных услуг.\n Заявка должна быть оформлена с контактного адреса почты хостинга."
 
         for hostingService in ListOfHostingServices:
-            hosting = cpanelUsersAccounts[hostingService.domain].server
-            username = cpanelUsersAccounts[hostingService.domain].username
-            package = cpanelUsersAccounts[hostingService.domain].package
+            try:
+                hosting = cpanelUsersAccounts[hostingService.domain].server
+                username = cpanelUsersAccounts[hostingService.domain].username
+                package = cpanelUsersAccounts[hostingService.domain].package
 
-            if("xS" in package):
-                answer = "Для аккаунта хостинга %s отсутствует возможность доступа по SSH:\n https://domain.by/info-help/hosting/#question_12 \n\n"%(hostingService.domain)
-                continue
+                if("xS" in package):
+                    answer = "Для аккаунта хостинга %s отсутствует возможность доступа по SSH:\n https://domain.by/info-help/hosting/#question_12 \n\n"%(hostingService.domain)
+                    continue
 
-            if(cpanelUsersAccounts[hostingService.domain].email not in hostingService.controlemail or cpanelUsersAccounts[hostingService.domain].email != emailFrom):
-                self.changeContactEmailInCpanel(emailFrom, hostingService, cpanelUsersAccounts)
-            else:
-                self.botLog.debug('Контактная почта в панели хостинга совпадает с панелью доменов.')
+                if(cpanelUsersAccounts[hostingService.domain].email not in hostingService.controlemail or cpanelUsersAccounts[hostingService.domain].email != emailFrom):
+                    self.changeContactEmailInCpanel(emailFrom, hostingService, cpanelUsersAccounts)
+                else:
+                    self.botLog.debug('Контактная почта в панели хостинга совпадает с панелью доменов.')
             
-            output = cpanelApiClient[hosting].call_v1('modifyacct',user=username,shell='jailshell')
-            answer += "Произведена активация ssh доступа для %s:\n"%(hostingService.domain)
-            self.botLog.debug(output)
+                output = cpanelApiClient[hosting].call_v1('modifyacct',user=username,shell='jailshell')
+                answer += "Произведена активация ssh доступа для %s:\n"%(hostingService.domain)
+                self.botLog.debug(output)
 
-            answer += self.accessToSsh(hostingService.domain, hosting, username, hostingService.state)
-    
+                answer += self.accessToSsh(hostingService.domain, hosting, username, hostingService.state)
+            except KeyError:
+                self.botLog.error("Аккаунт хостинга не обнаружен на серверах: %s"%hostingService.domain)
+                self.sendMessageGroup("Аккаунт хостинга не обнаружен на серверах: %s"%hostingService.domain)
+
         return answer
 
     def getServerbyEmail(self, _domain):
