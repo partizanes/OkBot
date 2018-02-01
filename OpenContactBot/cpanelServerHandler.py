@@ -9,10 +9,10 @@ class cpanelServerHandler(object):
     avgMax = {
         's2.open.by' : 10.0,
         's3.open.by' : 10.0,
-        's4.open.by' : 10.0,
+        's4.open.by' : 15.0,
         's5.open.by' : 10.0,
         's6.open.by' : 15.0,
-        's7.open.by' : 10.0
+        's7.open.by' : 15.0
          }
 
     sendNotify = {
