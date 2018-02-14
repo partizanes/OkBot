@@ -307,6 +307,9 @@ class DomainApi(object):
             for unBlockHosting in listUnBlockHosting:
                 self.dLog.info("[Domain.by] Исправлена ошибка разблокировки в дмс: %s "%unBlockHosting.encode("utf-8").decode("idna"))
                 self.openbot.sendMessageGroup("[Domain.by] Исправлена ошибка разблокировки в дмс: %s"%unBlockHosting.encode("utf-8").decode("idna"))
+
+            listUnBlockHosting.clear()
+            save_obj(listUnBlockHosting,'listUnBlockHosting')
     
     def checkUnBlockError(self, browser):
         exclude_list = cfg.getExcludeDomainList()
