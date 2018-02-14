@@ -650,8 +650,12 @@ https://%s:2083/""" %(domain.encode("utf-8").decode("idna"), state, server, user
 
         self.botLog.info('Bot started.Listening...')
 
-        MessageLoop(self, {'chat': self.handle,
-                           'callback_query': self.on_callback_query}).run_as_thread()
+        try:
+            MessageLoop(self, {'chat': self.handle,
+                               'callback_query': self.on_callback_query}).run_as_thread()
+        except Exception as exc:
+             self.botLog.critical("[MessageLoop][critical] %s" %(exc))
+
 
         while 1:
             time.sleep(10)
