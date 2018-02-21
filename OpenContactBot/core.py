@@ -45,7 +45,10 @@ t5.start()
 openbot.sendMessageGroup("Core started.")
 
 while 1:
-    Util.checkUpdate(coreLog, openbot, False, False)
-    time.sleep(10800)
+    try:
+        Util.checkUpdate(coreLog, openbot, False, False)
+        time.sleep(10800)
+    except Exception as exc:
+        print("[Core] %s"%exc.args)
     #coreLog.info('tick.')
 
