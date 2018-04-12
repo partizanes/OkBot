@@ -17,6 +17,7 @@ def loadServerList():
     cpanelApiClient['s5.open.by'] = client.Client('root', 's5.open.by', access_hash=Crypto.getCpanelToken('s5token'))
     cpanelApiClient['s6.open.by'] = client.Client('root', 's6.open.by', access_hash=Crypto.getCpanelToken('s6token'))
     cpanelApiClient['s7.open.by'] = client.Client('root', 's7.open.by', access_hash=Crypto.getCpanelToken('s7token'))
+    cpanelApiClient['s8.open.by'] = client.Client('root', 's7.open.by', access_hash=Crypto.getCpanelToken('s7token'))
 
     return cpanelApiClient
 
