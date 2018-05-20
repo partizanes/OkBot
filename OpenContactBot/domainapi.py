@@ -505,6 +505,12 @@ class DomainApi(object):
                  self.openbot.sendMessageGroup("[Domain.by][RuntimeError]: %s"%(inst))
             except Exception as inst:
                 self.dLog.critical("[checkDeleteHosting][Exception] %s"%inst)
+
+                cfg.setConfigValue('exclude', 'create', ",".join(cfg.getExcludeDomainList().append(domain)))
+                cfg.saveConfig()
+
+                self.dLog.critical("[checkDeleteHosting][Exception] %s добавлен в список исключений."%domain)
+
                 haveValue = False
             finally:
                 i += 1
