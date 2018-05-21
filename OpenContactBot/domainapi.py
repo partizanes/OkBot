@@ -506,7 +506,7 @@ class DomainApi(object):
             except Exception as inst:
                 self.dLog.critical("[checkDeleteHosting][Exception] %s"%inst)
 
-                cfg.setConfigValue('exclude', 'create', ",".join(cfg.getExcludeDomainList().append(domain)))
+                cfg.setConfigValue('exclude', 'create', ",".join(exclude_list.append(domain)))
                 cfg.saveConfig()
 
                 self.dLog.critical("[checkDeleteHosting][Exception] %s добавлен в список исключений."%domain)
