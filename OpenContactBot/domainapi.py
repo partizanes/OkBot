@@ -131,7 +131,7 @@ class DomainApi(object):
             #Добавляем все услуги хостинга из кабинета пользователя в общую переменную
             listOfHosting.extend(re.findall('openSansBold">(.+?)<\/div>\\r?\\n?\s{1,}?<div class="service_type openSansItalic">Виртуальный', browser.response.text))
 
-        for hosting in listOfHosting:
+        for hosting in set(listOfHosting):
             browser.open(self.url_search)
             request = browser.get_form(id='aspnetForm')
             request["ctl00$contentHolder$SearchContol$btnSearch"].value = 'Искать'

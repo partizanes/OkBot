@@ -448,7 +448,7 @@ https://%s:2083/""" %(domain.encode("utf-8").decode("idna"), state, server, user
 """)
                         return
                     if (checkCmd == '/restore'):
-                        subcommand = message.split(' ')[1]
+                        subcommand = message.split()[1]
                         self.sendMessageGroup('[/restore]%s'%(self.restoreCpanelPassword(subcommand)))
                         return
                     if (checkCmd == '/update'):
