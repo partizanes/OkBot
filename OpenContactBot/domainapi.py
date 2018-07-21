@@ -498,19 +498,17 @@ class DomainApi(object):
                         self.openbot.sendMessageGroup("[Domain.by] Хостинг не удален: %s .\nТекст ответа: %s"%(domain.encode("utf-8").decode("idna"), message))
 
             except KeyError as inst:
-                self.dLog.critical("[checkDeleteHosting][KeyError] %s"%inst)
-                pass
+                exclude_list.append(domain)
+
+                cfg.setConfigValue('exclude', 'create', ",".join(exclude_list))
+                cfg.saveConfig()
+
+                self.dLog.critical("[checkDeleteHosting][KeyError] %s добавлен в список исключений, так как не найден на сервере."%domain.encode("utf-8").decode("idna"))
+                self.openbot.sendMessageGroup("[checkDeleteHosting][KeyError] %s добавлен в список исключений, так как не найден на сервере."%domain.encode("utf-8").decode("idna"))
             except RuntimeError as inst:
                  self.dLog.critical("[checkDeleteHosting][Cpanel] %s"%inst)
                  self.openbot.sendMessageGroup("[Domain.by][RuntimeError]: %s"%(inst))
             except Exception as inst:
-                self.dLog.critical("[checkDeleteHosting][Exception] %s"%inst)
-
-                cfg.setConfigValue('exclude', 'create', ",".join(exclude_list.append(domain)))
-                cfg.saveConfig()
-
-                self.dLog.critical("[checkDeleteHosting][Exception] %s добавлен в список исключений."%domain)
-
                 haveValue = False
             finally:
                 i += 1
