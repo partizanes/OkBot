@@ -11,8 +11,6 @@ def loadServerList():
     #Remove it after deploy
     Config.initializeConfig()
 
-    cpanelApiClient['s2.open.by'] = client.Client('root', 's2.open.by', password=Crypto.getCpanelPass())
-    #cpanelApiClient['s3.open.by'] = client.Client('root', 's3.open.by', password=Crypto.getCpanelPass())
     cpanelApiClient['s4.open.by'] = client.Client('root', 's4.open.by', access_hash=Crypto.getCpanelToken('s4token'))
     cpanelApiClient['s5.open.by'] = client.Client('root', 's5.open.by', access_hash=Crypto.getCpanelToken('s5token'))
     cpanelApiClient['s6.open.by'] = client.Client('root', 's6.open.by', access_hash=Crypto.getCpanelToken('s6token'))

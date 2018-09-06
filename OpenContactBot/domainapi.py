@@ -1,7 +1,7 @@
 # -*- coding: utf-8 -*-
 # by Part!zanes 2017
 
-import re,time
+import re, time
 from log import Log
 from mail import sendMail
 from crypto import Crypto
@@ -64,10 +64,9 @@ class DomainApi(object):
         browser = RoboBrowser(parser='html.parser',history=True)
         browser.open(login_url)
 
-        signin = browser.get_form(id='aspnetForm')
-        signin["ctl00$contentHolder$Login1$Login1$UserName"].value = Crypto.getDomainUsername()
-        signin["ctl00$contentHolder$Login1$Login1$Password"].value = Crypto.getDomainPassword()
-        signin["ctl00$contentHolder$Login1$Login1$LoginButton"].value = "Вход"
+        signin = browser.get_form(action=re.compile(r'\/Authorization\/Login'))
+        signin["Login"].value = Crypto.getDomainUsername()
+        signin["Password"].value = Crypto.getDomainPassword()
         browser.submit_form(signin)
 
         if(browser.url == self.url_search):
