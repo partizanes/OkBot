@@ -42,8 +42,6 @@ class CheckHandler(object):
             pass
 
     def managerParse(self, ticket):
-        self.CheckHandlerLog.info("[Dashka][%s] Dashkaaaa detected :D" % ticket.ticket_id)
-        self.openbot.sendMessageMe("[Dashka][%s] Dashkaaaa detected :D" % ticket.ticket_id)
 
         if(re.match(u'Смена\s{1,}(ТП)?(тарифного)?',ticket.subject)):
             try:

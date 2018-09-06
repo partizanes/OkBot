@@ -266,17 +266,6 @@ class DomainApi(object):
         if(browser is None):
             return
 
-        if('ctl00_contentHolder_TaskList_ucCreate_lblActionType' in browser.response.text):
-            self.checkCreateHosting(browser)
-        else:
-            for createHosting in listCreateHosting:
-                self.dLog.info("[Domain.by] создание хостинга обработано вручную: %s"%createHosting)
-                self.openbot.sendMessageGroup("[Domain.by] создание хостинга обработано вручную: %s"%createHosting)
-                self.removeFromExcludeList(createHosting)
-
-            listCreateHosting.clear()
-            save_obj(listCreateHosting,'listCreateHosting')
-
         if('ctl00_contentHolder_TaskList_ucDelete_lblActionType' in browser.response.text):
             try:
                 self.checkDeleteHosting(browser.response.text, browser)
@@ -521,79 +510,6 @@ class DomainApi(object):
 
         listDeleteHosting = tempListDeleteHosting
         save_obj(listDeleteHosting,'listDeleteHosting')
-
-    def checkCreateHosting(self, browser):
-        soup=BeautifulSoup(browser.response.text, "html.parser")
-        recoveryHostingDns = ['s1.open.by', 's2.open.by', 's3.open.by', 's4.open.by', 's5.open.by', 's6.open.by', 'ns2.open.by', 'ns1.domain.by', 'ns2.domain.by']
-        exclude_list = cfg.getExcludeDomainList()
-
-        haveValue = True
-        i = 1
-
-        while(haveValue):
-            try:
-                domain = soup.find(id="ctl00_contentHolder_TaskList_ucCreate_rptServiceList_ctl0%s_lblDomain"%i).text
-                email = soup.find(id="ctl00_contentHolder_TaskList_ucCreate_rptServiceList_ctl0%s_lblEmail"%i).text
-                service = soup.find(id="ctl00_contentHolder_TaskList_ucCreate_rptServiceList_ctl0%s_lblService"%i).text
-                package = soup.find(id="ctl00_contentHolder_TaskList_ucCreate_rptServiceList_ctl0%s_lblTariffPlan"%i).text
-                exdate = soup.find(id="ctl00_contentHolder_TaskList_ucCreate_rptServiceList_ctl0%s_lblExpirationDate"%i).text
-                status = soup.find(id="ctl00_contentHolder_TaskList_ucCreate_rptServiceList_ctl0%s_lblCpanelError"%i).text 
-                url_create = "https://domain.by/BackEnd/Support/" + soup.find(id="ctl00_contentHolder_TaskList_ucCreate_rptServiceList_ctl0%s_hlAction"%i).get('href')
-
-                if(domain not in listCreateHosting):
-                    self.dLog.info("[Domain.by] Задача на создание хостинга: %s"%domain)
-                    self.openbot.sendMessageGroup("[Domain.by] Задача на создание хостинга: %s"%domain)
-                    listCreateHosting.append(domain)
-                    
-                    if(len(listCreateHosting) > 0):
-                        save_obj(listCreateHosting,'listCreateHosting')
-
-                    if(domain in exclude_list):
-                        self.dLog.info("[Domain.by] %s в списке исключений."%domain)
-                        self.openbot.sendMessageGroup("[Domain.by] %s в списке исключений."%domain)
-                        i += 1
-                        continue
-
-                    browser.open(url_create)
-
-                    create = browser.get_form(id='aspnetForm')
-
-                    #Меняем значение на 12 (s7.open.by)
-                    create['ctl00$contentHolder$HostingServersList$HostingServers'].value = "12"
-
-                    #Производим отправку формы с указанием id
-                    if('ctl00$contentHolder$btnCreateNoDomainService' in browser.response.text):
-                        #Если днс сервера не указаны (чужой домен)
-                        browser.submit_form(create, submit=create['ctl00$contentHolder$btnCreateNoDomainService'])
-                    else:
-                        #Проверка ранее прописаных днс серверов (проверка на резервную копию)
-                        if (create['ctl00$contentHolder$ucDnsServerEdit$RepeaterDnsEdit$ctl00$DnsServerName'].value or create['ctl00$contentHolder$ucDnsServerEdit$RepeaterDnsEdit$ctl01$DnsServerName'].value) in recoveryHostingDns:
-                            self.dLog.info("[Domain.by] Аккаунт хостинга необходимо восстановление из архива: %s"%domain)
-                            self.openbot.sendMessageGroup("[Domain.by] Аккаунт хостинга необходимо восстановление из архива: %s"%domain)
-                            i += 1
-                            continue
-
-                        #Если прописаны другие(пустые) ns сервера 
-                        if create['ctl00$contentHolder$ucDnsServerEdit$RepeaterDnsEdit$ctl00$DnsServerName'].value == "" and create['ctl00$contentHolder$ucDnsServerEdit$RepeaterDnsEdit$ctl01$DnsServerName'].value == "":
-                            create['ctl00$contentHolder$ucDnsServerEdit$RepeaterDnsEdit$ctl00$DnsServerName'].value = "ns1.domain.by"
-                            create['ctl00$contentHolder$ucDnsServerEdit$RepeaterDnsEdit$ctl01$DnsServerName'].value = "ns2.domain.by"
-                        
-                        browser.submit_form(create, submit=create['ctl00$contentHolder$ucDnsServerEdit$btnStart'])
-                        
-                    #Проверяем урл , если вернуло обратно на страницу техподдержки , значит все ок 
-                    if(browser.url == self.url_search):
-                        self.dLog.info("[Domain.by] Аккаунт хостинга создан: %s"%domain)
-                        self.openbot.sendMessageGroup("[Domain.by] хостинг создан: %s"%domain)
-                        
-                        listCreateHosting.remove(domain)  
-                        save_obj(listCreateHosting,'listCreateHosting')
-                    else:
-                        self.dLog.info("[Domain.by] Аккаунт хостинга не создан: %s"%domain)
-                        self.openbot.sendMessageGroup("[Domain.by] хостинг не создан: %s"%domain)
-
-                i += 1
-            except Exception as inst:
-                haveValue = False
 
     def loadListDeleteCachedValues(self):
         global listDeleteHosting
