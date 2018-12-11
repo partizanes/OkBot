@@ -13,7 +13,8 @@ class cpanelServerHandler(object):
         's5.open.by' : 10.0,
         's6.open.by' : 15.0,
         's7.open.by' : 15.0,
-        's8.open.by' : 15.0
+        's8.open.by' : 15.0,
+        's9.open.by' : 15.0
          }
 
     sendNotify = {
@@ -23,7 +24,8 @@ class cpanelServerHandler(object):
         's5.open.by' : False,
         's6.open.by' : False,
         's7.open.by' : False,
-        's8.open.by' : False
+        's8.open.by' : False,
+        's9.open.by' : False
         }
 
     def checkLoadAvg(self):
