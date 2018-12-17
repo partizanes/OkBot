@@ -22,12 +22,13 @@ class hdapi(object):
         cookies = dict(staff_data=secretKey,supportadmin=cfg.getHdSession())
 
         r = requests.get(hdapi.hdUrl + '/ticket_detail.php?ticket_id=%s' % (ticket_id), cookies=cookies)
-        subject = re.search(u'Предмет\n\t\t</td>\n\t\t<td class=\"ticket-content-[a-z]{1,10}\" colspan=5>\n\n\t\t(.+?)\n\n\t\t</td>', r.text).group(1).replace('\r','').replace('\t','')
 
-        if subject is None:
+        subject = "Ответ на заявку {0}".format(ticket_id)
+
+        try:
+            subject = re.search(u'Предмет\n\t\t</td>\n\t\t<td class=\"ticket-content-[a-z]{1,10}\" colspan=5>\n\n\t\t(.+?)\n\n\t\t</td>', r.text).group(1).replace('\r','').replace('\t','')
+        except Exception as exc:
             hdapi.hdLog.critical("[postQuickReply] Не удалось получить тему для ответа")
-            openbot.sendMessageGroup("[postQuickReply] Не удалось получить тему для ответа")
-            subject = "Ответ на заявку %s" % (ticket_id)
 
         dataToPost = {
             'ticket_id': ticket_id,
