@@ -3,6 +3,10 @@
 
 import os,configparser
 
+from util import Util
+
+TELEGRAM_CONFIG = Util.getDataFrom('../conf/telegram.json')
+
 class Config(object):
 
     configParser = configparser.RawConfigParser()
@@ -25,10 +29,6 @@ class Config(object):
     @classmethod
     def setConfigValue(cls, group, key, value):
          cls.configParser.set(group, key, value)
-
-    @staticmethod
-    def getToken():
-        return Config.getConfigValue('openContactBot','TOKEN')
 
     @staticmethod
     def getNameHost():
@@ -57,20 +57,6 @@ class Config(object):
     @staticmethod
     def getPrivateId():
         return Config.getConfigValue('security', 'privateId')
-
-    @staticmethod
-    def getGroupId():
-        return Config.getConfigValue('security', 'groupId')
-
-    @staticmethod
-    def getAdminList():
-        adminList = {}
-
-        for item in Config.getConfigValue('security', 'admList').split(','):
-            var = item.split(':') 
-            adminList[int(var[0])] = var[1]
-
-        return adminList
 
     @staticmethod
     def getPrivatekey():
@@ -125,4 +111,28 @@ class Config(object):
 
         exclude_list = list(filter(None, exclude_list))
         return exclude_list
-        
+
+
+    ########### TELEGRAM ###########
+
+    @staticmethod
+    def getToken():
+        return TELEGRAM_CONFIG["token"]
+
+    @staticmethod
+    def getPrivatesId():
+        return TELEGRAM_CONFIG["privatesId"]
+
+    @staticmethod
+    def getGroupId():
+        return TELEGRAM_CONFIG["groupid"]
+
+    @staticmethod
+    def getAdminList():
+        admlist = TELEGRAM_CONFIG["admlist"]
+
+        return {int(id):admlist[id] for id in admlist}
+
+    ################################
+
+

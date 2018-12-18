@@ -19,7 +19,7 @@ from util import Util
 Config.initializeConfig()
 AdminList = Config.getAdminList()
 GroupId = Config.getGroupId()
-PrivateId = Config.getPrivateId()
+PrivateIds = Config.getPrivatesId()
 
 class OpenBot(telepot.Bot):
     pass
@@ -30,14 +30,12 @@ class OpenBot(telepot.Bot):
         if(len(msg) > 4096):
             msg = msg[:4096-len(msg)]
 
-        try:
-            self.sendMessage(PrivateId, msg)
-        except Exception as exc:
-            self.botLog.critical("[sendMessageMe] %s"%(exc))
-            self.sendMessageMe("[sendMessageMe] %s"%(exc))
-            #self.botLog.info("При отправке сообщения прозошла ошибка.Повторная попытка через 10 секунд...")
-            #time.sleep(10)
-            #return self.sendMessageMe(msg)
+        for private_id in PrivateIds:
+            try:
+                self.sendMessage(private_id, msg)
+            except Exception as exc:
+                self.botLog.critical("[sendMessageMe][{0}] {1}".format(private_id, exc))
+                self.sendMessageMe("[sendMessageMe][{0}] {1}".format(private_id, exc))
     
     def disableButtonByTimeout(self, message):
         try:
