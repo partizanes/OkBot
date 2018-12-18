@@ -106,3 +106,4 @@ ENV/
 .vs
 /cache
 *.pkl
+/conf

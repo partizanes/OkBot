@@ -1,22 +1,17 @@
 # -*- coding: utf-8 -*-
-# by Part!zanes 2017
+# by Part!zanes 2019
 
-from crypto import Crypto
+
 from cpanelapi import client
-from config import Config
+from util import Util
+
 
 def loadServerList():
     cpanelApiClient = {}
+    data = Util.getDataFrom('../conf/cpanel.json')
 
-    #Remove it after deploy
-    Config.initializeConfig()
-
-    cpanelApiClient['s4.open.by'] = client.Client('root', 's4.open.by', access_hash=Crypto.getCpanelToken('s4token'))
-    cpanelApiClient['s5.open.by'] = client.Client('root', 's5.open.by', access_hash=Crypto.getCpanelToken('s5token'))
-    cpanelApiClient['s6.open.by'] = client.Client('root', 's6.open.by', access_hash=Crypto.getCpanelToken('s6token'))
-    cpanelApiClient['s7.open.by'] = client.Client('root', 's7.open.by', access_hash=Crypto.getCpanelToken('s7token'))
-    cpanelApiClient['s8.open.by'] = client.Client('root', 's8.open.by', access_hash=Crypto.getCpanelToken('s8token'))
-    cpanelApiClient['s9.open.by'] = client.Client('root', 's9.open.by', access_hash=Crypto.getCpanelToken('s9token'))
+    for key, value in data['cpanel'].items():
+            cpanelApiClient[key] = client.Client('root', key, access_hash=value)
 
     return cpanelApiClient
 

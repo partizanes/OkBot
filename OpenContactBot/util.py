@@ -1,8 +1,7 @@
 # -*- coding: utf-8 -*-
-# by Part!zanes 2017
+# by Part!zanes 2019
 
-import os, sys, time, git, subprocess
-import urllib.request
+import os, sys, json, time, git, subprocess, urllib.request
 from datetime import datetime
 
 startTime = datetime.now()
@@ -107,3 +106,12 @@ class Util(object):
     @staticmethod
     def getUpime():
         return  str(datetime.now() - startTime).split('.')[0]
+
+    @staticmethod
+    def getDataFrom(filePath):
+        if not(os.path.exists(filePath)):
+            return {}
+
+        with open(filePath) as f:
+            data = json.load(f)
+            return data
