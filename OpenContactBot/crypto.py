@@ -11,21 +11,6 @@ class Crypto(object):
         n,e,d,p,q =  map(int, cfg.getPrivatekey().split(","))
         return rsa.PrivateKey(n,e,d,p,q)
 
-    @staticmethod
-    def getMysqlUser():
-        return rsa.decrypt(base64.b64decode(cfg.getMysqlUser()), Crypto.getKey()).decode('UTF-8')
-
-    @staticmethod
-    def getMysqlPass():
-        return rsa.decrypt(base64.b64decode(cfg.getMysqlPass()), Crypto.getKey()).decode('UTF-8')
-
-    @staticmethod
-    def getCpanelPass():
-        return rsa.decrypt(base64.b64decode(cfg.getCpanelPass()), Crypto.getKey()).decode('UTF-8')
-
-    @staticmethod
-    def getCpanelToken(value):
-        return rsa.decrypt(base64.b64decode(cfg.getCpanelToken(value)), Crypto.getKey()).decode('UTF-8')
 
     @staticmethod
     def getDomainUsername():

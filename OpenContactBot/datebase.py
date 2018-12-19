@@ -13,8 +13,8 @@ class Datebase(object):
     dbLog = Log('Datebase')
 
     def __init__(self):
-        self.conn = MySQLdb.connect(host=cfg.getNameHost(),user=crt.getMysqlUser(),
-                  passwd=crt.getMysqlPass(),db=cfg.getDbName(),charset = cfg.getDbCharset())
+        self.conn = MySQLdb.connect(host=cfg.getNameHost(), user=cfg.getMysqlUser(),
+                  passwd=cfg.getMysqlPass(), db=cfg.getDbName(), charset = cfg.getDbCharset())
         self.cur = self.conn.cursor()
     
     def query(self,sql):
