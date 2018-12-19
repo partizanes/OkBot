@@ -97,23 +97,47 @@ class OpenBot(telepot.Bot):
         try:
             self.sendMessage(chat_id, answer)
         except:
-            self.botLog.info("При отправке сообщения прозошла ошибка.Повторная попытка через 10 секунд...")
+            self.botLog.info("При отправке сообщения произошла ошибка.Повторная попытка через 10 секунд...")
             time.sleep(10)
             return self.send(username, chat_id, msg, answer)
 
     def resetCpanelPasswordText(self, domain, server, username, email, state):
         return ("""
-Сбросить пароль от хостинга %s(%s), вы можете по ссылке:
+[Услуга %s (%s)]
+Сбросить пароль вы можете по ссылке:
 https://%s:2083/resetpass?start=1
 
 Логин: %s
 Почта: %s
-                           
-Введите имя пользователя и нажмите кнопку "сбросить пароль" , после чего введите адрес контактной почты хостинга и нажмите кнопку "отправить код безопасности". 
-Не закрывая данную вкладку , зайдите на почту и скопируйте код безопасности ,после чего вам будет доступно меню ввода нового пароля.
-                           
+    
+        """ %(domain.encode("utf-8").decode("idna"), state, server, username, email))
+
+    def additionalFtpInfo():
+        return ("""
+
+[Порядок действий]
+- введите логин и нажмите кнопку "сбросить пароль"
+- введите адрес контактной почты хостинга и нажмите кнопку "отправить код безопасности" 
+- не закрывая данную вкладку, зайдите на почту и скопируйте код безопасности, после чего вам будет доступно меню ввода нового пароля.
+
+[Авторизация]
 Для входа в панель управления хостингом используйте ссылку:
-https://%s:2083/""" %(domain.encode("utf-8").decode("idna"), state, server, username, email, server))
+https://cpanel.domain.by
+
+[FTP]
+Как настроить FTP-клиент: https://domain.by/info-help/cpanel/#question_9
+""")
+
+    def accessToFtp(self, domain, server, state):
+        return ("""
+Для доступа к %s(%s) по протоколу FTP используйте имя пользователя и пароль такие же, как и для доступа в cPanel.
+
+хост: %s или %s (если домен не делегирован на сервера domain.by)
+порт: 21
+
+Подробная информация по настройке FTP: https://domain.by/info-help/cpanel/#question_9
+
+        """ %(domain.encode("utf-8").decode("idna"), state, domain.encode("utf-8").decode("idna"), server))
 
     def accessToSsh(self, domain, server, username, state):
         return ("""
@@ -150,8 +174,8 @@ https://%s:2083/""" %(domain.encode("utf-8").decode("idna"), state, server, user
         #Получаем список всех хостинг услуг по адресу контактной почты
         ListOfHostingServices = self.dApi.getListofHostingServices(emailFrom)
         
-        if(len(ListOfHostingServices) == 0):
-            return "На данный контактный адрес почты не найдено зарегистрированых услуг.Заявка на восстановление доступа должна быть отправлена с контакного адреса хостинга."
+        if not len(ListOfHostingServices):
+            return "На данный контактный адрес почты не найдено зарегистрированных услуг. Заявка на восстановление доступа должна быть отправлена с контакного адреса хостинга."
 
         for hostingService in ListOfHostingServices:
             if(cpanelUsersAccounts[hostingService.domain].email not in hostingService.controlemail or cpanelUsersAccounts[hostingService.domain].email != emailFrom):
@@ -160,6 +184,28 @@ https://%s:2083/""" %(domain.encode("utf-8").decode("idna"), state, server, user
                 self.botLog.debug('Контактная почта в панели хостинга совпадает с панелью доменов.')
 
             answer += self.resetCpanelPasswordText(hostingService.domain, cpanelUsersAccounts[hostingService.domain].server, cpanelUsersAccounts[hostingService.domain].username, cpanelUsersAccounts[hostingService.domain].email, hostingService.state)
+
+        answer += self.additionalFtpInfo()
+
+        return answer
+
+    def howToConnectFtp(self, emailFrom):
+        answer = ""
+        cpanelUsersAccounts = getAccountsList()
+
+        #Получаем список всех хостинг услуг по адресу контактной почты
+        ListOfHostingServices = self.dApi.getListofHostingServices(emailFrom)
+        
+        if not len(ListOfHostingServices):
+            return "Подробная информация по настройке FTP: https://domain.by/info-help/cpanel/#question_9"
+
+        for hostingService in ListOfHostingServices:
+            if(cpanelUsersAccounts[hostingService.domain].email not in hostingService.controlemail or cpanelUsersAccounts[hostingService.domain].email != emailFrom):
+                self.changeContactEmailInCpanel(emailFrom, hostingService, cpanelUsersAccounts)
+            else:
+                self.botLog.debug('Контактная почта в панели хостинга совпадает с панелью доменов.')
+
+            answer += self.accessToFtp(hostingService.domain, cpanelUsersAccounts[hostingService.domain].server, hostingService.state)
 
         return answer
 
@@ -170,7 +216,7 @@ https://%s:2083/""" %(domain.encode("utf-8").decode("idna"), state, server, user
         #Получаем список всех хостинг услуг по адресу контактной почты
         ListOfHostingServices = self.dApi.getListofHostingServices(emailFrom)
 
-        if(len(ListOfHostingServices) == 0):
+        if not len(ListOfHostingServices):
             return "На данный контактный адрес почты не найдено зарегистрированных услуг.\n Заявка должна быть оформлена с контактного адреса почты хостинга."
 
         for hostingService in ListOfHostingServices:
@@ -443,6 +489,8 @@ https://%s:2083/""" %(domain.encode("utf-8").decode("idna"), state, server, user
 .exclude - Добавляет или удаляет доменное имя в список исключений. Пример: .exclude domain.by
 
 .ssh     - Добавляет пользователю возможность подключения по ssh.
+
+.ftp     - Предоставляет информацию по подключению к FTP.
 """)
                         return
                     if (checkCmd == '/restore'):
@@ -533,7 +581,7 @@ https://%s:2083/""" %(domain.encode("utf-8").decode("idna"), state, server, user
                                     self.botLog.warning(reset_answer)
 
                                     if any(x in reset_answer for x in trueAnswer):
-                                        hdapi.postQuickReply(ticket_id, reset_answer , HdTicketStatus.CLOSED, self)
+                                        hdapi.postQuickReply(ticket_id, reset_answer, HdTicketStatus.CLOSED, self)
                                     else:
                                         self.sendMessageGroup(reset_answer)
 
@@ -569,12 +617,28 @@ https://%s:2083/""" %(domain.encode("utf-8").decode("idna"), state, server, user
                                     self.botLog.warning(reset_answer)
                                     
                                     if any(x in reset_answer for x in trueAnswer):
-                                        hdapi.postQuickReply(ticket_id, reset_answer , HdTicketStatus.CLOSED, self)
+                                        hdapi.postQuickReply(ticket_id, reset_answer, HdTicketStatus.CLOSED, self)
                                     else:
                                         self.sendMessageGroup(reset_answer)
                                 except Exception as exc:
                                     self.botLog.critical("[.ssh] Во время выполнения возникло исключение: %s" %repr(exc))
                                     self.sendMessageGroup("[.ssh] Во время выполнения возникло исключение: %s" %repr(exc))
+                                return
+
+                            if(command == '.ftp'):
+                                try:
+                                    reset_answer = self.howToConnectFtp(ticket_email)
+                                    trueAnswer = ['Подробная информация по настройке FTP', 'как и для доступа в cPanel']
+
+                                    self.botLog.warning(reset_answer)
+                                    
+                                    if any(x in reset_answer for x in trueAnswer):
+                                        hdapi.postQuickReply(ticket_id, reset_answer, HdTicketStatus.CLOSED, self)
+                                    else:
+                                        self.sendMessageGroup(reset_answer)
+                                except Exception as exc:
+                                    self.botLog.critical("[.ftp] Во время выполнения возникло исключение: %s" %repr(exc))
+                                    self.sendMessageGroup("[.ftp] Во время выполнения возникло исключение: %s" %repr(exc))
                                 return
 
                             if(command == '.close'):
