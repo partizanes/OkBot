@@ -6,8 +6,9 @@ import os,configparser
 from util import Util
 
 TELEGRAM_CONFIG = Util.getDataFrom('../conf/telegram.json')
-MAIL_CONFIG = Util.getDataFrom('../conf/mail.json')
 HELPDESK_CONFIG = Util.getDataFrom('../conf/helpdesk.json')
+MYSQL_CONFIG = Util.getDataFrom('../conf/mysql.json')
+MAIL_CONFIG = Util.getDataFrom('../conf/mail.json')
 
 class Config(object):
 
@@ -31,30 +32,6 @@ class Config(object):
     @classmethod
     def setConfigValue(cls, group, key, value):
          cls.configParser.set(group, key, value)
-
-    @staticmethod
-    def getNameHost():
-        return Config.getConfigValue('helpDeskMysql','host')
-
-    @staticmethod
-    def getDbName():
-        return Config.getConfigValue('helpDeskMysql','db')
-
-    @staticmethod
-    def getDbCharset():
-        return Config.getConfigValue('helpDeskMysql','charset')
-
-    @staticmethod
-    def getMysqlUser():
-        return Config.getConfigValue('helpDeskMysql','user')
-
-    @staticmethod
-    def getMysqlPass():
-        return Config.getConfigValue('helpDeskMysql', 'password')
-  
-    @staticmethod
-    def getCpanelToken(value):
-        return Config.getConfigValue('cpanel', value)
 
     @staticmethod
     def getPrivatekey():
@@ -126,6 +103,32 @@ class Config(object):
         return HELPDESK_CONFIG["session"]
 
     ################################
+
+
+
+    ########### MYSQL ###########
+
+    @staticmethod
+    def getNameHost():
+        return MYSQL_CONFIG["host"]
+
+    @staticmethod
+    def getMysqlUser():
+        return MYSQL_CONFIG["user"]
+
+    @staticmethod
+    def getMysqlPass():
+        return MYSQL_CONFIG["password"]
+
+    @staticmethod
+    def getDbName():
+        return MYSQL_CONFIG["db"]
+
+    @staticmethod
+    def getDbCharset():
+        return MYSQL_CONFIG["charset"]
+
+    #############################
 
 
 
