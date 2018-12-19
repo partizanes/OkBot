@@ -8,7 +8,10 @@ from util import Util
 TELEGRAM_CONFIG = Util.getDataFrom('../conf/telegram.json')
 HELPDESK_CONFIG = Util.getDataFrom('../conf/helpdesk.json')
 MYSQL_CONFIG = Util.getDataFrom('../conf/mysql.json')
+SECURITY_CONFIG = Util.getDataFrom('../conf/security.json')
+DOMAIN_CONFIG = Util.getDataFrom('../conf/domain.json')
 MAIL_CONFIG = Util.getDataFrom('../conf/mail.json')
+
 
 class Config(object):
 
@@ -32,18 +35,6 @@ class Config(object):
     @classmethod
     def setConfigValue(cls, group, key, value):
          cls.configParser.set(group, key, value)
-
-    @staticmethod
-    def getPrivatekey():
-        return Config.getConfigValue('security', 'privateKey')
-
-    @staticmethod
-    def getDomainUsername():
-        return Config.getConfigValue('domain', 'username')
-
-    @staticmethod
-    def getDomainPassword():
-        return Config.getConfigValue('domain', 'password')
 
     @staticmethod
     def getExcludeDomainList():
@@ -77,9 +68,6 @@ class Config(object):
         return {int(id):admlist[id] for id in admlist}
 
     ################################
-
-
-
     ########### HELPDESK ###########
 
     @staticmethod
@@ -103,10 +91,7 @@ class Config(object):
         return HELPDESK_CONFIG["session"]
 
     ################################
-
-
-
-    ########### MYSQL ###########
+    ########### MYSQL ##############
 
     @staticmethod
     def getNameHost():
@@ -128,10 +113,25 @@ class Config(object):
     def getDbCharset():
         return MYSQL_CONFIG["charset"]
 
-    #############################
+    ##############################
+    ########### SECURITY #########
 
+    @staticmethod
+    def getPrivatekey():
+        return SECURITY_CONFIG["key"]
 
+    ##############################
+    ########### DOMAIN ###########
 
+    @staticmethod
+    def getDomainUsername():
+        return DOMAIN_CONFIG["username"]
+
+    @staticmethod
+    def getDomainPassword():
+        return DOMAIN_CONFIG["password"]
+
+    ##############################
     ########### MAIL ###########
 
     @staticmethod
