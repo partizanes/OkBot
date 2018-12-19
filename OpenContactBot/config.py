@@ -125,7 +125,7 @@ class Config(object):
 
     @staticmethod
     def getDomainUsername():
-        return DOMAIN_CONFIG["username"]
+        return DOMAIN_CONFIG["user"]
 
     @staticmethod
     def getDomainPassword():
