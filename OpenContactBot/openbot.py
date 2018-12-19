@@ -112,7 +112,7 @@ https://%s:2083/resetpass?start=1
     
         """ %(domain.encode("utf-8").decode("idna"), state, server, username, email))
 
-    def additionalFtpInfo():
+    def additionalFtpInfo(self):
         return ("""
 
 [Порядок действий]
