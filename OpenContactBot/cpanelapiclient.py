@@ -10,7 +10,7 @@ def loadServerList():
     cpanelApiClient = {}
     data = Util.getDataFrom('../conf/cpanel.json')
 
-    for key, value in data['cpanel'].items():
+    for key, value in data.items():
             cpanelApiClient[key] = client.Client('root', key, access_hash=value)
 
     return cpanelApiClient

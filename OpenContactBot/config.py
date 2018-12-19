@@ -6,6 +6,8 @@ import os,configparser
 from util import Util
 
 TELEGRAM_CONFIG = Util.getDataFrom('../conf/telegram.json')
+MAIL_CONFIG = Util.getDataFrom('../conf/mail.json')
+HELPDESK_CONFIG = Util.getDataFrom('../conf/helpdesk.json')
 
 class Config(object):
 
@@ -55,10 +57,6 @@ class Config(object):
         return Config.getConfigValue('cpanel', value)
 
     @staticmethod
-    def getPrivateId():
-        return Config.getConfigValue('security', 'privateId')
-
-    @staticmethod
     def getPrivatekey():
         return Config.getConfigValue('security', 'privateKey')
 
@@ -69,38 +67,6 @@ class Config(object):
     @staticmethod
     def getDomainPassword():
         return Config.getConfigValue('domain', 'password')
-
-    @staticmethod
-    def getHdBotToken():
-        return Config.getConfigValue('hd', 'token')
-
-    @staticmethod
-    def getHdBotUsername():
-        return Config.getConfigValue('hd', 'username')
-
-    @staticmethod
-    def getHdBotPassword():
-        return Config.getConfigValue('hd', 'password')
-
-    @staticmethod
-    def getHdUrl():
-        return Config.getConfigValue('hd', 'url')
-        
-    @staticmethod
-    def getHdSession():
-        return Config.getConfigValue('hd', 'session')
-    
-    @staticmethod
-    def getSmtpServer():
-        return Config.getConfigValue('mail', 'server')
-    
-    @staticmethod
-    def getMailFrom():
-        return Config.getConfigValue('mail', 'from')
-
-    @staticmethod
-    def getDnsAdmin():
-        return Config.getConfigValue('mail', 'dmsadmin')
 
     @staticmethod
     def getExcludeDomainList():
@@ -136,3 +102,45 @@ class Config(object):
     ################################
 
 
+
+    ########### HELPDESK ###########
+
+    @staticmethod
+    def getHdBotToken():
+        return HELPDESK_CONFIG["token"]
+
+    @staticmethod
+    def getHdUrl():
+        return HELPDESK_CONFIG["url"]
+
+    @staticmethod
+    def getHdBotUsername():
+        return HELPDESK_CONFIG["username"]
+
+    @staticmethod
+    def getHdBotPassword():
+        return HELPDESK_CONFIG["password"]
+        
+    @staticmethod
+    def getHdSession():
+        return HELPDESK_CONFIG["session"]
+
+    ################################
+
+
+
+    ########### MAIL ###########
+
+    @staticmethod
+    def getSmtpServer():
+        return MAIL_CONFIG["server"]
+    
+    @staticmethod
+    def getMailFrom():
+        return MAIL_CONFIG["from"]
+
+    @staticmethod
+    def getDnsAdmin():
+        return MAIL_CONFIG["dmsadmin"]
+
+    ############################
