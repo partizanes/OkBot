@@ -576,7 +576,7 @@ https://cpanel.domain.by
                             if(command == '.restore'):
                                 try:
                                     reset_answer = self.restoreCpanelPassword(ticket_email)
-                                    trueAnswer = ['не найдено зарегистрированых услуг', 'Сбросить пароль вы можете по ссылке']
+                                    trueAnswer = ['не найдено зарегистрированных услуг', 'Сбросить пароль вы можете по ссылке']
 
                                     self.botLog.warning(reset_answer)
 
@@ -612,7 +612,7 @@ https://cpanel.domain.by
                             if(command == '.ssh'):
                                 try:
                                     reset_answer = self.grantAccessToSsh(ticket_email)
-                                    trueAnswer = ['не найдено зарегистрированых услуг', 'как в панели управления хостингом', 'отсутствует возможность доступа']
+                                    trueAnswer = ['не найдено зарегистрированных услуг', 'как в панели управления хостингом', 'отсутствует возможность доступа', ]
 
                                     self.botLog.warning(reset_answer)
                                     
