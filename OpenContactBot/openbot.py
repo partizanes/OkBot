@@ -576,7 +576,7 @@ https://cpanel.domain.by
                             if(command == '.restore'):
                                 try:
                                     reset_answer = self.restoreCpanelPassword(ticket_email)
-                                    trueAnswer = ['не найдено зарегистрированых услуг', 'Сбросить пароль от хостинга']
+                                    trueAnswer = ['не найдено зарегистрированых услуг', 'Сбросить пароль вы можете по ссылке']
 
                                     self.botLog.warning(reset_answer)
 
