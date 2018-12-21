@@ -47,7 +47,7 @@ class Datebase(object):
         return self.cur.fetchall()
     
     def getRepliesTicketsIdList(self):
-        #Ticket with replies and status Open and Hold
+        # Ticket with replies and status Open and Hold
         sql = """
             SELECT ticket_id FROM hdp_tickets LEFT OUTER JOIN hdp_ticket_priorities_ru ON hdp_tickets.priority_id=hdp_ticket_priorities_ru.priority_id ,
             hdp_ticket_status_ru, hdp_departments, hdp_staff_departments, hdp_clients WHERE hdp_tickets.status=hdp_ticket_status_ru.status_key AND 
@@ -62,7 +62,7 @@ class Datebase(object):
         for row in self.cur.fetchall():
             list.append(row[0])
 
-        #ticket without ticket marker (Status new ticket ,but have replies)
+        # Ticket without ticket marker (Status new ticket ,but have replies)
         sql = """
             SELECT hdp_ticket_replies.ticket_id, change_status, hdp_ticket_replies.reporter_id, hdp_ticket_replies.subject, hdp_ticket_replies.reply, client_last_activity, hdp_tickets.dept_id, ticket_created, sent_date, timezone, hdp_clients.email FROM hdp_tickets 
 	        LEFT JOIN `hdp_ticket_replies` ON hdp_ticket_replies.ticket_id = hdp_tickets.ticket_id
@@ -71,6 +71,18 @@ class Datebase(object):
             hdp_tickets.dept_id=hdp_departments.dept_id AND hdp_tickets.dept_id=hdp_staff_departments.dept_id AND hdp_tickets.client_id=hdp_clients.client_id
             AND hdp_staff_departments.staff_id='103' AND  hdp_tickets.status IN ('N') AND hdp_tickets.updater = 'CLIENT' AND hdp_ticket_replies.ticket_id IS NOT NULL ORDER BY replied_on LIMIT 1
             """
+
+        self.cur.execute(sql)
+
+        for row in self.cur.fetchall():
+            list.append(row[0])
+
+        # Ticket moved from another dept with updater STAFF
+        sql = """
+        SELECT hdp_tickets.ticket_id FROM hdp_tickets 
+        LEFT JOIN hdp_activity_log ON hdp_tickets.ticket_id = hdp_activity_log.ticket_id
+        WHERE dept_id = 2 AND status = "N" AND updater = "STAFF" AND action_name = "MOVE" AND action_detail = ".BY Registrar => Отдел технической поддержки" 
+        """
 
         self.cur.execute(sql)
 
