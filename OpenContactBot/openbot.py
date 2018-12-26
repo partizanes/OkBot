@@ -453,6 +453,9 @@ https://cpanel.domain.by
                     self.sendMessage(chat_id, 'Invalid Message. please select an option from keyboard')
             elif(chat_type == 'group'):
 
+                # Replace double spaces and cleanup
+                message = ' '.join(message.strip().split())
+
                 if(message[0] == '/'):
 
                     if(len(message.split(' ')) > 1):
