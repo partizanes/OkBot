@@ -6,6 +6,7 @@ from log import Log
 from hdapi import hdapi
 from config import Config
 from datebase import Datebase
+from accApi import getDataFromApi
 from telepot.loop import MessageLoop
 from ticketStatus import HdTicketStatus
 from accountloader import getAccountsList
@@ -475,6 +476,7 @@ https://cpanel.domain.by
 /restore  - Функция для тестирования ответа сервера (/restore email)
 /smail    - Блокировка возможности отправки исходящей почты для аккаунта (/suspendemail email)
 /unsmail  - Разблокировка возможности отправки исходящей почты для аккаунта (/unsuspendemail email)
+/session  - Генерирует одноразовую ссылку для авторизации в cpanel пользователя (/session domain.by)
 
 Следующие команды используются , как ответ(reply) на сообщение:
 
@@ -549,6 +551,24 @@ https://cpanel.domain.by
                         return
                     if(checkCmd in ['/unsmail','unsuspendemail']):
                         self.unSuspendOutgoingEmail(message)
+                        return
+                    if(checkCmd == '/session'):
+
+                        if(len(message.split(' ')) > 1):
+                            subcommand = message.split(' ')[1]
+                        else:
+                            self.botLog.critical("[/session] Имя домена не указано.")
+                            self.sendMessageGroup("Имя домена не указано.")
+                            return
+
+                        try:
+                            answer = getDataFromApi('/api/session/{0}'.format(subcommand))
+
+                            self.sendMessageGroup("[{0}] Одноразовая ссылка: {1}".format(subcommand, answer['url']))
+                        except Exception as exc:
+                            self.botLog.critical("[/session] Во время выполнения возникло исключение: %s" %repr(exc))
+                            self.sendMessageGroup("[/session] Во время выполнения возникло исключение: %s" %repr(exc))
+                       
                         return
 
                     self.botLog.critical("[command] Команда не обработана: %s" %checkCmd)
