@@ -73,14 +73,11 @@ class CheckHandler(object):
         if re.match(u'Ошибки при автоматическом запуске хостинга', ticket.subject):
             try:
                 if('Время ожидания операции истекло' in ticket.message):
-                    self.CheckHandlerLog.info("[Таймаут][%s] Закрыт" % ticket.ticket_id)
-                    self.openbot.sendMessageMe("[Таймаут][%s] Закрыт" % ticket.ticket_id)
-                #elif('Данного хостинга нету на сервере' in ticket.message):
-                    #self.CheckHandlerLog.info("[Таймаут][%s] Закрыт. Необходимо вручную поменять сервер на domain.by для данного аккаунта. При следущем детекте добавить соответсвующую обработку" % ticket.ticket_id)
-                    #self.openbot.sendMessageGroup("[Таймаут][%s] Закрыт. Необходимо вручную поменять сервер на domain.by для данного аккаунта. При следущем детекте добавить соответсвующую обработку" % ticket.ticket_id)
-                else:
-                    self.CheckHandlerLog.info("[Таймаут][%s] Ошибка: %s" % (ticket.ticket_id, error))
-                    self.openbot.sendMessageMe("[Таймаут][%s] Ошибка: %s" % (ticket.ticket_id, error))
+                    self.CheckHandlerLog.info("[Таймаут][{0}] Закрыт".format(ticket.ticket_id))
+                    self.openbot.sendMessageMe("[Таймаут][{0}] Закрыт".format(ticket.ticket_id))
+                elif('Данного хостинга нету на сервере' in ticket.message):
+                     self.CheckHandlerLog.info("[Таймаут][{0}] Хостинг отсутствует на сервере.".format(ticket.ticket_id))
+                     self.openbot.sendMessageMe("[Таймаут][{0}] Хостинг отсутствует на сервере.".format(ticket.ticket_id))
 
                 Datebase().setTicketClose(ticket.ticket_id)
                 return True
