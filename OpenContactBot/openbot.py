@@ -567,8 +567,12 @@ https://cpanel.domain.by
                         try:
                             answer = getDataFromApi('/api/session/{0}'.format(subcommand))
 
+                            _str = ""
+
                             for server in answer:
-                                self.sendMessageGroup("[{0}] Cсылка: {1}".format(subcommand, server['url']))
+                                _str += "".join("[{0}] \n Cсылка: {1} \n\n".format(server, answer[server]['url']))
+
+                            self.sendMessageGroup(_str)
 
                         except Exception as exc:
                             self.botLog.critical("[/session] Во время выполнения возникло исключение: %s" %repr(exc))
