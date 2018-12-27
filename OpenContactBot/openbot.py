@@ -567,7 +567,9 @@ https://cpanel.domain.by
                         try:
                             answer = getDataFromApi('/api/session/{0}'.format(subcommand))
 
-                            self.sendMessageGroup("[{0}] Одноразовая ссылка: {1}".format(subcommand, answer['url']))
+                            for server in answer["data"]:
+                                self.sendMessageGroup("[{0}] Cсылка: {1}".format(subcommand, server['url']))
+
                         except Exception as exc:
                             self.botLog.critical("[/session] Во время выполнения возникло исключение: %s" %repr(exc))
                             self.sendMessageGroup("[/session] Во время выполнения возникло исключение: %s" %repr(exc))
