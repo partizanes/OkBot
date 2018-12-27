@@ -567,7 +567,7 @@ https://cpanel.domain.by
                         try:
                             answer = getDataFromApi('/api/session/{0}'.format(subcommand))
 
-                            for server in answer["data"]:
+                            for server in answer:
                                 self.sendMessageGroup("[{0}] Cсылка: {1}".format(subcommand, server['url']))
 
                         except Exception as exc:
