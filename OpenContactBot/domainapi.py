@@ -23,7 +23,9 @@ hostingServerDmsList = {
                         's4.open.by' : '5',
                         's5.open.by' : '8',
                         's6.open.by' : '9',
-                        's7.open.by' : '12'
+                        's7.open.by' : '12',
+                        's8.open.by' : '13',
+                        's9.open.by' : '14',
                         }
 
 class Service(object):
