@@ -284,7 +284,7 @@ class DomainApi(object):
         else:
             for blockHosting in listBlockHosting:
                 self.dLog.info("[Domain.by] Исправлена ошибка блокировки в дмс: %s "%blockHosting.encode("utf-8").decode("idna"))
-                self.openbot.sendMessageGroup("[Domain.by] Исправлена ошибка блокировки в дмс: %s"%blockHosting.encode("utf-8").decode("idna"))
+                self.openbot.sendMessageMe("[Domain.by] Исправлена ошибка блокировки в дмс: %s"%blockHosting.encode("utf-8").decode("idna"))
 
             listBlockHosting.clear()
             save_obj(listBlockHosting,'listDeleteHosting')
@@ -294,7 +294,7 @@ class DomainApi(object):
         else:
             for unBlockHosting in listUnBlockHosting:
                 self.dLog.info("[Domain.by] Исправлена ошибка разблокировки в дмс: %s "%unBlockHosting.encode("utf-8").decode("idna"))
-                self.openbot.sendMessageGroup("[Domain.by] Исправлена ошибка разблокировки в дмс: %s"%unBlockHosting.encode("utf-8").decode("idna"))
+                self.openbot.sendMessageMe("[Domain.by] Исправлена ошибка разблокировки в дмс: %s"%unBlockHosting.encode("utf-8").decode("idna"))
 
             listUnBlockHosting.clear()
             save_obj(listUnBlockHosting,'listUnBlockHosting')
@@ -412,7 +412,7 @@ class DomainApi(object):
                     browser.open(url_block, method='post', data=dataToPost)
 
                     self.dLog.info('Для доменного имени %s необходимо произвести смену хостинг сервера на %s'%(domain.encode("utf-8").decode("idna"), hosting))
-                    sendMail(cfg.getDnsAdmin(), 'Смена сервера хостинга для заблокированного домена', 'Для доменного имени %s необходимо произвести смену хостинг сервера на %s'%(domain.encode("utf-8").decode("idna"), hosting))
+                    self.openbot.sendMessageMe("[Domain.by] [Ошибка блокировки]  Для доменного имени %s необходимо произвести смену хостинг сервера на %s."%domain.encode("utf-8").decode("idna"), hosting)
 
                 i += 1
 
