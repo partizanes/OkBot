@@ -8,7 +8,7 @@ from config import Config
 from datebase import Datebase
 from accApi import getDataFromApi
 from telepot.loop import MessageLoop
-from ticketStatus import HdTicketStatus
+from ticket import HdTicketStatus
 from accountloader import getAccountsList
 from accountloader import loadDataFromServers
 from cpanelapiclient import cpanelApiClient

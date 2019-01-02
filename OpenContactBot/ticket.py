@@ -1,5 +1,7 @@
 # -*- coding: utf-8 -*-
-# by Part!zanes 2017
+# by Part!zanes 2019
+
+from enum import Enum
 
 class Ticket(object):
     def __init__(self, ticket_id, status, client_id, subject, message, client_last_activity, dept_id, ticket_created, sent_date, timezone, email, attachment=None):
@@ -15,6 +17,26 @@ class Ticket(object):
         self.timezone = timezone
         self.email = email
         self.attachment = attachment
+
+class TicketStatus(Enum):
+    NEW     = 1
+    OPEN    = 2
+    CLOSED  = 3
+    ON_HOLD = 4
+    SPAM    = 5
+
+    def __str__(self):
+        return '%s' % self._value_
+
+class HdTicketStatus(Enum):
+    NEW     = 'N'
+    OPEN    = 'O'
+    CLOSED  = 'C'
+    ON_HOLD = 'H'
+    SPAM    = 'S'
+
+    def __str__(self):
+        return '%s' % self._value_
 
 def getActiveTicketsList():
     return activeTickets

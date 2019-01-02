@@ -8,7 +8,7 @@ from log import Log
 from hdapi import hdapi
 from ticket import Ticket
 from datebase import Datebase
-from ticketStatus import HdTicketStatus
+from ticket import HdTicketStatus
 from accountloader import loadDataFromServers
 from accountloader import getAccountsList
 from cpanelapiclient import cpanelApiClient
