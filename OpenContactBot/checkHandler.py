@@ -45,7 +45,7 @@ class CheckHandler(object):
 
         if(re.match(u'Смена\s{1,}(ТП)?(тарифного)?',ticket.subject)):
             try:
-                _domain = (re.search('\s[a-zA-Z]{1,15}((-|\.)[a-zA-Z]{1,10})?((-|\.)[a-zA-Z]{1,10})?\.([a-zA-Z]{1,6})(\.|\s)', ticket.message).group(0)).strip().lower()
+                _domain = (re.search('\s[a-zA-Z]{1,15}((-|\.)[a-zA-Z]{1,10})?((-|\.)[a-zA-Z]{1,10})?\.([a-zA-Z]{1,6})(\.|\s)', ticket.message).group(0)).strip().lower().encode('idna').decode('utf-8')
                 _package = re.search('на (xS|S|M|L|XXL|MAX)', ticket.message).group(0).split()[1]
 
                 cpanelUsersAccounts = getAccountsList()
@@ -89,7 +89,7 @@ class CheckHandler(object):
             
         if re.match(u'Изменение тарифного плана виртуального хостинга для домена', ticket.subject) or (re.search(u'\<td\>В ДМС изменен тарифный план виртуального хостинга для домена', ticket.message) is not None):
             try:
-                domain = re.search(u'Изменение тарифного плана виртуального хостинга для домена (.+?)</td>', ticket.message).group(1)
+                domain = re.search(u'Изменение тарифного плана виртуального хостинга для домена (.+?)</td>', ticket.message).group(1).strip().lower().encode('idna').decode('utf-8')
                 #prevPackage = re.search(u'с плана \"(.+?)" на план',ticket.message).group(1)
                 afterPackage = re.search(u'на план \"(.+?)"\.<br', ticket.message).group(1)
 
