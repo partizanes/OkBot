@@ -103,12 +103,12 @@ class CheckHandler(object):
                 #self.CheckHandlerLog.info("[Package][%s] Сообщение: %s" %(domain , message))
 
                 if(status == 1):
-                    self.CheckHandlerLog.info("[Package][%s][%s] смена тарифного плана. " % (ticket.ticket_id, domain))
-                    self.openbot.sendMessageMe("[Package][%s][%s] смена тарифного плана. " % (ticket.ticket_id, domain))
+                    self.CheckHandlerLog.info("[Package][%s][%s] смена тарифного плана. " % (ticket.ticket_id, domain.encode('idna').decode('idna')))
+                    self.openbot.sendMessageMe("[Package][%s][%s] смена тарифного плана. " % (ticket.ticket_id, domain.encode('idna').decode('idna')))
                     Datebase().setTicketClose(ticket.ticket_id)
                 else:
-                    self.CheckHandlerLog.critical("[Package][%s][%s] %s." % (ticket.ticket_id, domain, ticket.message))
-                    self.openbot.sendMessageMe("[Package][%s][%s] %s. " % (ticket.ticket_id, domain, ticket.message))
+                    self.CheckHandlerLog.critical("[Package][%s][%s] %s." % (ticket.ticket_id, domain.encode('idna').decode('idna'), ticket.message))
+                    self.openbot.sendMessageMe("[Package][%s][%s] %s. " % (ticket.ticket_id, domain.encode('idna').decode('idna'), ticket.message))
                 return True
             except Exception as inst:
                 self.CheckHandlerLog.critical("[Package] %s" % (inst))
