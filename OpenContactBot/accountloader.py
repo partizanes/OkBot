@@ -23,7 +23,7 @@ def loadDataFromServers(isForce=False):
         except Exception as exc:
             log.critical(exc)
 
-        for accountData in (answeData['data']['acct']):
+        for accountData in (answeData.get('data', {}).get('acct', {})):
             cpanelUsersAccounts[accountData['domain']] =  cpanelUser(accountData['user'], accountData['domain'], hosting, accountData['email'], accountData['plan'])
 
     if(len(cpanelUsersAccounts) > 0):

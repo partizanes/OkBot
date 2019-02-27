@@ -18,16 +18,6 @@ class Ticket(object):
         self.email = email
         self.attachment = attachment
 
-class TicketStatus(Enum):
-    NEW     = 1
-    OPEN    = 2
-    CLOSED  = 3
-    ON_HOLD = 4
-    SPAM    = 5
-
-    def __str__(self):
-        return '%s' % self._value_
-
 class HdTicketStatus(Enum):
     NEW     = 'N'
     OPEN    = 'O'
