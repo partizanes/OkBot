@@ -12,7 +12,7 @@ from cache import save_obj,load_obj
 from accountloader import getAccountsList
 from cpanelapiclient import cpanelApiClient
 
-listDeleteHosting = []
+#listDeleteHosting = []
 listCreateHosting = []
 listBlockHosting = []
 listUnBlockHosting = []
@@ -260,25 +260,25 @@ class DomainApi(object):
 
     def getDomainTasksList(self):
         global listCreateHosting
-        global listDeleteHosting
+        #global listDeleteHosting
 
         browser  = self.getAuth()
 
         if(browser is None):
             return
 
-        if('ctl00_contentHolder_TaskList_ucDelete_lblActionType' in browser.response.text):
-            try:
-                self.checkDeleteHosting(browser.response.text, browser)
-            except Exception as exc:
-                self.dLog.critical("[checkDeleteHosting] %s"%exc)
-        else:
-            for deleteHosting in listDeleteHosting:
-                self.dLog.info("[Domain.by] хостинг удалён: %s "%deleteHosting.encode("utf-8").decode("idna"))
-                self.openbot.sendMessageGroup("[Domain.by] хостинг удалён: %s"%deleteHosting.encode("utf-8").decode("idna"))
+        #if('ctl00_contentHolder_TaskList_ucDelete_lblActionType' in browser.response.text):
+        #    try:
+        #        self.checkDeleteHosting(browser.response.text, browser)
+        #    except Exception as exc:
+        #        self.dLog.critical("[checkDeleteHosting] %s"%exc)
+        #else:
+        #    for deleteHosting in listDeleteHosting:
+        #        self.dLog.info("[Domain.by] хостинг удалён: %s "%deleteHosting.encode("utf-8").decode("idna"))
+        #        self.openbot.sendMessageGroup("[Domain.by] хостинг удалён: %s"%deleteHosting.encode("utf-8").decode("idna"))
 
-            listDeleteHosting.clear()
-            save_obj(listDeleteHosting,'listDeleteHosting')
+        #    listDeleteHosting.clear()
+        #    save_obj(listDeleteHosting,'listDeleteHosting')
 
         #Fix block error in dms
         if('ctl00_contentHolder_TaskList_ucStop_lblActionType' in browser.response.text):
@@ -289,7 +289,7 @@ class DomainApi(object):
                 self.openbot.sendMessageMe("[Domain.by] Исправлена ошибка блокировки в дмс: %s"%blockHosting.encode("utf-8").decode("idna"))
 
             listBlockHosting.clear()
-            save_obj(listBlockHosting,'listDeleteHosting')
+            save_obj(listBlockHosting,'listBlockHosting')
 
         if('ctl00_contentHolder_TaskList_ucUnblock_lblActionType' in browser.response.text):
             self.checkUnBlockError(browser)
@@ -429,99 +429,100 @@ class DomainApi(object):
             except Exception as inst:
                 haveValue = False
 
-    def checkDeleteHosting(self, value, browser):
-        global listDeleteHosting
-        tempListDeleteHosting = []
-        exclude_list = cfg.getExcludeDomainList()
+    #def checkDeleteHosting(self, value, browser):
+    #    global listDeleteHosting
+    #    tempListDeleteHosting = []
+    #    exclude_list = cfg.getExcludeDomainList()
 
-        soup=BeautifulSoup(value, "html.parser")
+    #    soup=BeautifulSoup(value, "html.parser")
 
-        haveValue = True
-        i = 1
+    #    haveValue = True
+    #    i = 1
 
-        while(haveValue):
-            try:
-                domain = soup.find(id="ctl00_contentHolder_TaskList_ucDelete_rptServiceList_ctl0%s_lblDomain"%i).text
+    #    while(haveValue):
+    #        try:
+    #            domain = soup.find(id="ctl00_contentHolder_TaskList_ucDelete_rptServiceList_ctl0%s_lblDomain"%i).text
 
-                if(re.search('[а-яА-Я]', domain)):
-                    domain = domain.encode("idna").decode("utf-8")
+    #            if(re.search('[а-яА-Я]', domain)):
+    #                domain = domain.encode("idna").decode("utf-8")
 
-                if(domain not in exclude_list and domain in listDeleteHosting):
-                    listDeleteHosting.remove(domain)
+    #            if(domain not in exclude_list and domain in listDeleteHosting):
+    #                listDeleteHosting.remove(domain)
 
-                tempListDeleteHosting.append(domain)
+    #            tempListDeleteHosting.append(domain)
                 
-                if(domain not in listDeleteHosting):
-                    self.dLog.info("[Domain.by] хостинг на удаление: %s"%domain.encode("utf-8").decode("idna"))
-                    self.openbot.sendMessageGroup("[Domain.by] хостинг на удаление: %s"%domain.encode("utf-8").decode("idna"))
-                    listDeleteHosting.append(domain)
+    #            if(domain not in listDeleteHosting):
+    #                self.dLog.info("[Domain.by] хостинг на удаление: %s"%domain.encode("utf-8").decode("idna"))
+    #                self.openbot.sendMessageGroup("[Domain.by] хостинг на удаление: %s"%domain.encode("utf-8").decode("idna"))
+    #                listDeleteHosting.append(domain)
 
-                    if(domain in exclude_list):
-                        self.dLog.info("[Domain.by] %s в списке исключений."%domain.encode("utf-8").decode("idna"))
-                        self.openbot.sendMessageGroup("[Domain.by] %s в списке исключений."%domain.encode("utf-8").decode("idna"))
-                        continue
+    #                if(domain in exclude_list):
+    #                    self.dLog.info("[Domain.by] %s в списке исключений."%domain.encode("utf-8").decode("idna"))
+    #                    self.openbot.sendMessageGroup("[Domain.by] %s в списке исключений."%domain.encode("utf-8").decode("idna"))
+    #                    continue
 
-                    cpanelUsersAccounts = getAccountsList()
+    #                cpanelUsersAccounts = getAccountsList()
 
-                    hosting = cpanelUsersAccounts[domain].server
-                    username = cpanelUsersAccounts[domain].username
-                    self.dLog.info("[Domain.by] Расположен на сервере: %s"%hosting)
-                    self.dLog.info("[Domain.by] Имя аккаунта: %s"%username)
+    #                hosting = cpanelUsersAccounts[domain].server
+    #                username = cpanelUsersAccounts[domain].username
+    #                self.dLog.info("[Domain.by] Расположен на сервере: %s"%hosting)
+    #                self.dLog.info("[Domain.by] Имя аккаунта: %s"%username)
 
-                    #Implement api query to remove hosting, after add list exception.
-                    answer = cpanelApiClient[hosting].call('removeacct',user=username)['result'][0]
-                    status = int(answer['status'])
-                    message = answer['statusmsg']
+    #                #Implement api query to remove hosting, after add list exception.
+    #                answer = cpanelApiClient[hosting].call('removeacct',user=username)['result'][0]
+    #                status = int(answer['status'])
+    #                message = answer['statusmsg']
 
-                    if(status == 1 or "does not exist!" in message):
-                        url_delete = "https://domain.by/BackEnd/Support/" + soup.find(id="ctl00_contentHolder_TaskList_ucDelete_rptServiceList_ctl0%s_hlAction"%i).get('href')
+    #                if(status == 1 or "does not exist!" in message):
+    #                    url_delete = "https://domain.by/BackEnd/Support/" + soup.find(id="ctl00_contentHolder_TaskList_ucDelete_rptServiceList_ctl0%s_hlAction"%i).get('href')
                         
-                        browser.open(url_delete)
-                        delete = browser.get_form(id='aspnetForm')
-                        browser.submit_form(delete, submit=delete['ctl00$contentHolder$btnDelete'])
+    #                    browser.open(url_delete)
+    #                    delete = browser.get_form(id='aspnetForm')
+    #                    browser.submit_form(delete, submit=delete['ctl00$contentHolder$btnDelete'])
 
-                        if(browser.url == self.url_search):
-                            self.dLog.info("[Domain.by] Задача удаления завершена: %s"%username)
+    #                    if(browser.url == self.url_search):
+    #                        self.dLog.info("[Domain.by] Задача удаления завершена: %s"%username)
 
-                    else:
-                        self.dLog.critical("[checkDeleteHosting][Cpanel] %s"%message)
-                        self.openbot.sendMessageGroup("[Domain.by] Хостинг не удален: %s .\nТекст ответа: %s"%(domain.encode("utf-8").decode("idna"), message))
+    #                else:
+    #                    self.dLog.critical("[checkDeleteHosting][Cpanel] %s"%message)
+    #                    self.openbot.sendMessageGroup("[Domain.by] Хостинг не удален: %s .\nТекст ответа: %s"%(domain.encode("utf-8").decode("idna"), message))
 
-            except KeyError as inst:
-                exclude_list.append(domain)
+    #        except KeyError as inst:
+    #            exclude_list.append(domain)
 
-                cfg.setConfigValue('exclude', 'create', ",".join(exclude_list))
-                cfg.saveConfig()
+    #            cfg.setConfigValue('exclude', 'create', ",".join(exclude_list))
+    #            cfg.saveConfig()
 
-                self.dLog.critical("[checkDeleteHosting][KeyError] %s добавлен в список исключений, так как не найден на сервере."%domain.encode("utf-8").decode("idna"))
-                self.openbot.sendMessageGroup("[checkDeleteHosting][KeyError] %s добавлен в список исключений, так как не найден на сервере."%domain.encode("utf-8").decode("idna"))
-            except RuntimeError as inst:
-                 self.dLog.critical("[checkDeleteHosting][Cpanel] %s"%inst)
-                 self.openbot.sendMessageGroup("[Domain.by][RuntimeError]: %s"%(inst))
-            except Exception as inst:
-                haveValue = False
-            finally:
-                i += 1
+    #            self.dLog.critical("[checkDeleteHosting][KeyError] %s добавлен в список исключений, так как не найден на сервере."%domain.encode("utf-8").decode("idna"))
+    #            self.openbot.sendMessageGroup("[checkDeleteHosting][KeyError] %s добавлен в список исключений, так как не найден на сервере."%domain.encode("utf-8").decode("idna"))
+    #        except RuntimeError as inst:
+    #             self.dLog.critical("[checkDeleteHosting][Cpanel] %s"%inst)
+    #             self.openbot.sendMessageGroup("[Domain.by][RuntimeError]: %s"%(inst))
+    #        except Exception as inst:
+    #            haveValue = False
+    #        finally:
+    #            i += 1
 
-        deletedHosting = set(listDeleteHosting) ^ set(tempListDeleteHosting)
+    #    deletedHosting = set(listDeleteHosting) ^ set(tempListDeleteHosting)
         
-        for dHosting in deletedHosting:
-            self.dLog.info("[Domain.by] хостинг удалён: %s "%dHosting.encode("utf-8").decode("idna"))
-            self.openbot.sendMessageGroup("[Domain.by] хостинг удалён: %s"%dHosting.encode("utf-8").decode("idna"))
+    #    for dHosting in deletedHosting:
+    #        self.dLog.info("[Domain.by] хостинг удалён: %s "%dHosting.encode("utf-8").decode("idna"))
+    #        self.openbot.sendMessageGroup("[Domain.by] хостинг удалён: %s"%dHosting.encode("utf-8").decode("idna"))
 
-        listDeleteHosting = tempListDeleteHosting
-        save_obj(listDeleteHosting,'listDeleteHosting')
+    #    listDeleteHosting = tempListDeleteHosting
+    #    save_obj(listDeleteHosting,'listDeleteHosting')
 
-    def loadListDeleteCachedValues(self):
-        global listDeleteHosting
+    #def loadListDeleteCachedValues(self):
+    #    global listDeleteHosting
 
-        try:
-            temp = load_obj('listDeleteHosting')
+    #    try:
+    #        temp = load_obj('listDeleteHosting')
 
-            if (len(temp) > 0):
-                listDeleteHosting = temp
-        except:
-            pass
+    #        if (len(temp) > 0):
+    #            listDeleteHosting = temp
+    #    except:
+    #        pass
+
     def loadListCreateCachedValues(self):
         global listCreateHosting
 
@@ -539,7 +540,7 @@ class DomainApi(object):
         self.dLog.info('DomainApi started.')
         self.openbot = openbot
 
-        self.loadListDeleteCachedValues()
+        #self.loadListDeleteCachedValues()
         self.loadListCreateCachedValues()
         
         while 1:

@@ -47,7 +47,7 @@ class Datebase(object):
         return self.cur.fetchall()
     
     def getRepliesTicketsIdList(self):
-        # Ticket with replies and status Open and Hold
+        # Ticket with replies and status Open or Hold
         sql = """
             SELECT ticket_id FROM hdp_tickets LEFT OUTER JOIN hdp_ticket_priorities_ru ON hdp_tickets.priority_id=hdp_ticket_priorities_ru.priority_id ,
             hdp_ticket_status_ru, hdp_departments, hdp_staff_departments, hdp_clients WHERE hdp_tickets.status=hdp_ticket_status_ru.status_key AND 
