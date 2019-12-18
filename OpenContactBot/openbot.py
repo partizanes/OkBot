@@ -235,7 +235,7 @@ https://cpanel.domain.by
                 else:
                     self.botLog.debug('Контактная почта в панели хостинга совпадает с панелью доменов.')
             
-                output = cpanelApiClient[hosting].call_v1('modifyacct',user=username,shell='jailshell')
+                output = cpanelApiClient[hosting].call_v1('modifyacct',user=username,HASSHELL=1)
                 answer += "Произведена активация ssh доступа для %s:\n"%(hostingService.domain)
                 self.botLog.debug(output)
 
