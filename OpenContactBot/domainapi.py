@@ -159,6 +159,9 @@ class DomainApi(object):
                     type = temp[-2]
                     email = temp[-1]
 
+                    if(domain.strip().lower() != hosting.strip().lower()):
+                        i += 1
+                        continue
 
                     if(re.search('[а-яА-Я]', domain)):
                         domain = domain.encode("idna").decode("utf-8")
