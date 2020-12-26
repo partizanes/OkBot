@@ -61,7 +61,7 @@ class DomainApi(object):
         return data
 
     def getAuth(self):
-        login_url = self.url + '/Login.aspx'
+        login_url = self.url + '/Authorization/Login'
 
         browser = RoboBrowser(parser='html.parser',history=True)
         browser.open(login_url)
@@ -70,6 +70,8 @@ class DomainApi(object):
         signin["Login"].value = Crypto.getDomainUsername()
         signin["Password"].value = Crypto.getDomainPassword()
         browser.submit_form(signin)
+
+        browser.open(self.url_search)
 
         if(browser.url == self.url_search):
             return browser
@@ -548,6 +550,7 @@ class DomainApi(object):
         
         while 1:
                 try:
+                    self.getDomainTasksList()
                     time.sleep(180)
                     self.getDomainTasksList()
                 except Exception as exc:

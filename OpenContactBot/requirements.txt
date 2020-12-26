@@ -9,14 +9,14 @@ gitdb2
 GitPython
 idna
 multidict
-mysqlclient
+mysqlclient==1.3.12
 pyasn1
 requests
-robobrowser
+robobrowser==0.5.3
 rsa
 six
 smmap2
 telepot
 urllib3
-Werkzeug
+Werkzeug==0.12.2
 yarl

@@ -20,11 +20,12 @@ def loadDataFromServers(isForce=False):
     for hosting,client in cpanelApiClient.items():
         try:
             answeData = client.call_v1('listaccts')
+
+            for accountData in (answeData.get('data', {}).get('acct', {})):
+                cpanelUsersAccounts[accountData['domain']] =  cpanelUser(accountData['user'], accountData['domain'], hosting, accountData['email'], accountData['plan'])
+
         except Exception as exc:
             log.critical(exc)
-
-        for accountData in (answeData.get('data', {}).get('acct', {})):
-            cpanelUsersAccounts[accountData['domain']] =  cpanelUser(accountData['user'], accountData['domain'], hosting, accountData['email'], accountData['plan'])
 
     if(len(cpanelUsersAccounts) > 0):
         save_obj(cpanelUsersAccounts,'cpanelUsersAccounts')
