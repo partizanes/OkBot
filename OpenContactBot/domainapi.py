@@ -550,7 +550,6 @@ class DomainApi(object):
         
         while 1:
                 try:
-                    self.getDomainTasksList()
                     time.sleep(180)
                     self.getDomainTasksList()
                 except Exception as exc:
