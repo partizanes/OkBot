@@ -134,7 +134,7 @@ https://%s:2083/resetpass?start=1
 https://cpanel.domain.by
 
 [FTP]
-Как настроить FTP-клиент: https://domain.by/info-help/cpanel/#question_9
+Как настроить FTP-клиент: https://domain.by/info-help/cpanel/#question_10
 """)
 
     def accessToFtp(self, domain, server, state):
@@ -144,7 +144,7 @@ https://cpanel.domain.by
 хост: %s или %s (если домен не делегирован на сервера domain.by)
 порт: 21
 
-Подробная информация по настройке FTP: https://domain.by/info-help/cpanel/#question_9
+Подробная информация по настройке FTP: https://domain.by/info-help/cpanel/#question_10
 
         """ %(domain.encode("utf-8").decode("idna"), state, domain.encode("utf-8").decode("idna"), server))
 
@@ -215,7 +215,7 @@ https://cpanel.domain.by
         ListOfHostingServices  = DomainbyApi.getListofHostingServices(emailFrom)
         
         if not len(ListOfHostingServices):
-            return "Подробная информация по настройке FTP: https://domain.by/info-help/cpanel/#question_9"
+            return "Подробная информация по настройке FTP: https://domain.by/info-help/cpanel/#question_10"
 
         for hosting in ListOfHostingServices:
 

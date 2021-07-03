@@ -12,6 +12,7 @@
     <Name>OpenContactBot</Name>
     <RootNamespace>OpenContactBot</RootNamespace>
     <InterpreterId>MSBuild|env36|$(MSBuildProjectFullPath)</InterpreterId>
+    <SuppressPackageInstallationPrompt>True</SuppressPackageInstallationPrompt>
   </PropertyGroup>
   <PropertyGroup Condition=" '$(Configuration)' == 'Debug' ">
     <DebugSymbols>true</DebugSymbols>
