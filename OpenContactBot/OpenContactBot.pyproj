@@ -11,6 +11,7 @@
     <OutputPath>.</OutputPath>
     <Name>OpenContactBot</Name>
     <RootNamespace>OpenContactBot</RootNamespace>
+    <InterpreterId>MSBuild|env36|$(MSBuildProjectFullPath)</InterpreterId>
   </PropertyGroup>
   <PropertyGroup Condition=" '$(Configuration)' == 'Debug' ">
     <DebugSymbols>true</DebugSymbols>
@@ -32,10 +33,33 @@
       <SubType>Code</SubType>
     </Compile>
     <Compile Include="cpanelServerHandler.py" />
+    <Compile Include="domainapi\types\services\serviceStatusTypes.py" />
+    <Compile Include="domainapi\yandexEmails.py">
+      <SubType>Code</SubType>
+    </Compile>
+    <Compile Include="domainapi\types\clients\searchCriterionTypes.py">
+      <SubType>Code</SubType>
+    </Compile>
+    <Compile Include="domainapi\types\services\serviceTypes.py">
+      <SubType>Code</SubType>
+    </Compile>
+    <Compile Include="domainapi\types\clients\__init__.py">
+      <SubType>Code</SubType>
+    </Compile>
+    <Compile Include="domainapi\types\services\__init__.py">
+      <SubType>Code</SubType>
+    </Compile>
+    <Compile Include="domainapi\types\__init__.py">
+      <SubType>Code</SubType>
+    </Compile>
+    <Compile Include="domainapi\__init__.py">
+      <SubType>Code</SubType>
+    </Compile>
+    <Compile Include="domainapi\domainbyApi.py" />
     <Compile Include="hdDepartaments.py">
       <SubType>Code</SubType>
     </Compile>
-    <Compile Include="domainapi.py">
+    <Compile Include="domainapiold.py">
       <SubType>Code</SubType>
     </Compile>
     <Compile Include="hdapi.py">
@@ -89,6 +113,21 @@
   </ItemGroup>
   <ItemGroup>
     <Folder Include="cpanelapi\" />
+    <Folder Include="domainapi\" />
+    <Folder Include="domainapi\types\" />
+    <Folder Include="domainapi\types\clients\" />
+    <Folder Include="domainapi\types\services\" />
+  </ItemGroup>
+  <ItemGroup>
+    <Interpreter Include="env36\">
+      <Id>env36</Id>
+      <Version>3.6</Version>
+      <Description>env36 (Python 3.6 (64-bit))</Description>
+      <InterpreterPath>Scripts\python.exe</InterpreterPath>
+      <WindowsInterpreterPath>Scripts\pythonw.exe</WindowsInterpreterPath>
+      <PathEnvironmentVariable>PYTHONPATH</PathEnvironmentVariable>
+      <Architecture>X64</Architecture>
+    </Interpreter>
   </ItemGroup>
   <Import Project="$(MSBuildExtensionsPath32)\Microsoft\VisualStudio\v$(VisualStudioVersion)\Python Tools\Microsoft.PythonTools.targets" />
   <!-- Uncomment the CoreCompile target to enable the Build command in

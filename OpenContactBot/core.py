@@ -7,7 +7,7 @@ from log import Log
 from util import Util
 from config import Config
 from openbot import OpenBot
-from domainapi import DomainApi
+from domainapiold import DomainApiOld
 from checkHandler import CheckHandler
 from accountloader import cronReloadListAccounts
 from cpanelServerHandler import cpanelServerHandler
@@ -17,7 +17,7 @@ time.sleep(1)
 coreLog = Log('Core')
 coreLog.info('Core started.')
 
-dApi = DomainApi()
+dApi = DomainApiOld()
 checkhandler = CheckHandler()
 openbot = OpenBot(Config.getToken())
 cServHandler = cpanelServerHandler()

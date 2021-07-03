@@ -10,11 +10,13 @@ from accApi import getDataFromApi
 from telepot.loop import MessageLoop
 from ticket import HdTicketStatus
 from accountloader import getAccountsList
+from domainapi.domainbyApi import DomainbyApi
 from accountloader import loadDataFromServers
 from cpanelapiclient import cpanelApiClient
 from hdDepartaments import hdDepartaments as dept
 from ticket import activeTickets,activeRepTickets
 from telepot.namedtuple import InlineKeyboardMarkup, InlineKeyboardButton
+from domainapi.types.services.serviceStatusTypes import ServiceStatusTypes
 from util import Util
 
 Config.initializeConfig()
@@ -104,14 +106,20 @@ class OpenBot(telepot.Bot):
 
     def resetCpanelPasswordText(self, domain, server, username, email, state):
         return ("""
-[Услуга %s (%s)]
+[Услуга %s]
 Сбросить пароль вы можете по ссылке:
 https://%s:2083/resetpass?start=1
 
 Логин: %s
 Почта: %s
     
-        """ %(domain.encode("utf-8").decode("idna"), state, server, username, email))
+        """ %(domain.encode("utf-8").decode("idna"), server, username, email))
+
+    def HostingAccountSuspended(self, domain):
+        return ("""
+[Услуга %s] на текущий момент приостановлена, восстановление пароля невозможно. 
+
+        """ %(domain.encode("utf-8").decode("idna")))
 
     def additionalFtpInfo(self):
         return ("""
@@ -150,11 +158,11 @@ https://cpanel.domain.by
 
         """ %(domain.encode("utf-8").decode("idna"), state, domain.encode("utf-8").decode("idna"), server, username))
     
-    def changeContactEmailInCpanel(self, emailFrom, hostingService, cpanelUsersAccounts):
+    def changeContactEmailInCpanel(self, emailFrom, domainName, cpanelUsersAccounts):
         self.botLog.warning('Адрес контактной почты в панели хостинга отличается от панели доменов или от адреса отправителя.')
 
-        hosting = cpanelUsersAccounts[hostingService.domain].server
-        username = cpanelUsersAccounts[hostingService.domain].username
+        hosting = cpanelUsersAccounts[domainName].server
+        username = cpanelUsersAccounts[domainName].username
 
         _answer = cpanelApiClient[hosting].call('modifyacct',user=username,contactemail=emailFrom)['result'][0]
             
@@ -164,29 +172,38 @@ https://cpanel.domain.by
         self.botLog.debug("[restoreCpanelPassword][modifyacct] %s" %(message))
 
         if(status == 1):
-            cpanelUsersAccounts[hostingService.domain].email = emailFrom
-            self.botLog.warning('Контактная почта %s для аккаунта %s синхронизирована с панелью хостинга.' %(emailFrom, hostingService.domain))
-            self.sendMessageGroup('Контактная почта %s для аккаунта %s синхронизирована с панелью хостинга.' %(emailFrom, hostingService.domain))
+            cpanelUsersAccounts[domainName].email = emailFrom
+            self.botLog.warning('Контактная почта %s для аккаунта %s синхронизирована с панелью хостинга.' %(emailFrom, domainName))
+            self.sendMessageGroup('Контактная почта %s для аккаунта %s синхронизирована с панелью хостинга.' %(emailFrom, domainName))
 
     def restoreCpanelPassword(self, emailFrom):
         answer = ""
         cpanelUsersAccounts = getAccountsList()
 
-        #Получаем список всех хостинг услуг по адресу контактной почты
-        ListOfHostingServices = self.dApi.getListofHostingServices(emailFrom)
+        ListOfHostingServices  = DomainbyApi.getListofHostingServices(emailFrom)
         
         if not len(ListOfHostingServices):
             return "На данный контактный адрес почты не найдено зарегистрированных услуг. Заявка на восстановление доступа должна быть отправлена с контакного адреса хостинга."
 
-        for hostingService in ListOfHostingServices:
-            if(cpanelUsersAccounts[hostingService.domain].email not in hostingService.controlemail or cpanelUsersAccounts[hostingService.domain].email != emailFrom):
-                self.changeContactEmailInCpanel(emailFrom, hostingService, cpanelUsersAccounts)
+        suspended = False
+
+        for hosting in ListOfHostingServices:
+            domainName = hosting["DomainName"]
+
+            if(cpanelUsersAccounts[domainName].email not in hosting["AllEmails"] or cpanelUsersAccounts[domainName].email != emailFrom):
+                self.changeContactEmailInCpanel(emailFrom, domainName, cpanelUsersAccounts)
             else:
                 self.botLog.debug('Контактная почта в панели хостинга совпадает с панелью доменов.')
 
-            answer += self.resetCpanelPasswordText(hostingService.domain, cpanelUsersAccounts[hostingService.domain].server, cpanelUsersAccounts[hostingService.domain].username, cpanelUsersAccounts[hostingService.domain].email, hostingService.state)
+            if(hosting["ServiceStatus"] == ServiceStatusTypes.OK.name):
+                answer += self.resetCpanelPasswordText(domainName, cpanelUsersAccounts[domainName].server, cpanelUsersAccounts[domainName].username, cpanelUsersAccounts[domainName].email, hosting["ServiceStatus"])
+            else:
+                suspended = True
+                answer += self.HostingAccountSuspended(domainName)
 
-        answer += self.additionalFtpInfo()
+
+        if (len(ListOfHostingServices) == 1 and not suspended) or len(ListOfHostingServices) > 1:
+            answer += self.additionalFtpInfo()
 
         return answer
 
@@ -194,19 +211,22 @@ https://cpanel.domain.by
         answer = ""
         cpanelUsersAccounts = getAccountsList()
 
-        #Получаем список всех хостинг услуг по адресу контактной почты
-        ListOfHostingServices = self.dApi.getListofHostingServices(emailFrom)
+        # Получаем список всех хостинг услуг по адресу контактной почты
+        ListOfHostingServices  = DomainbyApi.getListofHostingServices(emailFrom)
         
         if not len(ListOfHostingServices):
             return "Подробная информация по настройке FTP: https://domain.by/info-help/cpanel/#question_9"
 
-        for hostingService in ListOfHostingServices:
-            if(cpanelUsersAccounts[hostingService.domain].email not in hostingService.controlemail or cpanelUsersAccounts[hostingService.domain].email != emailFrom):
-                self.changeContactEmailInCpanel(emailFrom, hostingService, cpanelUsersAccounts)
+        for hosting in ListOfHostingServices:
+
+            domainName = hosting["DomainName"]
+
+            if(cpanelUsersAccounts[domainName].email not in hosting["AllEmails"] or cpanelUsersAccounts[domainName].email != emailFrom):
+                self.changeContactEmailInCpanel(emailFrom, domainName, cpanelUsersAccounts)
             else:
                 self.botLog.debug('Контактная почта в панели хостинга совпадает с панелью доменов.')
 
-            answer += self.accessToFtp(hostingService.domain, cpanelUsersAccounts[hostingService.domain].server, hostingService.state)
+            answer += self.accessToFtp(domainName, cpanelUsersAccounts[domainName].server, hosting["ServiceStatus"])
 
         return answer
 
@@ -214,35 +234,37 @@ https://cpanel.domain.by
         answer = ""
         cpanelUsersAccounts = getAccountsList()
 
-        #Получаем список всех хостинг услуг по адресу контактной почты
-        ListOfHostingServices = self.dApi.getListofHostingServices(emailFrom)
+        # Получаем список всех хостинг услуг по адресу контактной почты
+        ListOfHostingServices  = DomainbyApi.getListofHostingServices(emailFrom)
 
         if not len(ListOfHostingServices):
             return "На данный контактный адрес почты не найдено зарегистрированных услуг.\n Заявка должна быть оформлена с контактного адреса почты хостинга."
 
-        for hostingService in ListOfHostingServices:
+        for hosting in ListOfHostingServices:
             try:
-                hosting = cpanelUsersAccounts[hostingService.domain].server
-                username = cpanelUsersAccounts[hostingService.domain].username
-                package = cpanelUsersAccounts[hostingService.domain].package
+                domainName = hosting["DomainName"]
+                hosting = cpanelUsersAccounts[domainName].server
+                username = cpanelUsersAccounts[domainName].username
+                package = cpanelUsersAccounts[domainName].package
 
                 if("xS" in package):
-                    answer = "Для аккаунта хостинга %s отсутствует возможность доступа по SSH:\n https://domain.by/info-help/hosting/#question_12 \n\n"%(hostingService.domain)
+                    answer = "Для аккаунта хостинга %s отсутствует возможность доступа по SSH:\n https://domain.by/info-help/hosting/#question_12 \n\n"%(domainName)
                     continue
 
-                if(cpanelUsersAccounts[hostingService.domain].email not in hostingService.controlemail or cpanelUsersAccounts[hostingService.domain].email != emailFrom):
-                    self.changeContactEmailInCpanel(emailFrom, hostingService, cpanelUsersAccounts)
+                # TODO CHECK IT c
+                if(panelUsersAccounts[domainName].email not in hosting["AllEmails"] or cpanelUsersAccounts[domainName].email != emailFrom):
+                    self.changeContactEmailInCpanel(emailFrom, domainName, cpanelUsersAccounts)
                 else:
                     self.botLog.debug('Контактная почта в панели хостинга совпадает с панелью доменов.')
             
                 output = cpanelApiClient[hosting].call_v1('modifyacct',user=username,HASSHELL=1)
-                answer += "Произведена активация ssh доступа для %s:\n"%(hostingService.domain)
+                answer += "Произведена активация ssh доступа для %s:\n"%(domainName)
                 self.botLog.debug(output)
 
-                answer += self.accessToSsh(hostingService.domain, hosting, username, hostingService.state)
+                answer += self.accessToSsh(domainName, hosting, username, hosting["ServiceStatus"])
             except KeyError:
-                self.botLog.error("Аккаунт хостинга не обнаружен на серверах: %s"%hostingService.domain)
-                self.sendMessageGroup("Аккаунт хостинга не обнаружен на серверах: %s"%hostingService.domain)
+                self.botLog.error("Аккаунт хостинга не обнаружен на серверах: %s"%domainName)
+                self.sendMessageGroup("Аккаунт хостинга не обнаружен на серверах: %s"%domainName)
 
         return answer
 
