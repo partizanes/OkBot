@@ -1,6 +1,8 @@
 import re
 import requests
 
+from config import Config as cfg
+
 from domainapi.types.clients.searchCriterionTypes import SearchCriterionTypes
 from domainapi.types.services.serviceTypes import ServiceTypes
 from domainapi.types.services.serviceStatusTypes import ServiceStatusTypes
@@ -11,8 +13,8 @@ from log import Log
 class DomainbyApi(object):
 
     log = Log('DomainbyApi')
-    parentUrl = "https://domain.by/SupportApi/"
-    apiKey =""
+    parentUrl = cfg.getApiUrl()
+    apiKey = cfg.getApiKey()
     
     @staticmethod
     def GetClients(searchCriterion: SearchCriterionTypes, searchString: str, apiKey=apiKey):

@@ -10,6 +10,7 @@ HELPDESK_CONFIG = Util.getDataFrom('../conf/helpdesk.json')
 MYSQL_CONFIG = Util.getDataFrom('../conf/mysql.json')
 SECURITY_CONFIG = Util.getDataFrom('../conf/security.json')
 DOMAIN_CONFIG = Util.getDataFrom('../conf/domain.json')
+DOMAIN_NEW_CONFIG = Util.getDataFrom('../conf/domainbyapi.json')
 ACCAPI_CONFIG = Util.getDataFrom('../conf/accapi.json')
 MAIL_CONFIG = Util.getDataFrom('../conf/mail.json')
 
@@ -131,6 +132,17 @@ class Config(object):
     @staticmethod
     def getDomainPassword():
         return DOMAIN_CONFIG["password"]
+
+    ##############################
+    ########### DOMAINNEW ########
+
+    @staticmethod
+    def getApiUrl():
+        return DOMAIN_NEW_CONFIG["apiUrl"]
+
+    @staticmethod
+    def getApiKey():
+        return DOMAIN_NEW_CONFIG["apiKey"]
 
     ##############################
     ########### ACCAPI ###########
