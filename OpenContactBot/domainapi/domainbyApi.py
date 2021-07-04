@@ -12,7 +12,7 @@ class DomainbyApi(object):
 
     log = Log('DomainbyApi')
     parentUrl = "https://domain.by/SupportApi/"
-    apiKey ="***REMOVED***"
+    apiKey =""
     
     @staticmethod
     def GetClients(searchCriterion: SearchCriterionTypes, searchString: str, apiKey=apiKey):
