@@ -524,6 +524,10 @@ https://cpanel.domain.by
                         subcommand = message.split()[1]
                         self.sendMessageGroup('[/restore]%s'%(self.restoreCpanelPassword(subcommand)))
                         return
+                    if (checkCmd == '/ssh'):
+                        subcommand = message.split()[1]
+                        self.sendMessageGroup('[/ssh]%s'%(self.grantAccessToSsh(subcommand)))
+                        return
                     if (checkCmd == '/update'):
                         self.sendMessageGroup("Проводим проверку наличия обновлений...")
                         Util.checkUpdate(self.botLog, self)
