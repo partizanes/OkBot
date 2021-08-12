@@ -240,10 +240,10 @@ https://cpanel.domain.by
         if not len(ListOfHostingServices):
             return "На данный контактный адрес почты не найдено зарегистрированных услуг.\n Заявка должна быть оформлена с контактного адреса почты хостинга."
 
-        for hosting in ListOfHostingServices:
+        for hostingService in ListOfHostingServices:
             try:
-                domainName = hosting["DomainName"]
-                hosting = cpanelUsersAccounts[domainName].server
+                domainName = hostingService["DomainName"]
+                server = cpanelUsersAccounts[domainName].server
                 username = cpanelUsersAccounts[domainName].username
                 package = cpanelUsersAccounts[domainName].package
 
@@ -252,16 +252,16 @@ https://cpanel.domain.by
                     continue
 
                 # TODO CHECK IT
-                if(cpanelUsersAccounts[domainName].email not in hosting["AllEmails"] or cpanelUsersAccounts[domainName].email != emailFrom):
+                if(cpanelUsersAccounts[domainName].email not in hostingService["AllEmails"] or cpanelUsersAccounts[domainName].email != emailFrom):
                     self.changeContactEmailInCpanel(emailFrom, domainName, cpanelUsersAccounts)
                 else:
                     self.botLog.debug('Контактная почта в панели хостинга совпадает с панелью доменов.')
             
-                output = cpanelApiClient[hosting].call_v1('modifyacct',user=username,HASSHELL=1)
+                output = cpanelApiClient[server].call_v1('modifyacct',user=username,HASSHELL=1)
                 answer += "Произведена активация ssh доступа для %s:\n"%(domainName)
                 self.botLog.debug(output)
 
-                answer += self.accessToSsh(domainName, hosting, username, hosting["ServiceStatus"])
+                answer += self.accessToSsh(domainName, server, username, hostingService["ServiceStatus"])
             except KeyError:
                 self.botLog.error("Аккаунт хостинга не обнаружен на серверах: %s"%domainName)
                 self.sendMessageGroup("Аккаунт хостинга не обнаружен на серверах: %s"%domainName)
