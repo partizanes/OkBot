@@ -251,8 +251,8 @@ https://cpanel.domain.by
                     answer = "Для аккаунта хостинга %s отсутствует возможность доступа по SSH:\n https://domain.by/info-help/hosting/#question_12 \n\n"%(domainName)
                     continue
 
-                # TODO CHECK IT c
-                if(panelUsersAccounts[domainName].email not in hosting["AllEmails"] or cpanelUsersAccounts[domainName].email != emailFrom):
+                # TODO CHECK IT
+                if(cpanelUsersAccounts[domainName].email not in hosting["AllEmails"] or cpanelUsersAccounts[domainName].email != emailFrom):
                     self.changeContactEmailInCpanel(emailFrom, domainName, cpanelUsersAccounts)
                 else:
                     self.botLog.debug('Контактная почта в панели хостинга совпадает с панелью доменов.')
