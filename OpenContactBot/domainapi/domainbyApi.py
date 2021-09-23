@@ -56,16 +56,19 @@ class DomainbyApi(object):
     @staticmethod
     def getListofHostingServices(emailInTicket, serviceStatusTypes: ServiceStatusTypes = [ServiceStatusTypes.OK, ServiceStatusTypes.PendingDelete]):
 
-        listOfEmails = buildYandexAliasList(emailInTicket)
-
-        listOfContract = set('')
-
-        # Get all clientId by email
-        clientsId =  DomainbyApi.GetClients(SearchCriterionTypes.Email, emailInTicket)
-
+        listOfContract = []
         virtualHostingListTemp = []
 
-        for client in clientsId:
+        # Build alias list for yandex emails
+        listOfEmails = buildYandexAliasList(emailInTicket)
+
+        # Get all client json object by email with alias
+        for email in listOfEmails:
+            clientsId = DomainbyApi.GetClients(SearchCriterionTypes.Email, email)
+            _existClientId = [contract['ClientId'] for contract in listOfContract]
+            listOfContract.extend([client for client in clientsId if client['ClientId'] not in _existClientId])
+
+        for client in listOfContract:
             virtualHostingList = DomainbyApi.getServices(client['ClientId'], [ServiceTypes.VirtualHosting])
 
             # Add emails to hosting service 
