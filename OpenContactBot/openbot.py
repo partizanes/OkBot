@@ -183,7 +183,7 @@ https://cpanel.domain.by
         ListOfHostingServices  = DomainbyApi.getListofHostingServices(emailFrom)
         
         if not len(ListOfHostingServices):
-            return "На данный контактный адрес почты не найдено зарегистрированных услуг. Заявка на восстановление доступа должна быть отправлена с контакного адреса хостинга."
+            return "На данный контактный адрес почты не найдено зарегистрированных услуг. Заявка на восстановление доступа должна быть отправлена с контактного адреса хостинга."
 
         suspended = False
 
