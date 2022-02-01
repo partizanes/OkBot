@@ -429,8 +429,9 @@ https://cpanel.domain.by
             self.sendMessageGroup("Возможность входа для почтового аккаунта: %s заблокирована. Аккаунт хостинга: %s. Сервер: %s"%(_email, _username, _hosting))
             return
 
-        self.botLog.critical("[/blockmail] Ошибка блокировки: %s"%(_message))
-        self.sendMessageGroup("[/blockmail] Ошибка блокировки: %s"%(_message))
+
+        self.botLog.critical("[/blockmail] Ошибка блокировки: %s %s"%(_answer, _message))
+        self.sendMessageGroup("[/blockmail] Ошибка блокировки: %s %s"(_answer, _message))
 
     def handle(self, msg):
         self.botLog.debug(msg)

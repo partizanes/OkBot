@@ -67,9 +67,9 @@ class Client(object):
         url = self._build_url(command)
 
         if kwargs:
-            r = requests.get(url, params=kwargs, auth=self.auth)
+            r = requests.get(url, params=kwargs, auth=self.auth, verify=False)
         else:
-            r = requests.get(url, auth=self.auth)
+            r = requests.get(url, auth=self.auth, verify=False)
 
         return r.json()
 
