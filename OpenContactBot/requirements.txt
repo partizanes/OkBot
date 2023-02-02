@@ -18,5 +18,5 @@ six
 smmap2
 telepot
 urllib3
-Werkzeug==0.15.3
+Werkzeug==0.15.5
 yarl
